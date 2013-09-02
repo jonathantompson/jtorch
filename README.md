@@ -5,7 +5,7 @@
 **Overview**
 --------
 
-Torch7 is an AMAZING machine learning library written and maintained by some very smart people.  For me it's only downside is that interfacing with it from C++ on Windows 7 is difficult (if not impossible).  This library is a C++ framework for doing the forward propagation of various torch modules.  It uses OpenCL to perform the forward prop on the GPU.  I have even found that some of the OpenCL modules here are actually faster than the Torch7 CUDA modules on Linux (i.e., the linear network here is very fast when doing forward prop on non-batch inputs).
+Torch7 (<http://www.torch.ch/>) is an AMAZING machine learning library written and maintained by some very smart people.  For me it's only downside is that interfacing with it from C++ on Windows 7 is difficult (if not impossible).  This library is a C++ framework for doing the forward propagation of various torch modules.  It uses OpenCL to perform the forward prop on the GPU.  I have even found that some of the OpenCL modules here are actually faster than the Torch7 CUDA modules on Linux (i.e., the linear network here is very fast when doing forward prop on non-batch inputs).
 
 Please note that this is not supposed to be a replacement for Torch7.  There is no back propagation (so no learning), and only a very limited subset of the modules are implemented.
 
