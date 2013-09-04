@@ -50,8 +50,8 @@ set(LIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../lib/MAC_OS_X)
 
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../include/MAC_OS_X)
 
-set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../PRenderer2/jtil/include/)
-set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../PRenderer2/jcl/include/)
+set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../jtil/include/)
+set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../jcl/include/)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # COMPILER FLAGS AND PREDEFINES
@@ -131,11 +131,11 @@ message( "EXTRA_LIBS to be linked in: " ${EXTRA_LIBS} )
 
 add_library(${TARGET_NAME} STATIC ${JTORCH_CXX_SOURCE} ${JTORCH_CC_SOURCE} ${JTORCH_HEADER})
 
-if(NOT DEFINED jtil)
+if(NOT TARGET jtil)
   set(BUILD_JTIL_TESTS false)
   add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jtil/" "${CMAKE_CURRENT_BINARY_DIR}/jtil")
 endif()
-if(NOT DEFINED jcl)
+if(NOT TARGET jcl)
   SET(BUILD_JCL_TESTS false)
   add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jcl/" "${CMAKE_CURRENT_BINARY_DIR}/jcl")
 endif()

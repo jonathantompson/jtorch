@@ -50,9 +50,9 @@ set(LIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../lib/MAC_OS_X)
 
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../include/MAC_OS_X)
 
-set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../PRenderer2/jtil/include/)
-set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../PRenderer2/jcl/include/)
-set(JTORCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../jtorch/include/)
+set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../jtil/include/)
+set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..jcl/include/)
+set(JTORCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include/)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # COMPILER FLAGS AND PREDEFINES
