@@ -1,5 +1,18 @@
 project(jtorch)
-set(CMAKE_VERBOSE_MAKEFILE root_VERBOSE_MAKEFILE)
+if(DEFINED root_VERBOSE_MAKEFILE)
+  set(CMAKE_VERBOSE_MAKEFILE root_VERBOSE_MAKEFILE)
+else()
+  set(CMAKE_VERBOSE_MAKEFILE true) # Default to verbose
+endif()
+
+if(NOT DEFINED BUILD)
+  if(DEFINED CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE MATCHES DEBUG OR CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES debug))
+    set(BUILD debug)
+  else()
+    set(BUILD release) # default to release
+  endif()
+endif()
+
 cmake_minimum_required(VERSION 2.8.10)
 
 message("*************************************************")
@@ -118,6 +131,15 @@ message( "EXTRA_LIBS to be linked in: " ${EXTRA_LIBS} )
 
 add_library(${TARGET_NAME} STATIC ${JTORCH_CXX_SOURCE} ${JTORCH_CC_SOURCE} ${JTORCH_HEADER})
 
+if(NOT DEFINED jtil)
+  set(BUILD_JTIL_TESTS false)
+  add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jtil/" "${CMAKE_CURRENT_BINARY_DIR}/jtil")
+endif()
+if(NOT DEFINED jcl)
+  SET(BUILD_JCL_TESTS false)
+  add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jcl/" "${CMAKE_CURRENT_BINARY_DIR}/jcl")
+endif()
+
 target_link_libraries(${TARGET_NAME} ${EXTRA_LIBS})
 
 if(BUILD MATCHES debug)
@@ -127,3 +149,13 @@ else()
     target_link_libraries(${TARGET_NAME} jtil)
     target_link_libraries(${TARGET_NAME} jcl)
 endif()
+
+if(DEFINED BUILD_JTORCH_TESTS AND (BUILD_JTORCH_TESTS MATCHES false))
+  message("Not building the jtorch tests...")
+else()
+  message("building the jtorch tests...")
+  add_subdirectory(tests_jtorch) # default to building the tests
+endif()
+
+
+

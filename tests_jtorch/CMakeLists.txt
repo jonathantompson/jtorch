@@ -1,5 +1,18 @@
-project(jtorch_test)
-set(CMAKE_VERBOSE_MAKEFILE root_VERBOSE_MAKEFILE)
+project(tests_jtorch)
+if(DEFINED root_VERBOSE_MAKEFILE)
+  set(CMAKE_VERBOSE_MAKEFILE root_VERBOSE_MAKEFILE)
+else()
+  set(CMAKE_VERBOSE_MAKEFILE true) # Default to verbose
+endif()
+
+if(NOT DEFINED BUILD)
+  if(DEFINED CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE MATCHES DEBUG OR CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES debug))
+    set(BUILD debug)
+  else()
+    set(BUILD release) # default to release
+  endif()
+endif()
+
 cmake_minimum_required(VERSION 2.8.10)
 
 message("*************************************************")
