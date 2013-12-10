@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    const bool use_cpu = true;
+    const bool use_cpu = false;
     jtorch::InitJTorch("../", use_cpu);
 
     Tensor<float> data_in(Int3(width, height, num_feats_in));
