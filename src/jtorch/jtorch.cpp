@@ -1,4 +1,5 @@
 #include <mutex>
+#include <iostream>
 #include "jcl/jcl.h"
 #include "jtorch/jtorch.h"
 #include "jtil/exceptions/wruntime_error.h"
@@ -14,14 +15,22 @@ namespace jtorch {
 
   void InitJTorchInternal(const std::string& path_to_jtorch, 
     const bool use_cpu) {
+    const bool strict_float = false;
+    if (!strict_float) {
+      std::cout << "WARNING: not using strict floats." << std::endl;
+    }
     if (use_cpu) {
-      cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny);
+      cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny),
+        strict_float;
     } else {
       if (jcl::JCL::queryDeviceExists(jcl::CLDeviceGPU, jcl::CLVendorAny)) {
-        cl_context = new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny);
+        cl_context = new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny,
+          strict_float);
       } else {
+        std::cout << "WARNING: jtorch is using the CPU!" << std::endl;
         // Fall back to using the CPU (if a valid GPU context doesn't exist)
-        cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny);
+        cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny,
+          strict_float);
       }
     }
     jtorch_path = path_to_jtorch;

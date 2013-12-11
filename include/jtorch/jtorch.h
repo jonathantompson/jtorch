@@ -15,6 +15,8 @@
 #include "jtil/math/math_types.h"
 #include <string>
 
+#define USE_OPENCL_LOCAL_SIZES  // Let OpenCL choose worksizes
+
 namespace jcl { class JCL; }
 
 namespace jtorch {
