@@ -25,11 +25,11 @@ __kernel void SpatialMaxPooling(const __global  float* input,  // 0
 
   for (int v = vstart; v <= vend; v++) {
     const int istart = v * input_width + x_out * poolsize_u;
-	const int iend = v * input_width + (x_out + 1) * poolsize_u - 1;
+	  const int iend = v * input_width + (x_out + 1) * poolsize_u - 1;
 
     for (int i = istart; i <= iend; i++) {
-	  out_val = max(out_val, input_f[i]);
-	}
+	    out_val = max(out_val, input_f[i]);
+	  }
   }
 
   const int index = x_out + width * (y_out + height * f_out);
