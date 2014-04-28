@@ -61,7 +61,7 @@ So jtorch and jcl must exist at the same directory level.
     - open jtorch.sln
     - right click "jtorch_test" in the Solution Explorer -> "Set as StartUp Project"
     - From the file menu: DEBUG -> Start Debugging... (or press F5)
-    - TWO tests should run and at the end of each test there should be a "PASSED" printout.
+    - The tests should run and at the end of each test there should be a "PASSED" printout (otherwise it will print FAILED).
 
 ### MAC OS X:
 - **Follow all the compilation steps in <https://github.com/jonathantompson/jcl/blob/master/README.md>**
