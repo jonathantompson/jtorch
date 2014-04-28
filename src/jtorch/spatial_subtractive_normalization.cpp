@@ -1,17 +1,16 @@
 #include "jtorch/spatial_subtractive_normalization.h"
 #include "jtorch/tensor.h"
-#include "jtil/exceptions/wruntime_error.h"
-#include "jtil/threading/thread.h"
-#include "jtil/threading/callback.h"
-#include "jtil/threading/thread_pool.h"
-#include "jtil/data_str/vector_managed.h"
+#include "jcl/threading/thread.h"
+#include "jcl/threading/callback.h"
+#include "jcl/threading/thread_pool.h"
+#include "jcl/data_str/vector_managed.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
-using namespace jtil::threading;
-using namespace jtil::math;
-using namespace jtil::data_str;
+using namespace jcl::threading;
+using namespace jcl::math;
+using namespace jcl::data_str;
 
 namespace jtorch {
 
@@ -21,7 +20,7 @@ namespace jtorch {
     const Tensor<float>& kernel1d) : TorchStage() {
     if (kernel1d.dataSize() % 2 == 0 || kernel1d.dim()[1] != 1 ||
       kernel1d.dim()[2] != 1) {
-      throw std::wruntime_error("SpatialSubtractiveNormalization() - ERROR: "
+      throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
         "Averaging kernel must be 1D and have odd size!");
     }
 
@@ -57,7 +56,7 @@ namespace jtorch {
 
   void SpatialSubtractiveNormalization::init(TorchData& input)  {
     if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::wruntime_error("SpatialSubtractiveNormalization::init() - "
+      throw std::runtime_error("SpatialSubtractiveNormalization::init() - "
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;

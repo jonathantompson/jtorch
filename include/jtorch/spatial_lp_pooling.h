@@ -12,13 +12,14 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "jtil/math/math_types.h"
-#include "jtil/threading/callback.h"
+#include "jcl/math/int_types.h"
+#include "jcl/threading/callback.h"
 #include "jtorch/torch_stage.h"
 
 #define JTIL_SPATIAL_LP_POOLING_NTHREADS 4
 
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace threading { class ThreadPool; } }
 
 namespace jtorch {
   
@@ -44,15 +45,15 @@ namespace jtorch {
     int32_t poolsize_u_;
 
     // Multithreading primatives and functions
-    jtil::threading::ThreadPool* tp_;
+    jcl::threading::ThreadPool* tp_;
     int32_t threads_finished_;
     std::mutex thread_update_lock_;
     std::condition_variable not_finished_;
-    jtil::data_str::VectorManaged<jtil::threading::Callback<void>*>* thread_cbs_; 
+    jcl::data_str::VectorManaged<jcl::threading::Callback<void>*>* thread_cbs_; 
 
     void forwardPropThread(const int32_t outf);
 
-    void init(TorchData& input, jtil::threading::ThreadPool& tp);
+    void init(TorchData& input, jcl::threading::ThreadPool& tp);
 
     // Non-copyable, non-assignable.
     SpatialLPPooling(SpatialLPPooling&);

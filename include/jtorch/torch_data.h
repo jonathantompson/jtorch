@@ -11,9 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "jtil/math/math_types.h"
-
-namespace jtil { namespace threading { class ThreadPool; } }
+#include "jcl/math/int_types.h"
 
 namespace jtorch {
 

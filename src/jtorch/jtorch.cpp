@@ -2,7 +2,6 @@
 #include <iostream>
 #include "jcl/jcl.h"
 #include "jtorch/jtorch.h"
-#include "jtil/exceptions/wruntime_error.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -17,7 +16,7 @@ namespace jtorch {
     const bool use_cpu) {
     const bool strict_float = false;
     if (!strict_float) {
-      std::cout << "WARNING: not using strict floats." << std::endl;
+      std::cout << "\tWARNING: not using strict floats." << std::endl;
     }
     if (use_cpu) {
       cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny),
@@ -27,7 +26,7 @@ namespace jtorch {
         cl_context = new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny,
           strict_float);
       } else {
-        std::cout << "WARNING: jtorch is using the CPU!" << std::endl;
+        std::cout << "\tWARNING: jtorch is using the CPU!" << std::endl;
         // Fall back to using the CPU (if a valid GPU context doesn't exist)
         cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny,
           strict_float);
@@ -43,7 +42,7 @@ namespace jtorch {
   void InitJTorch(const std::string& path_to_jtorch, const bool use_cpu) {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
     if (cl_context != NULL) {
-      throw std::wruntime_error("jtorch::InitJTorch() - ERROR: Init called "
+      throw std::runtime_error("jtorch::InitJTorch() - ERROR: Init called "
         "twice!");
     }
     InitJTorchInternal(path_to_jtorch, use_cpu);

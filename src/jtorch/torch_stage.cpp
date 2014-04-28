@@ -18,7 +18,6 @@
 #include "jtorch/threshold.h"
 #include "jtorch/join_table.h"
 #include "jtorch/transpose.h"
-#include "jtil/exceptions/wruntime_error.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -48,7 +47,7 @@ namespace jtorch {
       std::stringstream ss;
       ss << "HandNet::loadFromFile() - ERROR: Could not open modelfile";
       ss << " file " << file << std::endl;
-      throw std::wruntime_error(ss.str());
+      throw std::runtime_error(ss.str());
     }
     return ret;
   }
@@ -59,52 +58,52 @@ namespace jtorch {
     ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
     switch (type) {
     case SEQUENTIAL_STAGE:
-      std::cout << "  Loading Sequential..." << std::endl;
+      std::cout << "\tLoading Sequential..." << std::endl;
       return Sequential::loadFromFile(ifile);
     case PARALLEL_STAGE:
-      std::cout << "  Loading Parallel..." << std::endl;
+      std::cout << "\tLoading Parallel..." << std::endl;
       return Parallel::loadFromFile(ifile);
     case TANH_STAGE:
-      std::cout << "  Loading Tanh..." << std::endl;
+      std::cout << "\tLoading Tanh..." << std::endl;
       return Tanh::loadFromFile(ifile);
     case THRESHOLD_STAGE:
-      std::cout << "  Loading Threshold..." << std::endl;
+      std::cout << "\tLoading Threshold..." << std::endl;
       return Threshold::loadFromFile(ifile);
     case LINEAR_STAGE:
-      std::cout << "  Loading Linear..." << std::endl;
+      std::cout << "\tLoading Linear..." << std::endl;
       return Linear::loadFromFile(ifile);
     case RESHAPE_STAGE:
-      std::cout << "  Loading Reshape..." << std::endl;
+      std::cout << "\tLoading Reshape..." << std::endl;
       return Reshape::loadFromFile(ifile);
     case SPATIAL_CONVOLUTION_STAGE:
-      std::cout << "  Loading SpatialConvolution..." << std::endl;
+      std::cout << "\tLoading SpatialConvolution..." << std::endl;
       return SpatialConvolution::loadFromFile(ifile);
     case SPATIAL_CONVOLUTION_MAP_STAGE:
-      std::cout << "  Loading SpatialConvolutionMap..." << std::endl;
+      std::cout << "\tLoading SpatialConvolutionMap..." << std::endl;
       return SpatialConvolutionMap::loadFromFile(ifile);
     case SPATIAL_LP_POOLING_STAGE:
-      std::cout << "  Loading SpatialLPPooling..." << std::endl;
+      std::cout << "\tLoading SpatialLPPooling..." << std::endl;
       return SpatialLPPooling::loadFromFile(ifile);
     case SPATIAL_MAX_POOLING_STAGE:
-      std::cout << "  Loading SpatialMaxPooling..." << std::endl;
+      std::cout << "\tLoading SpatialMaxPooling..." << std::endl;
       return SpatialMaxPooling::loadFromFile(ifile);
     case SPATIAL_SUBTRACTIVE_NORMALIZATION_STAGE:
-      std::cout << "  Loading SpatialSubtractiveNormalization..." << std::endl;
+      std::cout << "\tLoading SpatialSubtractiveNormalization..." << std::endl;
       return SpatialSubtractiveNormalization::loadFromFile(ifile);
     case SPATIAL_DIVISIVE_NORMALIZATION_STAGE:
-      std::cout << "  Loading SpatialDivisiveNormalization..." << std::endl;
+      std::cout << "\tLoading SpatialDivisiveNormalization..." << std::endl;
       return SpatialDivisiveNormalization::loadFromFile(ifile);
     case SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE:
-      std::cout << "  Loading SpatialContrastiveNormalization..." << std::endl;
+      std::cout << "\tLoading SpatialContrastiveNormalization..." << std::endl;
       return SpatialContrastiveNormalization::loadFromFile(ifile);
     case JOIN_TABLE_STAGE:
-      std::cout << "  Loading JoinTable..." << std::endl;
+      std::cout << "\tLoading JoinTable..." << std::endl;
       return JoinTable::loadFromFile(ifile);
     case TRANSPOSE_STAGE:
-      std::cout << "  Loading Transpose..." << std::endl;
+      std::cout << "\tLoading Transpose..." << std::endl;
       return Transpose::loadFromFile(ifile);
     default:
-      throw std::wruntime_error("TorchStage::loadFromFile() - ERROR: "
+      throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
         "Node type not recognized!");
     }
   }

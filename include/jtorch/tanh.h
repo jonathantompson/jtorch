@@ -8,11 +8,11 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "jtil/math/math_types.h"
-#include "jtil/threading/callback.h"
+#include "jcl/math/int_types.h"
+#include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
 namespace jtorch {
   
@@ -29,7 +29,7 @@ namespace jtorch {
 
   protected:
     void init(TorchData& input);
-    jtil::math::Int3 local_worgroup_size;
+    jcl::math::Int3 local_worgroup_size;
 
     // Non-copyable, non-assignable.
     Tanh(Tanh&);

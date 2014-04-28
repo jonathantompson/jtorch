@@ -12,8 +12,8 @@
 
 #pragma once
 
-#include "jtil/math/math_types.h"
 #include <string>
+#include "jcl/math/int_types.h"
 
 #define USE_OPENCL_LOCAL_SIZES  // Let OpenCL choose worksizes
 

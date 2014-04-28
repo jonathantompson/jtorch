@@ -1,17 +1,16 @@
 #include "jtorch/spatial_max_pooling.h"
 #include "jtorch/tensor.h"
-#include "jtil/exceptions/wruntime_error.h"
-#include "jtil/threading/thread.h"
-#include "jtil/threading/callback.h"
-#include "jtil/threading/thread_pool.h"
-#include "jtil/data_str/vector_managed.h"
+#include "jcl/threading/thread.h"
+#include "jcl/threading/callback.h"
+#include "jcl/threading/thread_pool.h"
+#include "jcl/data_str/vector_managed.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
-using namespace jtil::threading;
-using namespace jtil::math;
-using namespace jtil::data_str;
+using namespace jcl::threading;
+using namespace jcl::math;
+using namespace jcl::data_str;
 
 namespace jtorch {
 
@@ -28,7 +27,7 @@ namespace jtorch {
 
   void SpatialMaxPooling::init(TorchData& input)  {
     if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::wruntime_error("SpatialMaxPooling::init() - "
+      throw std::runtime_error("SpatialMaxPooling::init() - "
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
@@ -41,7 +40,7 @@ namespace jtorch {
     if (output == NULL) {
       if (in.dim()[0] % poolsize_u_ != 0 || 
         in.dim()[1] % poolsize_v_ != 0) {
-        throw std::wruntime_error("width or height is not a multiple of "
+        throw std::runtime_error("width or height is not a multiple of "
           "the poolsize!");
       }
       Int3 out_dim(in.dim());

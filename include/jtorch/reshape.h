@@ -14,8 +14,6 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "jtil/math/math_types.h"
-#include "jtil/threading/callback.h"
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {

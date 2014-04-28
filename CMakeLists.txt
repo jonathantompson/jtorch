@@ -50,7 +50,6 @@ set(LIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../lib/MAC_OS_X)
 
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../include/MAC_OS_X)
 
-set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../jtil/include/)
 set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../jcl/include/)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -118,7 +117,6 @@ if(root_PRINT_SOURCE_FILES MATCHES true)
 endif()
 
 message( "INCLUDE DIRECTORIES:" )
-message( STATUS "jtil: " ${JTIL_INC_DIR} )
 message( STATUS "jcl: " ${JCL_INC_DIR} )
 
 include_directories(
@@ -131,10 +129,6 @@ message( "EXTRA_LIBS to be linked in: " ${EXTRA_LIBS} )
 
 add_library(${TARGET_NAME} STATIC ${JTORCH_CXX_SOURCE} ${JTORCH_CC_SOURCE} ${JTORCH_HEADER})
 
-if(NOT TARGET jtil)
-  set(BUILD_JTIL_TESTS false)
-  add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jtil/" "${CMAKE_CURRENT_BINARY_DIR}/jtil")
-endif()
 if(NOT TARGET jcl)
   SET(BUILD_JCL_TESTS false)
   add_subdirectory( "${CMAKE_CURRENT_SOURCE_DIR}/../jcl/" "${CMAKE_CURRENT_BINARY_DIR}/jcl")
@@ -143,10 +137,8 @@ endif()
 target_link_libraries(${TARGET_NAME} ${EXTRA_LIBS})
 
 if(BUILD MATCHES debug)
-    target_link_libraries(${TARGET_NAME} jtil_d)
     target_link_libraries(${TARGET_NAME} jcl_d)
 else()
-    target_link_libraries(${TARGET_NAME} jtil)
     target_link_libraries(${TARGET_NAME} jcl)
 endif()
 

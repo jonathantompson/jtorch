@@ -3,18 +3,15 @@
 #include <stdexcept>
 #include <fstream>
 #include "jtorch/table.h"
-#include "jtil/data_str/vector_managed.h"
-#include "jtil/exceptions/wruntime_error.h"
+#include "jcl/data_str/vector_managed.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
-using namespace jtil::math;
-
 namespace jtorch {
 
   Table::Table() {
-    data_ = new jtil::data_str::VectorManaged<TorchData*>();
+    data_ = new jcl::data_str::VectorManaged<TorchData*>();
   }
 
   Table::~Table() {

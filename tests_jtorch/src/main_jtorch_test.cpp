@@ -23,12 +23,11 @@
 #include "jtorch/parallel.h"
 #include "jtorch/table.h"
 #include "jtorch/join_table.h"
-#include "jtil/threading/thread_pool.h"
-#include "jtil/data_str/vector_managed.h"
-#include "jtil/debug_util/debug_util.h"
-#include "jtil/file_io/file_io.h"
-#include "jtil/string_util/string_util.h"
-#include "jtil/clk/clk.h"
+#include "jcl/threading/thread_pool.h"
+#include "jcl/data_str/vector_managed.h"
+#include "debug_util.h"
+#include "file_io.h"
+#include "clk/clk.h"
 
 #if defined(WIN32) || defined(_WIN32)
   #define snprintf _snprintf_s
@@ -36,11 +35,11 @@
 
 using namespace std;
 using namespace jtorch;
-using namespace jtil::threading;
-using namespace jtil::math;
-using namespace jtil::data_str;
-using namespace jtil::file_io;
-using namespace jtil::clk;
+using namespace jcl::threading;
+using namespace jcl::math;
+using namespace jcl::data_str;
+using namespace jcl::file_io;
+using namespace clk;
 
 const uint32_t num_feats_in = 5;
 const uint32_t num_feats_out = 10;
@@ -91,12 +90,14 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
 
 int main(int argc, char *argv[]) {  
 #if defined(_DEBUG) || defined(DEBUG)
-  jtil::debug::EnableMemoryLeakChecks();
-  // jtil::debug::EnableAggressiveMemoryLeakChecks();
-  // jtil::debug::SetBreakPointOnAlocation(8420);
+  jcl::debug::EnableMemoryLeakChecks();
+  // jcl::debug::EnableAggressiveMemoryLeakChecks();
+  // jcl::debug::SetBreakPointOnAlocation(8420);
 #endif
 
   try {
+    std::cout << "Beginning jtorch tests..." << std::endl;
+
     const bool use_cpu = false;
     jtorch::InitJTorch("../", use_cpu);
 
@@ -217,8 +218,8 @@ int main(int argc, char *argv[]) {
     // Test SpatialSubtractiveNormalization
     uint32_t gauss_size = 7;
     Tensor<float>* kernel = Tensor<float>::gaussian1D(gauss_size);
-    std::cout << "kernel1D:" << std::endl;
-    kernel->print();
+    // std::cout << "\tkernel1D:" << std::endl;
+    // kernel->print();
 
     SpatialSubtractiveNormalization sub_norm_stage(*kernel);
     sub_norm_stage.forwardProp(data_in);
@@ -238,7 +239,7 @@ int main(int argc, char *argv[]) {
     const int32_t lena_height = 512;
     Tensor<float> lena(Int2(lena_width, lena_height));
     float* lena_cpu = new float[lena.dataSize()];
-    jtil::file_io::LoadArrayFromFile<float>(lena_cpu, 
+    jcl::file_io::LoadArrayFromFile<float>(lena_cpu, 
       lena_width * lena_height, "lena_image.bin");
     lena.setData(lena_cpu);
     delete[] lena_cpu;
@@ -248,9 +249,9 @@ int main(int argc, char *argv[]) {
     cont_norm_stage.forwardProp(lena);
     float* cont_norm_output_cpu = new float[cont_norm_stage.output->dataSize()];
     ((Tensor<float>*)cont_norm_stage.output)->getData(cont_norm_output_cpu);
-    jtil::file_io::SaveArrayToFile<float>(cont_norm_output_cpu, 
+    jcl::file_io::SaveArrayToFile<float>(cont_norm_output_cpu, 
       lena_width * lena_height, "lena_image_processed.bin");
-    std::cout << "SpatialContrastiveNormalization output saved to ";
+    std::cout << "\tSpatialContrastiveNormalization output saved: ";
     std::cout << "lena_image_processed.bin" << endl;
     delete[] cont_norm_output_cpu;
 
@@ -285,133 +286,22 @@ int main(int argc, char *argv[]) {
 
     // ***********************************************
     // Test Loading a model
-    if (jtil::file_io::fileExists("./testmodel.bin")) {
-      TorchStage* model = TorchStage::loadFromFile("./testmodel.bin");
+    TorchStage* model = TorchStage::loadFromFile("./testmodel.bin");
 
-      model->forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)model->output,
-        "./test_data/test_model_result.bin");
+    model->forwardProp(data_in);
+    testJTorchValue((jtorch::Tensor<float>*)model->output,
+      "./test_data/test_model_result.bin");
 
-      // Some debugging if things go wrong:
-      if (model->type() != SEQUENTIAL_STAGE) {
-        throw std::wruntime_error("main() - ERROR: Expecting sequential!");
-      }
-
-      delete model;
-    } else {
-      std::cout << "WARNING: ./testmodel.bin doesn't exist.  Skipping test";
-      std::cout << std::endl;
+    // Some debugging if things go wrong:
+    if (model->type() != SEQUENTIAL_STAGE) {
+      throw std::runtime_error("main() - ERROR: Expecting sequential!");
     }
 
-    // ***********************************************
-    // Test Loading the big convnet model
-    if (jtil::file_io::fileExists("../data/handmodel.net.convnet")) {
-      TorchStage* convnet_model = TorchStage::loadFromFile("../data/handmodel.net.convnet");
+    delete model;
 
-      if (convnet_model->type() != SEQUENTIAL_STAGE) {
-        throw std::wruntime_error("main() - ERROR: Expecting Sequential!");
-      }
-
-      uint32_t w = 96;
-      uint32_t h = 96;
-      const uint32_t num_banks = 3;
-      uint32_t data_size = 0;
-      for (uint32_t i = 0; i < num_banks; i++) {
-        data_size += w * h;
-        w = w / 2;
-        h = h / 2;
-      }
-
-      float* convnet_input_cpu = new float[data_size];
-      LoadArrayFromFile<float>(convnet_input_cpu, data_size,
-        "hpf_processed_2271250584_hands0_493030668000.bin");
-
-      // Create some dummy data (all zeros for now)
-      Table* convnet_input = new Table();
-      w = 96;
-      h = 96;
-      float* cur_hand_image = convnet_input_cpu;
-      for (uint32_t i = 0; i < num_banks; i++) {
-        Tensor<float>* im = new Tensor<float>(Int3(w, h, 1));
-        convnet_input->add(im);
-        im->setData(cur_hand_image);
-        cur_hand_image = &cur_hand_image[w*h];
-        w = w / 2;
-        h = h / 2;
-      }
-
-      std::cout << "Performing forward prop...";
-      convnet_model->forwardProp(*convnet_input);
-      Tensor<float>* convnet_output = (Tensor<float>*)convnet_model->output;
-      std::cout << "Model Output (just the first 30 numbers) = " << std::endl;
-      convnet_output->print(Int2(0, 29), Int2(0, 0), Int2(0, 0));
-
-      // Save the result to file
-      float* convnet_output_cpu = new float[convnet_output->dataSize()];
-      convnet_output->getData(convnet_output_cpu);
-      jtil::file_io::SaveArrayToFile<float>(convnet_output_cpu,
-        convnet_output->dataSize(), "convnet_output.bin");
-      delete[] convnet_output_cpu;
-
-      // Now profile
-      jtorch::cl_context->sync(jtorch::deviceid);
-      std::cout << "Profiling for 5 seconds..." << std::endl;
-      Clk clk;
-      uint32_t num_evals = 0;
-      double time_accum = 0.0;
-      while (time_accum < 5) {
-        // Fairest test is to perform a sync after every read and wait for the
-        // work queue to empty.  Otherwise requests happen in parallel which
-        // isn't what torch does.
-        double t0 = clk.getTime();
-        convnet_model->forwardProp(*convnet_input);
-        jtorch::cl_context->sync(jtorch::deviceid);
-        double t1 = clk.getTime();
-        time_accum += (t1 - t0);
-        num_evals++;
-      }
-      std::cout << "Time per evaluation ";
-      std::cout << (time_accum / (double)num_evals) * 1e3 << "ms" << std::endl;
-
-      // Approximate benchmark times:
-      // 9.3756ms total
-      // 5.3824ms linear (57.4%)
-      // 2.0362ms convolution (21.7%)
-      // 57.8us max pooling (0.6%)
-
-      // Profile the linear stage
-      jtorch::cl_context->sync(jtorch::deviceid);
-      std::cout << "Profiling linear for 5 seconds..." << std::endl;
-      JoinTable* join_t = (JoinTable*)((Sequential*)convnet_model)->get(1);
-      Linear* linear_stage1 = (Linear*)((Sequential*)convnet_model)->get(2);
-      Threshold* threshold_stage1 = (Threshold*)((Sequential*)convnet_model)->get(3);
-      Linear* linear_stage2 = (Linear*)((Sequential*)convnet_model)->get(4);
-      num_evals = 0;
-      time_accum = 0.0;
-      while (time_accum < 5) {
-
-        double t0 = clk.getTime();
-        linear_stage1->forwardProp(*join_t->output);
-        linear_stage2->forwardProp(*threshold_stage1->output);
-        jtorch::cl_context->sync(jtorch::deviceid);
-        double t1 = clk.getTime();
-        time_accum += (t1 - t0);
-        num_evals++;
-      }
-      std::cout << "Time per evaluation ";
-      std::cout << (time_accum / (double)num_evals) * 1e3 << "ms" << std::endl;
-
-      delete[] convnet_input_cpu;
-      delete convnet_input;
-      delete convnet_model;
-    } else {
-      std::cout << "WARNING: ../data/handmodel.net.convnet doesn't exist.  ";
-      std::cout << "Skipping test" << std::endl;
-    }
-
-  } catch (std::wruntime_error e) {
+  } catch (std::runtime_error e) {
     std::cout << "Exception caught!" << std::endl;
-    std::cout << jtil::string_util::ToNarrowString(e.errorMsg()) << std::endl;
+    std::cout << e.what() << std::endl;
   };
 
   jtorch::ShutdownJTorch();

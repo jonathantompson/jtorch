@@ -8,13 +8,10 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "jtil/math/math_types.h"
-#include "jtil/threading/callback.h"
+#include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
-// #define SIMPLE_LINEAR  // Might actually be faster using the CPU!
-
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+// #define SIMPLE_LINEAR  // Might actually be faster when using the CPU!
 
 namespace jtorch {
 

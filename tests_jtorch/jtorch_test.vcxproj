@@ -11,10 +11,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\debug_util_win32.cpp" />
     <ClCompile Include="src\main_jtorch_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="accum.cl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\clk\clk.h" />
+    <ClInclude Include="headers\debug_util.h" />
+    <ClInclude Include="headers\file_io.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
@@ -64,8 +70,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>HAND_FIT;NDEBUG;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../jcl/include;$(ProjectDir)../../jtil/include;$(ProjectDir)../include;$(ProjectDir)headers</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../jcl/include;$(ProjectDir)../include;$(ProjectDir)headers</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OpenMPSupport>true</OpenMPSupport>
@@ -73,8 +79,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\build\$(Platform)\$(Configuration)\;$(ProjectDir)..\..\jtil\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jtorch_d.lib;jtil_d.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jtorch_d.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>/NODEFAULTLIB:[msvcrt.lib, libcmt.lib, LIBCMT]</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -91,8 +97,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>HAND_FIT;NDEBUG;WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../jcl/include;$(ProjectDir)../../jtil/include;$(ProjectDir)../include;$(ProjectDir)headers</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WIN64;_AMD64_;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../jcl/include;$(ProjectDir)../include;$(ProjectDir)headers</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <AdditionalOptions>/Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
@@ -104,8 +110,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>jtorch.lib;jtil.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\build\$(Platform)\$(Configuration)\;$(ProjectDir)..\..\jtil\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jtorch.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>/NODEFAULTLIB:[msvcrt.lib, libcmt.lib, LIBCMT]</IgnoreSpecificDefaultLibraries>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>

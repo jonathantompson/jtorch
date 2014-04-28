@@ -13,13 +13,13 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include "jcl/math/int_types.h"
+#include "jcl/math/math_types.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
-#include "jtil/math/math_types.h"
-#include "jtil/exceptions/wruntime_error.h"
 #include "jtorch/torch_data.h"
 #include "jtorch/jtorch.h"
 
-namespace jtil { namespace threading { class ThreadPool; } }
+namespace jcl { namespace threading { class ThreadPool; } }
 
 namespace jtorch {
   
@@ -27,8 +27,8 @@ namespace jtorch {
   class Tensor : public TorchData {
   public:
     // Constructor / Destructor
-    Tensor(const jtil::math::Int3& dim);  // Assumes dim[3]=1
-    Tensor(const jtil::math::Int2& dim);  // Assumes dim[3]=1, dim[2]=1
+    Tensor(const jcl::math::Int3& dim);  // Assumes dim[3]=1
+    Tensor(const jcl::math::Int2& dim);  // Assumes dim[3]=1, dim[2]=1
     Tensor(const int dim);  // Assumes dim[3]=1, dim[2]=1, dim[1]=1
     virtual ~Tensor();
 
@@ -38,13 +38,13 @@ namespace jtorch {
     void setData(const T* data);
     void getData(T* data);
 
-    const jtil::math::Int3& dim() const { return dim_; }
+    const jcl::math::Int3& dim() const { return dim_; }
 
     // Print --> EXPENSIVE
     virtual void print();  // print to std::cout
-    void print(const jtil::math::Int2& interval0, 
-      const jtil::math::Int2& interval1, 
-      const jtil::math::Int2& interval2);
+    void print(const jcl::math::Int2& interval0, 
+      const jcl::math::Int2& interval1, 
+      const jcl::math::Int2& interval2);
 
     // Deep copy (not too expensive since it'll copy GPU mem to GPU mem)
     Tensor<T>* copy() const;
@@ -60,7 +60,7 @@ namespace jtorch {
 
   protected:
     jcl::JCLBuffer data_;  // Internal data
-    jtil::math::Int3 dim_;  // dim_[0] is lowest contiguous dimension, 
+    jcl::math::Int3 dim_;  // dim_[0] is lowest contiguous dimension, 
                              // dim_[2] is highest dimension
 
     // Non-copyable, non-assignable.
@@ -69,7 +69,7 @@ namespace jtorch {
   };
 
   template <typename T>
-  Tensor<T>::Tensor(const jtil::math::Int3& dim) {
+  Tensor<T>::Tensor(const jcl::math::Int3& dim) {
     dim_.set(dim[0], dim[1], dim[2]);
     data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
       dim_[0], dim_[1], dim_[2]);
@@ -78,7 +78,7 @@ namespace jtorch {
   }
 
   template <typename T>
-  Tensor<T>::Tensor(const jtil::math::Int2& dim) {
+  Tensor<T>::Tensor(const jcl::math::Int2& dim) {
     dim_.set(dim[0], dim[1], 1);
     data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
       dim_[0], dim_[1], dim_[2]);
@@ -144,17 +144,17 @@ namespace jtorch {
   };
 
   template <typename T>
-  void Tensor<T>::print(const jtil::math::Int2& interval0, 
-    const jtil::math::Int2& interval1, const jtil::math::Int2& interval2) {
+  void Tensor<T>::print(const jcl::math::Int2& interval0, 
+    const jcl::math::Int2& interval1, const jcl::math::Int2& interval2) {
     if (interval0[0] > interval0[1] || interval1[0] > interval1[1] || 
       interval2[0] > interval2[1]) {
-      throw std::wruntime_error("Tensor<T>::print() - ERROR: "
+      throw std::runtime_error("Tensor<T>::print() - ERROR: "
         "intervals must be monotonic");
     }
     if (interval0[0] < 0 || interval0[1] >= dim_[0] || 
       interval1[0] < 0 || interval1[1] >= dim_[1] ||
       interval2[0] < 0 || interval2[1] >= dim_[2]) {
-      throw std::wruntime_error("Tensor<T>::print() - ERROR: "
+      throw std::runtime_error("Tensor<T>::print() - ERROR: "
         "intervals out of range");
     }
     T* d = new T[dataSize()];
@@ -190,7 +190,7 @@ namespace jtorch {
 
   template <typename T>
   Tensor<T>* Tensor<T>::gaussian1D(const int32_t kernel_size) {
-    Tensor<T>* ret = new Tensor<T>(jtil::math::Int3(kernel_size, 1, 1));
+    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, 1, 1));
     const float sigma = 0.25f;
     const float amplitude = 1.0f;
     const float size = (float)kernel_size;
@@ -207,7 +207,7 @@ namespace jtorch {
 
   template <typename T>
   Tensor<T>* Tensor<T>::ones1D(const int32_t kernel_size) {
-    Tensor<T>* ret = new Tensor<T>(jtil::math::Int3(kernel_size, 1, 1));
+    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, 1, 1));
     T* data = new T[kernel_size];
     for (int32_t i = 0; i < kernel_size; i++) {
       data[i] = (T)1;

@@ -11,10 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "jtil/math/math_types.h"
 #include "jtorch/torch_stage.h"
-
-namespace jtil { namespace threading { class ThreadPool; } }
 
 namespace jtorch {
   

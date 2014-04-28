@@ -50,7 +50,6 @@ set(LIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../lib/MAC_OS_X)
 
 set(INCLUDE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../include/MAC_OS_X)
 
-set(JTIL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../jtil/include/)
 set(JCL_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..jcl/include/)
 set(JTORCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include/)
 
@@ -119,7 +118,6 @@ if(root_PRINT_SOURCE_FILES MATCHES true)
 endif()
 
 message( "INCLUDE DIRECTORIES:" )
-message( STATUS "jtil: " ${JTIL_INC_DIR} )
 message( STATUS "jcl: " ${JCL_INC_DIR} )
 message( STATUS "jtorch: " ${JTORCH_INC_DIR} )
 
@@ -137,11 +135,9 @@ add_executable(${TARGET_NAME} ${JTORCH_TEST_CXX_SOURCE} ${JTORCH_TEST_CC_SOURCE}
 target_link_libraries(${TARGET_NAME} ${EXTRA_LIBS})
 
 if(BUILD MATCHES debug)
-    target_link_libraries(${TARGET_NAME} jtil_d)
     target_link_libraries(${TARGET_NAME} jcl_d)
     target_link_libraries(${TARGET_NAME} jtorch_d)
 else()
-    target_link_libraries(${TARGET_NAME} jtil)
     target_link_libraries(${TARGET_NAME} jcl)
     target_link_libraries(${TARGET_NAME} jtorch)
 endif()

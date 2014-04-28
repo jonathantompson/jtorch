@@ -9,11 +9,10 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "jtil/math/math_types.h"
+#include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jtil { namespace threading { class ThreadPool; } }
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
 namespace jtorch {
   
@@ -33,7 +32,7 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    jtil::data_str::VectorManaged<TorchStage*>* network_;
+    jcl::data_str::VectorManaged<TorchStage*>* network_;
 
     // Non-copyable, non-assignable.
     Sequential(Sequential&);

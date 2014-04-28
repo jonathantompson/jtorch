@@ -1,22 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtil", "..\jtil\jtil.vcxproj", "{B6B147F5-C7F9-4E94-A58C-1B4855967A48}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jcl", "..\jcl\jcl.vcxproj", "{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48} = {B6B147F5-C7F9-4E94-A58C-1B4855967A48}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtorch", "jtorch.vcxproj", "{287F2B7F-A92D-4144-B56D-B0A87E5883EE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2} = {7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48} = {B6B147F5-C7F9-4E94-A58C-1B4855967A48}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtorch_test", "tests\jtorch_test.vcxproj", "{CD3A45CC-3DF2-45FA-A444-ED26CE254410}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtorch_test", "tests_jtorch\jtorch_test.vcxproj", "{CD3A45CC-3DF2-45FA-A444-ED26CE254410}"
 	ProjectSection(ProjectDependencies) = postProject
 		{287F2B7F-A92D-4144-B56D-B0A87E5883EE} = {287F2B7F-A92D-4144-B56D-B0A87E5883EE}
+		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2} = {7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}
 	EndProjectSection
 EndProject
 Global
@@ -25,10 +20,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48}.Debug|x64.ActiveCfg = Debug|x64
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48}.Debug|x64.Build.0 = Debug|x64
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48}.Release|x64.ActiveCfg = Release|x64
-		{B6B147F5-C7F9-4E94-A58C-1B4855967A48}.Release|x64.Build.0 = Release|x64
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}.Debug|x64.ActiveCfg = Debug|x64
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}.Debug|x64.Build.0 = Debug|x64
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}.Release|x64.ActiveCfg = Release|x64

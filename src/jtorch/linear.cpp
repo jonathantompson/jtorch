@@ -1,18 +1,17 @@
 #include "jtorch/linear.h"
 #include "jtorch/tensor.h"
-#include "jtil/exceptions/wruntime_error.h"
-#include "jtil/threading/thread.h"
-#include "jtil/threading/callback.h"
-#include "jtil/threading/thread_pool.h"
-#include "jtil/data_str/vector_managed.h"
+#include "jcl/threading/thread.h"
+#include "jcl/threading/callback.h"
+#include "jcl/threading/thread_pool.h"
+#include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
-using namespace jtil::threading;
-using namespace jtil::math;
-using namespace jtil::data_str;
+using namespace jcl::threading;
+using namespace jcl::math;
+using namespace jcl::data_str;
 
 namespace jtorch {
 
@@ -43,12 +42,12 @@ namespace jtorch {
 
   void Linear::init(TorchData& input)  {
     if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::wruntime_error("Linear::init() - "
+      throw std::runtime_error("Linear::init() - "
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
     if (static_cast<int32_t>(in.dataSize()) != n_inputs_) {
-      throw std::wruntime_error("Linear::init() - ERROR: input size mismatch!");
+      throw std::runtime_error("Linear::init() - ERROR: input size mismatch!");
     }
   }
 

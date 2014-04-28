@@ -5,9 +5,9 @@
 **Overview**
 --------
 
-Torch7 (<http://www.torch.ch/>) is an AMAZING machine learning library written and maintained by some very smart people.  For me it's only downside is that interfacing with it from C++ on Windows 7 is difficult (if not impossible).  This library is a C++ framework for doing the forward propagation of various torch modules.  It uses OpenCL to perform the forward prop on the GPU.  I have even found that some of the OpenCL modules here are actually faster than the Torch7 CUDA modules on Linux (i.e., the linear network here is very fast when doing forward prop on non-batch inputs).
+Torch7 (<http://www.torch.ch/>) is an AMAZING machine learning library written and maintained by some very smart people :-)  For me it's only downside is that interfacing with it from C++ on Windows 7 (and other operating systems other than Mac OS X and Linux) is difficult (if not sometimes impossible).  This library is a C++ framework for doing the forward propagation of various torch modules.  It uses OpenCL to perform the forward prop on the GPU.  I have even found that some of the OpenCL modules here are actually faster than the Torch7 CUDA modules on Linux.  With this said, you should profile torch vs jtorch and make sure there are no super slow modules in this library (since I haven't spent all that much time optimizing GPU code).
 
-Please note that this is not supposed to be a replacement for Torch7.  There is no back propagation (so no learning), and only a very limited subset of the modules are implemented.
+Please note that this is not supposed to be a replacement for Torch7.  There is no back propagation (so no learning), and only a very limited subset of the modules are implemented.  The use-case for this library is for people who do model development on Linux, but want to run FPROP of their models on other operating systems.
 
 The library consists of a simple lua codebase for recursively saving a torch model to a compact binary format (all in the ./lua folder):
 
@@ -46,19 +46,27 @@ The following stages have partial implementations:
 **Compilation**
 ---------------
 
-Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X.  The only real dependancy is the jtil + jcl libraries.  See <http://github.com/jonathantompson/jtil> and <http://github.com/jonathantompson/jcl> for more details.
+Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X.  The only dependancy is the jcl library.  See <http://github.com/jonathantompson/jcl> for more details.
 
 VS2012 and cmake expect a specific directory structure:
 
-- \\include\\WIN\\
-- \\include\\MAC\_OS\_X\\
-- \\lib\\WIN\\
-- \\lib\\MAC\_OS\_X\\
-- \\jtil\\
 - \\jcl\\
 - \\jtorch\\
 
-So the dependancy headers and static libraries (.lib on Windows and .a on Mac OS X) are separated by OS and exist in directories at the same level as jtorch, jtil and jcl.  I have pre-compiled the dependencies and put them in dropbox, let me know if you need the link.
+So jtorch and jcl must exist at the same directory level.
+
+### Windows:
+- **Follow all the compilation steps in <https://github.com/jonathantompson/jcl/blob/master/README.md>**
+- **Compiling the library:**
+    - open jtorch.sln
+    - right click "jtorch_test" in the Solution Explorer -> "Set as StartUp Project"
+    - From the file menu: DEBUG -> Start Debugging... (or press F5)
+    - TWO tests should run and at the end of each test there should be a "PASSED" printout.
+
+### MAC OS X:
+- **Follow all the compilation steps in <https://github.com/jonathantompson/jcl/blob/master/README.md>**
+- Just run cmake and then build (all frameworks should be included).  
+- cl.hpp doesn't exist by default but there is a copy of it in the local directory opencl_cpp_header.
 
 **Style**
 ---------

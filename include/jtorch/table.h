@@ -12,11 +12,10 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "jtil/math/math_types.h"
+#include "jcl/math/int_types.h"
 #include "jtorch/torch_data.h"
 
-namespace jtil { namespace threading { class ThreadPool; } }
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
 namespace jtorch {
   
@@ -40,7 +39,7 @@ namespace jtorch {
     uint32_t tableSize() const;
 
   protected:
-    jtil::data_str::VectorManaged<TorchData*>* data_;  // Internal data
+    jcl::data_str::VectorManaged<TorchData*>* data_;  // Internal data
 
     // Non-copyable, non-assignable.
     Table(Table&);

@@ -12,11 +12,11 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "jtil/math/math_types.h"
-#include "jtil/threading/callback.h"
+#include "jcl/math/int_types.h"
+#include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jtil { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
 namespace jtorch {
 
@@ -43,8 +43,8 @@ namespace jtorch {
     Tensor<float>* std_pass2_;  // 3D - Vertical + normalization pass
     float threshold_;
 
-    jtil::math::Int3 local_worgroup_size_3d;
-    jtil::math::Int3 local_worgroup_size_2d;
+    jcl::math::Int3 local_worgroup_size_3d;
+    jcl::math::Int3 local_worgroup_size_2d;
 
     void init(TorchData& input);
 

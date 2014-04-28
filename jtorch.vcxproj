@@ -100,9 +100,7 @@
     <None Include="kernels\tanh.cl" />
     <None Include="kernels\tensor.cl" />
     <None Include="kernels\threshold.cl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="README.txt" />
+    <None Include="README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{287F2B7F-A92D-4144-B56D-B0A87E5883EE}</ProjectGuid>
@@ -146,7 +144,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)..\jtil\include;$(ProjectDir)..\jcl\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)..\jcl\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -160,8 +158,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\jtil\build\$(Platform)\$(Configuration)\;$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jcl_d.lib;jtil_d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jcl_d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
@@ -179,7 +177,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)..\jtil\include;$(ProjectDir)..\jcl\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)..\jcl\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -196,8 +194,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\jtil\build\$(Platform)\$(Configuration)\;$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>jcl.lib;jtil.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>jcl.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>

@@ -168,8 +168,6 @@
     <None Include="kernels\tensor.cl">
       <Filter>kernels</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="README.txt" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

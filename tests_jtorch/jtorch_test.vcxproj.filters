@@ -5,13 +5,33 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{8545287c-22ce-4fa2-b774-6988678dd486}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\clk">
+      <UniqueIdentifier>{15688745-4988-49ad-adec-2b23ff9718ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main_jtorch_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\debug_util_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="accum.cl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\debug_util.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\file_io.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\clk\clk.h">
+      <Filter>headers\clk</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

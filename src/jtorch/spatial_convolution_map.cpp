@@ -1,17 +1,16 @@
 #include "jtorch/spatial_convolution_map.h"
 #include "jtorch/tensor.h"
-#include "jtil/exceptions/wruntime_error.h"
-#include "jtil/threading/thread.h"
-#include "jtil/threading/callback.h"
-#include "jtil/threading/thread_pool.h"
-#include "jtil/data_str/vector_managed.h"
+#include "jcl/threading/thread.h"
+#include "jcl/threading/callback.h"
+#include "jcl/threading/thread_pool.h"
+#include "jcl/data_str/vector_managed.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
-using namespace jtil::threading;
-using namespace jtil::math;
-using namespace jtil::data_str;
+using namespace jcl::threading;
+using namespace jcl::math;
+using namespace jcl::data_str;
 
 namespace jtorch {
 
@@ -42,9 +41,8 @@ namespace jtorch {
 
     tp_ = new ThreadPool(JTIL_SPATIAL_CONVOLUTION_MAP_NTHREADS);
 
-    std::cout << "WARNING: SPATIALCONVOLUTIONMAP IS SLOW.  All computation is";
-    std::cout << " done on the CPU and incurs large transfer penalties!";
-    std::cout << std::endl;
+    std::cout << "WARNING: SPATIALCONVOLUTIONMAP IS SLOW." << std::endl;
+    std::cout << "--> ALL COMPUTATION IS DONE ON THE CPU!" << std::endl;
   }
 
   SpatialConvolutionMap::~SpatialConvolutionMap() {
@@ -66,14 +64,14 @@ namespace jtorch {
   }
 
   void SpatialConvolutionMap::init(TorchData& input, 
-    jtil::threading::ThreadPool& tp)  {
+    jcl::threading::ThreadPool& tp)  {
     if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::wruntime_error("SpatialConvolutionMap::init() - "
+      throw std::runtime_error("SpatialConvolutionMap::init() - "
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
     if (in.dim()[2] != feats_in_) {
-      throw std::wruntime_error("SpatialConvolutionMap::init() - ERROR: "
+      throw std::runtime_error("SpatialConvolutionMap::init() - ERROR: "
         "incorrect number of input features!");
     }
     if (output != NULL) {
