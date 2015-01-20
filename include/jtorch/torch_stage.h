@@ -35,6 +35,10 @@ namespace jtorch {
     SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE = 13,
     JOIN_TABLE_STAGE = 14,
     TRANSPOSE_STAGE = 15,  // Not actually implemented --> Ignored
+    IDENTITY_STAGE = 16,
+    SELECT_TABLE_STAGE = 17,
+    SPATIAL_UP_SAMPLING_NEAREST_STAGE = 18,
+    C_ADD_TABLE_STAGE = 19,
   } TorchStageType;
 
   class TorchData;

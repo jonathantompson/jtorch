@@ -102,6 +102,18 @@ namespace jtorch {
     case TRANSPOSE_STAGE:
       std::cout << "\tLoading Transpose..." << std::endl;
       return Transpose::loadFromFile(ifile);
+    case IDENTITY_STAGE:
+      std::cout << "\tLoading Identity..." << std::endl;
+      throw std::runtime_error("TODO: Implement this");
+    case SELECT_TABLE_STAGE:
+      std::cout << "\tLoading SelectTable..." << std::endl;
+      throw std::runtime_error("TODO: Implement this");
+    case SPATIAL_UP_SAMPLING_NEAREST_STAGE:
+      std::cout << "\tLoading SpatialUpSamplingNearestStage..." << std::endl;
+      throw std::runtime_error("TODO: Implement this");
+    case C_ADD_TABLE_STAGE:
+      std::cout << "\tLoading CAddTable..." << std::endl;
+      throw std::runtime_error("TODO: Implement this");
     default:
       throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
         "Node type not recognized!");
