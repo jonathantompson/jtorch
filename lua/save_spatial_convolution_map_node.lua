@@ -18,6 +18,7 @@ function saveSpatialConvolutionMapNode(node, ofile)
   local fanin = node.connTableRev:size()[2]
   ofile:writeInt(fanin)
  
+  -- TODO: Vectorize this
   for i=1,(node.nOutputPlane * fanin) do
     for v=1,node.kH do
       for u=1,node.kW do
@@ -25,6 +26,8 @@ function saveSpatialConvolutionMapNode(node, ofile)
       end
     end
   end
+  
+  -- TODO: Vectorize this
   for i=1,node.nOutputPlane do
     for v=1,fanin do
       ofile:writeShort(node.connTableRev[{i, v, 1}] - 1)  -- input feature
@@ -32,8 +35,7 @@ function saveSpatialConvolutionMapNode(node, ofile)
     end
   end
 
-  for i=1,(node.nOutputPlane) do
-    ofile:writeFloat(node.bias[{i}])
-  end
+  assert(node.bias:dim() == 1, 'bias vector is not 1D!')
+  saveFloatTensorSafe(ofile, node.bias)
 
 end

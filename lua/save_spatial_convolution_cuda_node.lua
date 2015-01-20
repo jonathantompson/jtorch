@@ -1,8 +1,4 @@
 function saveSpatialConvolutionCUDANode(node, ofile)
-  -- Note: SpatialConvolution gets saved as if it was a 
-  --       SpatialConvolutionMap, we just fill out a full
-  --       connection table.
-
   -- The layout is as follows:
   -- 1. filter width (int)
   -- 2. filter height (int)
@@ -18,6 +14,7 @@ function saveSpatialConvolutionCUDANode(node, ofile)
 
   local fanin = node.nInputPlane
 
+  -- TODO: Vectorize this! (transpose first and then save that out)
   for i=1,(node.nOutputPlane) do
     for j=1,(node.nInputPlane) do
       for v=1,node.kH do
@@ -28,9 +25,7 @@ function saveSpatialConvolutionCUDANode(node, ofile)
       end
     end
   end
-
-  for i=1,(node.nOutputPlane) do
-    ofile:writeFloat(node.bias[{i}])
-  end
-
+  
+  assert(node.bias:dim() == 1, 'bias vector is not 1D!')
+  saveFloatTensorSafe(ofile, node.bias)
 end

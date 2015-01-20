@@ -6,7 +6,20 @@ dofile(jtorch_root..'/lua/save_linear_node.lua')
 dofile(jtorch_root..'/lua/save_reshape_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_convolution_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_convolution_cuda_node.lua')
+dofile(jtorch_root..'/lua/save_spatial_convolution_mm_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_convolution_map_node.lua')
+function saveFloatTensorSafe(ofile, tensor)
+  -- We need to make sure that the underlining storage is the same size as the
+  -- tensor header before saving to file
+  local sz = 1
+  for i = 1, tensor:dim() do
+    sz = sz * tensor:size(i)
+  end
+  assert(tensor:storage():size() == sz, 
+    'underlining storage is not the same size as the tensor')
+  ofile:writeFloat(tensor:storage())
+end
+
 dofile(jtorch_root..'/lua/save_spatial_lp_pooling_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_max_pooling_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_max_pooling_cuda_node.lua')
@@ -15,6 +28,10 @@ dofile(jtorch_root..'/lua/save_spatial_divisive_normalization_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_contrastive_normalization_node.lua')
 dofile(jtorch_root..'/lua/save_join_table_node.lua')
 dofile(jtorch_root..'/lua/save_transpose_node.lua')
+dofile(jtorch_root..'/lua/save_identity_node.lua')
+dofile(jtorch_root..'/lua/save_select_table_node.lua')
+dofile(jtorch_root..'/lua/save_spatial_up_sampling_nearest_node.lua')
+dofile(jtorch_root..'/lua/save_c_add_table_node.lua')
 
 function saveNNNode(node, ofile)
   -- Just send the node off to the correct routine depending on it's type
@@ -48,6 +65,12 @@ function saveNNNode(node, ofile)
      --       as SpatialConvolution
      ofile:writeInt(7)
      saveSpatialConvolutionCUDANode(node, ofile)
+  elseif ((class_str == "nn.SpatialConvolutionMM") or 
+          (class_str == "nn.SpatialConvolutionMMOut")) then
+     -- Note: SpatialConvolutionMM gets saved with same index
+     --       as SpatialConvolution.
+     ofile:writeInt(7)
+     saveSpatialConvolutionMMNode(node, ofile)
   elseif (class_str == "nn.SpatialConvolutionMap") then
      ofile:writeInt(8)
      saveSpatialConvolutionMapNode(node, ofile)
@@ -62,13 +85,16 @@ function saveNNNode(node, ofile)
      --       as SpatialMaxPooling
      ofile:writeInt(10)
      saveSpatialMaxPoolingCUDANode(node, ofile)
-  elseif (class_str == "nn.SpatialSubtractiveNormalization") then
+  elseif ((class_str == "nn.SpatialSubtractiveNormalization") or 
+          (class_str == "nn.SpatialSubtractiveNormalizationBatch")) then
      ofile:writeInt(11)
      saveSpatialSubtractiveNormalizationNode(node, ofile)
-  elseif (class_str == "nn.SpatialDivisiveNormalization") then
+  elseif ((class_str == "nn.SpatialDivisiveNormalization") or 
+          (class_str == "nn.SpatialDivisiveNormalizationBatch")) then
      ofile:writeInt(12)
      saveSpatialDivisiveNormalizationNode(node, ofile)
-  elseif (class_str == "nn.SpatialContrastiveNormalization") then
+  elseif ((class_str == "nn.SpatialContrastiveNormalization") or 
+          (class_str == "nn.SpatialContrastiveNormalizationBatch")) then
      ofile:writeInt(13)
      saveSpatialContrastiveNormalizationNode(node, ofile)
   elseif (class_str == "nn.JoinTable") then
@@ -77,6 +103,18 @@ function saveNNNode(node, ofile)
   elseif (class_str == "nn.Transpose") then
      ofile:writeInt(15)
      saveTransposeNode(node, ofile)
+  elseif (class_str == "nn.Identity") then
+     ofile:writeInt(16)
+     saveIdentityNode(node, ofile)    
+  elseif (class_str == "nn.SelectTable") then
+     ofile:writeInt(17)
+     saveSelectTableNode(node, ofile)
+  elseif (class_str == "nn.SpatialUpSamplingNearest") then
+     ofile:writeInt(18)
+     saveSpatialUpSamplingNearestNode(node, ofile)
+  elseif (class_str == "nn.CAddTable") then
+     ofile:writeInt(19)
+     saveCAddTableNode(node, ofile)
   else
      error('Node type ' .. class_str .. ' is not recognized.')
      return
