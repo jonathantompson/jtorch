@@ -20,27 +20,27 @@ namespace jtorch {
   // kernel1d default is either TorchStage::gaussian1D<float>(n) or just a
   // vector of 1 values.
   SpatialContrastiveNormalization::SpatialContrastiveNormalization(
-    const Tensor<float>* kernel1d, const float threshold) : TorchStage() {
-    const Tensor<float>* kernel;
-    if (kernel1d) {
-      if (kernel1d->dataSize() % 2 == 0 || kernel1d->dim()[1] != 1 ||
-        kernel1d->dim()[2] != 1) {
+    const Tensor<float>* kernel, const float threshold) : TorchStage() {
+    const Tensor<float>* cur_kernel;
+    if (kernel) {
+      if (kernel->dim()[0] % 2 == 0 || kernel->dim()[1] % 2 == 0 ||
+        kernel->dim()[2] != 1) {
         throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
-          "Averaging kernel must be 1D and have odd size!");
+          "Averaging kernel must have odd size!");
       }
-      kernel = kernel1d;
+      cur_kernel = kernel;
     } else {
-      kernel = Tensor<float>::ones1D(7);
+      cur_kernel = Tensor<float>::ones1D(7);
     }
 
     network_ = new Sequential();
-    network_->add(new SpatialSubtractiveNormalization(*kernel));
-    network_->add(new SpatialDivisiveNormalization(*kernel, threshold));
+    network_->add(new SpatialSubtractiveNormalization(*cur_kernel));
+    network_->add(new SpatialDivisiveNormalization(*cur_kernel, threshold));
 
-    if (kernel1d == NULL) {
+    if (kernel == NULL) {
       // remove temporarily allocated kernel (since sub-modules will store
       // their own copy).
-      delete kernel;
+      delete cur_kernel;
     }
   }
 
@@ -54,16 +54,21 @@ namespace jtorch {
   }
 
   TorchStage* SpatialContrastiveNormalization::loadFromFile(std::ifstream& file) {
-#error (This needs to be fixed... It has changed)
-
     // This whole thing is a little wasteful.  I copy to GPU here, and then
     // I copy it back down in the constructor anyway...  But it's good enough
     // for now.
-    int32_t kernel_size;
-    file.read((char*)(&kernel_size), sizeof(kernel_size));
-    Tensor<float>* kernel = new Tensor<float>(kernel_size);
-    float* kernel_cpu = new float[kernel_size];
-    file.read((char*)(kernel_cpu), kernel_size * sizeof(*kernel_cpu));
+    int32_t kernel_size_2, kernel_size_1;  // kernel_size_1 is the inner dim
+    file.read((char*)(&kernel_size_1), sizeof(kernel_size_1));
+    file.read((char*)(&kernel_size_2), sizeof(kernel_size_2));
+    Tensor<float>* kernel;
+    if (kernel_size_2 > 1) {
+      // The kernel is 2D
+      kernel = new Tensor<float>(Int2(kernel_size_1, kernel_size_2));
+    } else {
+      kernel = new Tensor<float>(kernel_size_1);
+    }
+    float* kernel_cpu = new float[kernel->dataSize()];
+    file.read((char*)(kernel_cpu), kernel->dataSize() * sizeof(*kernel_cpu));
     kernel->setData(kernel_cpu);
     float threshold;
     file.read((char*)(&threshold), sizeof(threshold));

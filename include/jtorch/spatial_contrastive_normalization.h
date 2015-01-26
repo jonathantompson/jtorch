@@ -25,8 +25,8 @@ namespace jtorch {
   class SpatialContrastiveNormalization : public TorchStage {
   public:
     // Constructor / Destructor
-    // Note if kernel1d is NULL, then a rectangular filter kernel is used
-    SpatialContrastiveNormalization(const Tensor<float>* kernel1d = NULL, 
+    // Note if kernel is NULL, then a rectangular filter kernel is used
+    SpatialContrastiveNormalization(const Tensor<float>* kernel = NULL, 
       const float threshold = 1e-4f);
     virtual ~SpatialContrastiveNormalization();
 

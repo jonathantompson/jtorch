@@ -17,25 +17,25 @@ namespace jtorch {
   // kernel1d default is either TorchStage::gaussian1D<float>(n) or just a
   // vector of 1 values.
   SpatialSubtractiveNormalization::SpatialSubtractiveNormalization(
-    const Tensor<float>& kernel1d) : TorchStage() {
-    if (kernel1d.dataSize() % 2 == 0 || kernel1d.dim()[1] != 1 ||
-      kernel1d.dim()[2] != 1) {
+    const Tensor<float>& kernel) : TorchStage() {
+    if (kernel.dim()[0] % 2 == 0 || kernel.dim()[1] % 2 == 0 ||
+      kernel.dim()[2] != 1) {
       throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
-        "Averaging kernel must be 1D and have odd size!");
+        "Averaging kernel must have odd size!");
     }
 
-    kernel1d_ = kernel1d.copy();
-    float* kernel_cpu = new float[kernel1d_->dataSize()];
-    kernel1d_->getData(kernel_cpu);
+    kernel_ = kernel.copy();
+    float* kernel_cpu = new float[kernel_->dataSize()];
+    kernel_->getData(kernel_cpu);
     // Now normalize the kernel!
     float sum = 0.0f;
-    for (int32_t i = 0; i < kernel1d_->dim()[0]; i++) {
+    for (uint32_t i = 0; i < kernel_->dataSize(); i++) {
       sum += kernel_cpu[i];
     }
-    for (int32_t i = 0; i < kernel1d_->dim()[0]; i++) {
+    for (uint32_t i = 0; i < kernel_->dataSize(); i++) {
       kernel_cpu[i] /= sum;
     }
-    kernel1d_->setData(kernel_cpu);
+    kernel_->setData(kernel_cpu);
     delete[] kernel_cpu;
 
     output = NULL;
@@ -47,7 +47,7 @@ namespace jtorch {
 
   SpatialSubtractiveNormalization::~SpatialSubtractiveNormalization() {
     SAFE_DELETE(output);
-    SAFE_DELETE(kernel1d_);
+    SAFE_DELETE(kernel_);
     SAFE_DELETE(mean_coef_);
     SAFE_DELETE(mean_pass1_);
     SAFE_DELETE(mean_pass2_);
@@ -84,40 +84,65 @@ namespace jtorch {
       mean_coef_ = new Tensor<float>(mean_coeff_dim);
 
       float* mean_coef_cpu = new float[mean_coef_->dataSize()];
-      float* kernel1d_cpu = new float[kernel1d_->dataSize()];
-      kernel1d_->getData(kernel1d_cpu);
+      float* kernel_cpu = new float[kernel_->dataSize()];
+      kernel_->getData(kernel_cpu);
+      bool onedim_kernel = kernel_->dim()[1] == 1;
 
       // Filter an image of all 1 values to create the normalization constants
       // See norm_test.lua for proof that this works as well as:
       // https://github.com/andresy/torch/blob/master/extra/nn/SpatialSubtractiveNormalization.lua
-      // The filter is seperable, but we'll just do the dumb 2D version since
-      // we only do this once on startup.  --> O(n * m)
-      int32_t kernel1d_size = kernel1d_->dim()[0];
-      int32_t filt_rad = (kernel1d_size - 1) / 2;
       int32_t n_feats = ((Tensor<float>*)output)->dim()[2];
       int32_t height = ((Tensor<float>*)output)->dim()[1];
       int32_t width = ((Tensor<float>*)output)->dim()[0];
-      for (int32_t v = 0; v < height; v++) {
-        for (int32_t u = 0; u < width; u++) {
-          mean_coef_cpu[v * width + u] = 0.0f;
-          for (int32_t v_filt = -filt_rad; v_filt <= filt_rad; v_filt++) {
-            for (int32_t u_filt = -filt_rad; u_filt <= filt_rad; u_filt++) {
-              int32_t u_in = u + u_filt;
-              int32_t v_in = v + v_filt;
-              if (u_in >= 0 && u_in < width && v_in >= 0 && v_in < height) {
-                // Pixel is inside --> We'll effectively clamp zeros elsewhere.
-                mean_coef_cpu[v * width + u] += 
-                  (kernel1d_cpu[v_filt + filt_rad] *
-                   kernel1d_cpu[u_filt + filt_rad]);
+      if (onedim_kernel) {
+        // 1D case - The filter is seperable, but we'll just do the dumb 2D 
+        // version since we only do this once on startup.  --> O(n * m)
+        int32_t kernel_size = kernel_->dim()[0];
+        int32_t filt_rad = (kernel_size - 1) / 2;
+        for (int32_t v = 0; v < height; v++) {
+          for (int32_t u = 0; u < width; u++) {
+            mean_coef_cpu[v * width + u] = 0.0f;
+            for (int32_t v_filt = -filt_rad; v_filt <= filt_rad; v_filt++) {
+              for (int32_t u_filt = -filt_rad; u_filt <= filt_rad; u_filt++) {
+                int32_t u_in = u + u_filt;
+                int32_t v_in = v + v_filt;
+                if (u_in >= 0 && u_in < width && v_in >= 0 && v_in < height) {
+                  // Pixel is inside --> We'll effectively clamp zeros elsewhere.
+                  mean_coef_cpu[v * width + u] += 
+                    (kernel_cpu[v_filt + filt_rad] * kernel_cpu[u_filt + filt_rad]);
+                }
               }
             }
+            mean_coef_cpu[v * width + u] /= n_feats;
           }
-          mean_coef_cpu[v * width + u] /= n_feats;
+        }
+      } else {
+        // 2D case
+        int32_t kernel_size_u = kernel_->dim()[0];
+        int32_t kernel_size_v = kernel_->dim()[1];
+        int32_t filt_rad_u = (kernel_size_u - 1) / 2;
+        int32_t filt_rad_v = (kernel_size_v - 1) / 2;
+        for (int32_t v = 0; v < height; v++) {
+          for (int32_t u = 0; u < width; u++) {
+            mean_coef_cpu[v * width + u] = 0.0f;
+            for (int32_t v_filt = -filt_rad_v; v_filt <= filt_rad_v; v_filt++) {
+              for (int32_t u_filt = -filt_rad_u; u_filt <= filt_rad_u; u_filt++) {
+                int32_t u_in = u + u_filt;
+                int32_t v_in = v + v_filt;
+                if (u_in >= 0 && u_in < width && v_in >= 0 && v_in < height) {
+                  // Pixel is inside --> We'll effectively clamp zeros elsewhere.
+                  mean_coef_cpu[v * width + u] += 
+                    kernel_cpu[(v_filt + filt_rad_v) * kernel_size_u + (u_filt + filt_rad_u)];
+                }
+              }
+            }
+            mean_coef_cpu[v * width + u] /= n_feats;
+          }
         }
       }
       mean_coef_->setData(mean_coef_cpu);
       delete[] mean_coef_cpu;
-      delete[] kernel1d_cpu;
+      delete[] kernel_cpu;
     }
     if (mean_ == NULL) {
       Int3 mean_coeff_dim(((Tensor<float>*)output)->dim());
@@ -131,54 +156,65 @@ namespace jtorch {
 
   void SpatialSubtractiveNormalization::forwardProp(TorchData& input) { 
     init(input);
-    int32_t filt_rad = (kernel1d_->dim()[0] - 1) / 2;
+    bool onedim_kernel = kernel_->dim()[1] == 1;
+
+    if (onedim_kernel) {
+      int32_t filt_rad = (kernel_->dim()[0] - 1) / 2;
     
-    // Perform horizontal filter pass
-    Tensor<float>& in = (Tensor<float>&)input;
-    Tensor<float>* out = (Tensor<float>*)output;
-    std::string kernel = jtorch::jtorch_path + "kernels/spatial_subtractive_normalization.cl";
-    cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationHoriz");
-    cl_context->setArg(0, in.data());
-    cl_context->setArg(1, mean_pass1_->data());
-    cl_context->setArg(2, kernel1d_->data());
-    cl_context->setArg(3, filt_rad);
-    cl_context->runKernel3D(jtorch::deviceid, mean_pass1_->dim(), false);
+      // Perform horizontal filter pass
+      Tensor<float>& in = (Tensor<float>&)input;
+      Tensor<float>* out = (Tensor<float>*)output;
+      std::string kernel = jtorch::jtorch_path + "kernels/spatial_subtractive_normalization.cl";
+      cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationHoriz");
+      cl_context->setArg(0, in.data());
+      cl_context->setArg(1, mean_pass1_->data());
+      cl_context->setArg(2, kernel_->data());
+      cl_context->setArg(3, filt_rad);
+      cl_context->runKernel3D(jtorch::deviceid, mean_pass1_->dim(), false);
 
-    // Perform vertical filter pass
-    cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationVert");
-    cl_context->setArg(0, mean_pass1_->data());
-    cl_context->setArg(1, mean_pass2_->data());
-    cl_context->setArg(2, kernel1d_->data());
-    cl_context->setArg(3, filt_rad);
-    cl_context->runKernel3D(jtorch::deviceid, mean_pass2_->dim(), false);
+      // Perform vertical filter pass
+      cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationVert");
+      cl_context->setArg(0, mean_pass1_->data());
+      cl_context->setArg(1, mean_pass2_->data());
+      cl_context->setArg(2, kernel_->data());
+      cl_context->setArg(3, filt_rad);
+      cl_context->runKernel3D(jtorch::deviceid, mean_pass2_->dim(), false);
 
-    // Perform accumulation and division pass
-    cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationAccumDiv");
-    cl_context->setArg(0, mean_pass2_->data());
-    cl_context->setArg(1, mean_->data());
-    cl_context->setArg(2, mean_coef_->data());
-    cl_context->setArg(3, out->dim()[2]);
-    cl_context->runKernel3D(jtorch::deviceid, mean_->dim(), false);
+      // Perform accumulation and division pass
+      cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalizationAccumDiv");
+      cl_context->setArg(0, mean_pass2_->data());
+      cl_context->setArg(1, mean_->data());
+      cl_context->setArg(2, mean_coef_->data());
+      cl_context->setArg(3, out->dim()[2]);
+      cl_context->runKernel3D(jtorch::deviceid, mean_->dim(), false);
 
-    // Perform normalization pass
-    cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalization");
-    cl_context->setArg(0, in.data());
-    cl_context->setArg(1, out->data());
-    cl_context->setArg(2, mean_->data());
-    cl_context->runKernel3D(jtorch::deviceid, out->dim(), false);
+      // Perform normalization pass
+      cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalization");
+      cl_context->setArg(0, in.data());
+      cl_context->setArg(1, out->data());
+      cl_context->setArg(2, mean_->data());
+      cl_context->runKernel3D(jtorch::deviceid, out->dim(), false);
+    } else {
+      throw std::runtime_error("Not finished - 2D Kernel's need to be implemented!");
+    }
   }
 
   TorchStage* SpatialSubtractiveNormalization::loadFromFile(std::ifstream& file) {
-#error (This needs to be fixed... It has changed)
-
     // This whole thing is a little wasteful.  I copy to GPU here, and then
     // I copy it back down in the constructor anyway...  But it's good enough
     // for now.
-    int32_t kernel_size;
-    file.read((char*)(&kernel_size), sizeof(kernel_size));
-    Tensor<float>* kernel = new Tensor<float>(kernel_size);
-    float* kernel_cpu = new float[kernel_size];
-    file.read((char*)(kernel_cpu), kernel_size * sizeof(*kernel_cpu));
+    int32_t kernel_size_2, kernel_size_1;  // kernel_size_1 is the inner dim
+    file.read((char*)(&kernel_size_1), sizeof(kernel_size_1));
+    file.read((char*)(&kernel_size_2), sizeof(kernel_size_2));
+    Tensor<float>* kernel;
+    if (kernel_size_2 > 1) {
+      // The kernel is 2D
+      kernel = new Tensor<float>(Int2(kernel_size_1, kernel_size_2));
+    } else {
+      kernel = new Tensor<float>(kernel_size_1);
+    }
+    float* kernel_cpu = new float[kernel->dataSize()];
+    file.read((char*)(kernel_cpu), kernel->dataSize() * sizeof(*kernel_cpu));
     kernel->setData(kernel_cpu);
     TorchStage* ret = new SpatialSubtractiveNormalization(*kernel);
     delete kernel;

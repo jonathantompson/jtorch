@@ -7,7 +7,7 @@
 
 Torch7 (<http://www.torch.ch/>) is an AMAZING machine learning library written and maintained by some very smart people :-)  For me it's only downside is that interfacing with it from C++ on Windows 7 (and other operating systems other than Mac OS X and Linux) is difficult (if not sometimes impossible).  This library is a C++ framework for doing the forward propagation of various torch modules.  It uses OpenCL to perform the forward prop on the GPU.  I have even found that some of the OpenCL modules here are actually faster than the Torch7 CUDA modules on Linux.  With this said, you should profile torch vs jtorch and make sure there are no super slow modules in this library (since I haven't spent all that much time optimizing GPU code).
 
-Please note that this is not supposed to be a replacement for Torch7.  There is no back propagation (so no learning), and only a very limited subset of the modules are implemented.  The use-case for this library is for people who do model development on Linux, but want to run FPROP of their models on other operating systems.
+Please note that this is not supposed to be a replacement for Torch7.  There is no back propagation (so no learning), and only a very limited subset of the modules are implemented.  Additionally, none of the modules support batches (so single sample FPROP only).  The use-case for this library is for people who do model development on Linux, but want to run real-time FPROP of their models on other operating systems.
 
 The library consists of a simple lua codebase for recursively saving a torch model to a compact binary format (all in the ./lua folder):
 
