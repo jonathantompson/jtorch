@@ -19,6 +19,8 @@
 #include "jtorch/torch_data.h"
 #include "jtorch/jtorch.h"
 
+#define JTORCH_TENSOR_PRECISON 4
+
 namespace jcl { namespace threading { class ThreadPool; } }
 
 namespace jtorch {
@@ -111,6 +113,8 @@ namespace jtorch {
 
   template <typename T>
   void Tensor<T>::print() {
+    std::streamsize prec = std::cout.precision();
+    std::cout.precision(JTORCH_TENSOR_PRECISON);
     T* d = new T[dataSize()];
     getData(d);
     const int32_t dim = dim_[0] * dim_[1];
@@ -131,7 +135,8 @@ namespace jtorch {
         }
         std::cout.setf(std::ios::showpos);
         for (int32_t u = 0; u < dim_[0]; u++) {
-          std::cout << data[v * dim_[0] + u];
+          std::cout << std::fixed << data[v * dim_[0] + u];
+          std::cout.unsetf(std::ios_base::floatfield);
           if (u != dim_[0] - 1) {
             std::cout << ", ";
           } else {
@@ -140,8 +145,14 @@ namespace jtorch {
         }
       }
     }
+    std::cout.precision(prec);
     std::cout << std::resetiosflags(std::ios_base::showpos);
     delete[] d;
+
+    std::cout << "[jtorch.";
+    std::cout << jcl::JCL::CLDeviceToString(jtorch::cl_context->device());
+    std::cout << " of dimension " << dim_[2] << "x" << dim_[1] << "x";
+    std::cout << dim_[0] << "]" << std::endl;
   };
 
   template <typename T>
@@ -153,11 +164,13 @@ namespace jtorch {
         "intervals must be monotonic");
     }
     if (interval0[0] < 0 || interval0[1] >= dim_[0] || 
-      interval1[0] < 0 || interval1[1] >= dim_[1] ||
-      interval2[0] < 0 || interval2[1] >= dim_[2]) {
+        interval1[0] < 0 || interval1[1] >= dim_[1] ||
+        interval2[0] < 0 || interval2[1] >= dim_[2]) {
       throw std::runtime_error("Tensor<T>::print() - ERROR: "
         "intervals out of range");
     }
+    std::streamsize prec = std::cout.precision();
+    std::cout.precision(JTORCH_TENSOR_PRECISON);
     T* d = new T[dataSize()];
     getData(d);
     for (int32_t f = interval2[0]; f <= interval2[1]; f++) {
@@ -177,7 +190,8 @@ namespace jtorch {
         }
         std::cout.setf(std::ios::showpos);
         for (int32_t u = interval0[0]; u <= interval0[1]; u++) {
-          std::cout << data[v * dim_[0] + u];
+          std::cout << std::fixed << data[v * dim_[0] + u];
+          std::cout.unsetf(std::ios_base::floatfield);
           if (u != interval0[1]) {
             std::cout << ", ";
           } else {
@@ -186,7 +200,14 @@ namespace jtorch {
         }
       }
     }
+    std::cout.precision(prec);
+    std::cout << std::resetiosflags(std::ios_base::showpos);
     delete[] d;
+
+    std::cout << "[jtorch.";
+    std::cout << jcl::JCL::CLDeviceToString(jtorch::cl_context->device());
+    std::cout << " of dimension " << dim_[2] << "x" << dim_[1] << "x";
+    std::cout << dim_[0] << "]" << std::endl;
   }
 
   template <typename T>

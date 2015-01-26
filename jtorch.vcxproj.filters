@@ -80,6 +80,9 @@
     <ClInclude Include="include\jtorch\spatial_convolution.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
+    <ClInclude Include="include\jtorch\identity.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\jtorch\join_table.cpp">
@@ -137,6 +140,9 @@
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
     <ClCompile Include="src\jtorch\spatial_convolution.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jtorch\identity.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
   </ItemGroup>

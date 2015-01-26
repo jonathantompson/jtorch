@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\jtorch\identity.h" />
     <ClInclude Include="include\jtorch\spatial_convolution.h" />
     <ClInclude Include="include\jtorch\tensor.h" />
     <ClInclude Include="include\jtorch\join_table.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="include\jtorch\transpose.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\jtorch\identity.cpp" />
     <ClCompile Include="src\jtorch\join_table.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>

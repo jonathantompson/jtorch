@@ -18,6 +18,7 @@
 #include "jtorch/threshold.h"
 #include "jtorch/join_table.h"
 #include "jtorch/transpose.h"
+#include "jtorch/identity.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -104,7 +105,7 @@ namespace jtorch {
       return Transpose::loadFromFile(ifile);
     case IDENTITY_STAGE:
       std::cout << "\tLoading Identity..." << std::endl;
-      throw std::runtime_error("TODO: Implement this");
+      return Identity::loadFromFile(ifile);
     case SELECT_TABLE_STAGE:
       std::cout << "\tLoading SelectTable..." << std::endl;
       throw std::runtime_error("TODO: Implement this");
