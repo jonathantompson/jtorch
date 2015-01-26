@@ -11,6 +11,7 @@ num_feats_in = 5
 num_feats_out = 10
 width = 10
 height = 10
+math.mod = math.fmod
 
 data_in = torch.FloatTensor(num_feats_in, height, width)
 
@@ -141,26 +142,54 @@ saveArray(res, "test_data/spatial_max_pooling.bin")
 print('Spatial Max Pooling result result saved to test_data/spatial_max_pooling.bin')
 
 -- Test SpatialSubtractiveNormalization
-model4 = nn.Sequential()
-normkernel = image.gaussian1D(7)
-print('Normalization Kernel1D')
-print(normkernel)
-spatial_sub_norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
-model4:add(spatial_sub_norm)
-res = model4:forward(data_in)
-saveArray(res, "test_data/spatial_subtractive_normalization.bin")
-print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
+do
+  model4 = nn.Sequential()
+  normkernel = image.gaussian1D(7)
+  print('Normalization Kernel1D')
+  print(normkernel)
+  norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+  model4:add(norm)
+  res = model4:forward(data_in)
+  saveArray(res, "test_data/spatial_subtractive_normalization.bin")
+  print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
+end
+
+do
+  model4 = nn.Sequential()
+  normkernel = image.gaussian(7)
+  print('Normalization Kernel2D')
+  print(normkernel)
+  norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+  model4:add(norm)
+  res = model4:forward(data_in)
+  saveArray(res, "test_data/spatial_subtractive_normalization_2d.bin")
+  print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
+end
 
 -- Test SpatialDivisiveNormalization
-model5 = nn.Sequential()
-normkernel = image.gaussian1D(7)
-print('Normalization Kernel1D')
-print(normkernel)
-spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
-model5:add(spatial_div_norm)
-res = model5:forward(data_in)
-saveArray(res, "test_data/spatial_divisive_normalization.bin")
-print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
+do
+  model5 = nn.Sequential()
+  normkernel = image.gaussian1D(7)
+  print('Normalization Kernel1D')
+  print(normkernel)
+  spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+  model5:add(spatial_div_norm)
+  res = model5:forward(data_in)
+  saveArray(res, "test_data/spatial_divisive_normalization.bin")
+  print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
+end
+
+do
+  model5 = nn.Sequential()
+  normkernel = image.gaussian(7)
+  print('Normalization Kernel2D')
+  print(normkernel)
+  spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+  model5:add(spatial_div_norm)
+  res = model5:forward(data_in)
+  saveArray(res, "test_data/spatial_divisive_normalization_2d.bin")
+  print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
+end
 
 -- return spatial_div_norm.localstds
 
@@ -269,6 +298,7 @@ torch.save("testmodel.torch.bin", test_model)
 --]]
 
 -- Check the real model
+--[[
 require 'nn'
 require 'image'
 require 'torch'
@@ -279,8 +309,6 @@ require 'cunn'
 require 'cutorch'
 model = torch.load("../HandNets/handmodel.net")
 collectgarbage()
-
--- nvidia-smi -q -d MEMORY
 
 width = 96
 height = 96
@@ -372,4 +400,4 @@ image.display{image=cpp_out, padding=2, nrow=4, zoom=zoom_factor, scaleeach=fals
 -- Print out a few odd numbers
 print(model:get(1):get(1):get(4).output[{1, 1, {1,20}, {1,6}}])  -- First threshold out
 print(res[{1,{1,10}}])
-
+--]]
