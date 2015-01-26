@@ -33,6 +33,8 @@
   #define snprintf _snprintf_s
 #endif
 
+#define JTORCH_FLOAT_PRECISION 1e-5
+
 using namespace std;
 using namespace jtorch;
 using namespace jcl::threading;
@@ -70,8 +72,8 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
   bool data_correct = true;
   for (uint32_t i = 0; i < data->dataSize() && data_correct; i++) {
     float delta = fabsf(model_data[i] - correct_data[i]) ;
-    if (delta > LOOSE_EPSILON && (delta /
-      std::max<float>(fabsf(correct_data[i]), EPSILON)) > 0.0001f) {
+    if (delta > JTORCH_FLOAT_PRECISION && (delta /
+      std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > JTORCH_FLOAT_PRECISION) {
       data_correct = false;
       std::cout << "index " << i << " incorrect!: " << std::endl;
       std::cout << std::fixed << std::setprecision(15); 
@@ -229,12 +231,19 @@ int main(int argc, char *argv[]) {
     testJTorchValue((jtorch::Tensor<float>*)sub_norm_stage.output, 
       "./test_data/spatial_subtractive_normalization.bin");
 
+    SpatialSubtractiveNormalization sub_norm_stage_2d(*kernel_2d);
+    sub_norm_stage_2d.forwardProp(data_in);
+    testJTorchValue((jtorch::Tensor<float>*)sub_norm_stage_2d.output, 
+      "./test_data/spatial_subtractive_normalization_2d.bin");
+
     // ***********************************************
     // Test SpatialDivisiveNormalization
     SpatialDivisiveNormalization div_norm_stage(*kernel_1d);
     div_norm_stage.forwardProp(data_in);
     testJTorchValue((jtorch::Tensor<float>*)div_norm_stage.output, 
       "./test_data/spatial_divisive_normalization.bin");
+
+    // TODO: Add 2D Kernel test
 
     // ***********************************************
     // Test SpatialContrastiveNormalization

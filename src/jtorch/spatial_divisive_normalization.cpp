@@ -113,20 +113,20 @@ namespace jtorch {
         int32_t filt_rad = (kernel_size - 1) / 2;
         for (int32_t v = 0; v < height; v++) {
           for (int32_t u = 0; u < width; u++) {
-            std_coef_cpu[v * width + u] = 0.0f;
+            float tmp = 0.0f;
             for (int32_t v_filt = -filt_rad; v_filt <= filt_rad; v_filt++) {
               for (int32_t u_filt = -filt_rad; u_filt <= filt_rad; u_filt++) {
                 int32_t u_in = u + u_filt;
                 int32_t v_in = v + v_filt;
                 if (u_in >= 0 && u_in < width && v_in >= 0 && v_in < height) {
                   // Pixel is inside --> We'll effectively clamp zeros elsewhere.
-                  std_coef_cpu[v * width + u] += 
+                  tmp += 
                     (kernel_norm_cpu[v_filt + filt_rad] * 
                      kernel_norm_cpu[u_filt + filt_rad]);
                 }
               }
             }
-            std_coef_cpu[v * width + u] /= n_feats;
+            std_coef_cpu[v * width + u] = tmp / n_feats;
           }
         }
       } else {
@@ -137,19 +137,19 @@ namespace jtorch {
         int32_t filt_rad_v = (kernel_size_v - 1) / 2;
         for (int32_t v = 0; v < height; v++) {
           for (int32_t u = 0; u < width; u++) {
-            std_coef_cpu[v * width + u] = 0.0f;
+            float tmp = 0.0f;
             for (int32_t v_filt = -filt_rad_v; v_filt <= filt_rad_v; v_filt++) {
               for (int32_t u_filt = -kernel_size_u; u_filt <= kernel_size_u; u_filt++) {
                 int32_t u_in = u + u_filt;
                 int32_t v_in = v + v_filt;
                 if (u_in >= 0 && u_in < width && v_in >= 0 && v_in < height) {
                   // Pixel is inside --> We'll effectively clamp zeros elsewhere.
-                  std_coef_cpu[v * width + u] += 
+                  tmp += 
                     kernel_norm_cpu[(v_filt + filt_rad_v) * kernel_size_u + (u_filt + filt_rad_u)];
                 }
               }
             }
-            std_coef_cpu[v * width + u] /= n_feats;
+            std_coef_cpu[v * width + u] = tmp / n_feats;
           }
         }
       }
@@ -171,13 +171,14 @@ namespace jtorch {
     init(input);
     bool onedim_kernel = kernel_->dim()[1] == 1;
 
+    std::string kernel = jtorch::jtorch_path + 
+      "kernels/spatial_divisive_normalization.cl";
+    Tensor<float>& in = (Tensor<float>&)input;
+    Tensor<float>* out = (Tensor<float>*)output;
     if (onedim_kernel) {
       int32_t filt_rad = (kernel_norm_->dim()[0] - 1) / 2;
-    
+
       // Perform horizontal filter pass
-      Tensor<float>& in = (Tensor<float>&)input;
-      Tensor<float>* out = (Tensor<float>*)output;
-      std::string kernel = jtorch::jtorch_path + "kernels/spatial_divisive_normalization.cl";
       cl_context->useKernel(kernel.c_str(), "SpatialDivisiveNormalizationHoriz");
       cl_context->setArg(0, in.data());
       cl_context->setArg(1, std_pass1_->data());
@@ -192,25 +193,25 @@ namespace jtorch {
       cl_context->setArg(2, kernel_norm_->data());
       cl_context->setArg(3, filt_rad);
       cl_context->runKernel3D(jtorch::deviceid, std_pass2_->dim(), false);
-
-      // Perform accumulation and division pass
-      cl_context->useKernel(kernel.c_str(), "SpatialDivisiveNormalizationAccumDiv");
-      cl_context->setArg(0, std_pass2_->data());
-      cl_context->setArg(1, std_->data());
-      cl_context->setArg(2, std_coef_->data());
-      cl_context->setArg(3, out->dim()[2]);
-      cl_context->setArg(4, threshold_);
-      cl_context->runKernel3D(jtorch::deviceid, std_->dim(), false);
-
-      // Perform normalization pass
-      cl_context->useKernel(kernel.c_str(), "SpatialDivisiveNormalization");
-      cl_context->setArg(0, in.data());
-      cl_context->setArg(1, out->data());
-      cl_context->setArg(2, std_->data());
-      cl_context->runKernel3D(jtorch::deviceid, out->dim(), false);
     } else {
       throw std::runtime_error("Not finished - 2D Kernel's need to be implemented!");
     }
+
+    // Perform accumulation and division pass
+    cl_context->useKernel(kernel.c_str(), "SpatialDivisiveNormalizationAccumDiv");
+    cl_context->setArg(0, std_pass2_->data());
+    cl_context->setArg(1, std_->data());
+    cl_context->setArg(2, std_coef_->data());
+    cl_context->setArg(3, out->dim()[2]);
+    cl_context->setArg(4, threshold_);
+    cl_context->runKernel3D(jtorch::deviceid, std_->dim(), false);
+
+    // Perform normalization pass
+    cl_context->useKernel(kernel.c_str(), "SpatialDivisiveNormalization");
+    cl_context->setArg(0, in.data());
+    cl_context->setArg(1, out->data());
+    cl_context->setArg(2, std_->data());
+    cl_context->runKernel3D(jtorch::deviceid, out->dim(), false);
   }
 
   TorchStage* SpatialDivisiveNormalization::loadFromFile(std::ifstream& file) {
