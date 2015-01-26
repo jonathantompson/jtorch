@@ -26,9 +26,8 @@ namespace jtorch {
 
 
   TorchStage* JoinTable::loadFromFile(std::ifstream& file) {
-#error (this has changed, now saving dimension)
-    int32_t output_dim;
-    file.read((char*)(&output_dim), sizeof(output_dim));
+    int32_t dimension;
+    file.read((char*)(&dimension), sizeof(dimension));
     // But we don't really use it...
     return new JoinTable();
   }

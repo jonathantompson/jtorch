@@ -217,18 +217,21 @@ int main(int argc, char *argv[]) {
     // ***********************************************
     // Test SpatialSubtractiveNormalization
     uint32_t gauss_size = 7;
-    Tensor<float>* kernel = Tensor<float>::gaussian1D(gauss_size);
+    Tensor<float>* kernel_1d = Tensor<float>::gaussian1D(gauss_size);
+    Tensor<float>* kernel_2d = Tensor<float>::gaussian(gauss_size);
     // std::cout << "\tkernel1D:" << std::endl;
-    // kernel->print();
+    // kernel_1d->print();
+    // std::cout << "\tkernel2D:" << std::endl;
+    // kernel_2d->print();
 
-    SpatialSubtractiveNormalization sub_norm_stage(*kernel);
+    SpatialSubtractiveNormalization sub_norm_stage(*kernel_1d);
     sub_norm_stage.forwardProp(data_in);
     testJTorchValue((jtorch::Tensor<float>*)sub_norm_stage.output, 
       "./test_data/spatial_subtractive_normalization.bin");
 
     // ***********************************************
     // Test SpatialDivisiveNormalization
-    SpatialDivisiveNormalization div_norm_stage(*kernel);
+    SpatialDivisiveNormalization div_norm_stage(*kernel_1d);
     div_norm_stage.forwardProp(data_in);
     testJTorchValue((jtorch::Tensor<float>*)div_norm_stage.output, 
       "./test_data/spatial_divisive_normalization.bin");
@@ -281,7 +284,8 @@ int main(int argc, char *argv[]) {
     testJTorchValue((jtorch::Tensor<float>*)lin_stage.output, 
       "./test_data/linear.bin");
 
-    delete kernel;
+    delete kernel_1d;
+    delete kernel_2d;
     delete kernel2;
 
     // ***********************************************

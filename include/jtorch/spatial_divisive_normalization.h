@@ -25,7 +25,7 @@ namespace jtorch {
   class SpatialDivisiveNormalization : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialDivisiveNormalization(const Tensor<float>& kernel1d, 
+    SpatialDivisiveNormalization(const Tensor<float>& kernel, 
       const float threshold = 1e-4f);
     virtual ~SpatialDivisiveNormalization();
 
@@ -35,8 +35,8 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    Tensor<float>* kernel1d_;
-    Tensor<float>* kernel1d_norm_;  // kernel normalization depends on input size
+    Tensor<float>* kernel_;
+    Tensor<float>* kernel_norm_;  // kernel normalization depends on input size
     Tensor<float>* std_coef_;
     Tensor<float>* std_;        // 2D
     Tensor<float>* std_pass1_;  // 3D - Horizontal pass

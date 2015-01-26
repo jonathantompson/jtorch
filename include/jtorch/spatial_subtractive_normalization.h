@@ -21,7 +21,7 @@ namespace jtorch {
   class SpatialSubtractiveNormalization : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialSubtractiveNormalization(const Tensor<float>& kernel1d);
+    SpatialSubtractiveNormalization(const Tensor<float>& kernel);
     virtual ~SpatialSubtractiveNormalization();
 
     virtual TorchStageType type() const { return SPATIAL_SUBTRACTIVE_NORMALIZATION_STAGE; }
@@ -30,7 +30,7 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    Tensor<float>* kernel1d_;
+    Tensor<float>* kernel_;
     Tensor<float>* mean_coef_;
     Tensor<float>* mean_;        // 2D
     Tensor<float>* mean_pass1_;  // 3D - Horizontal pass

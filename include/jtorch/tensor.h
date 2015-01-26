@@ -53,6 +53,7 @@ namespace jtorch {
     // gaussian1D In torch: >> normkernel = image.gaussian1D(n)
     // It's a gaussian of x = -2*sigma to 2*sigma, where sigma = size / 2
     static Tensor<T>* gaussian1D(const int32_t kernel_size);
+    static Tensor<T>* gaussian(const int32_t kernel_size);
     static Tensor<T>* ones1D(const int32_t kernel_size);
 
     inline jcl::JCLBuffer data() { return data_; }
@@ -61,7 +62,7 @@ namespace jtorch {
   protected:
     jcl::JCLBuffer data_;  // Internal data
     jcl::math::Int3 dim_;  // dim_[0] is lowest contiguous dimension, 
-                             // dim_[2] is highest dimension
+                           // dim_[2] is highest dimension
 
     // Non-copyable, non-assignable.
     Tensor(Tensor&);
@@ -199,6 +200,27 @@ namespace jtorch {
     for (int32_t i = 0; i < kernel_size; i++) {
       data[i] = (T)amplitude * expf(-(powf(((float)(i+1) - center) / 
         (sigma*size), 2.0f) / 2.0f));
+    }
+    ret->setData(data);
+    delete[] data;
+    return ret;
+  }
+
+  template <typename T>
+  Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
+    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, kernel_size, 1));
+    const float sigma = 0.25f;
+    const float amplitude = 1.0f;
+    const float size = (float)kernel_size;
+    const float center = size/2.0f + 0.5f;
+    T* data = new T[kernel_size * kernel_size];
+    for (int32_t v = 0; v < kernel_size; v++) {
+      for (int32_t u = 0; u < kernel_size; u++) {
+        float du = ((float)(u+1) - center) / (sigma*size);
+        float dv = ((float)(v+1) - center) / (sigma*size);
+        data[v * kernel_size + u] = (T)amplitude * expf(-(du * du + dv * dv) / 
+          2.0f);
+      }
     }
     ret->setData(data);
     delete[] data;
