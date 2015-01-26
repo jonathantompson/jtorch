@@ -312,6 +312,8 @@ int main(int argc, char *argv[]) {
     delete kernel_2d;
     delete kernel2;
 
+    // TODO: Test Identity
+
     // ***********************************************
     // Test Loading a model
     TorchStage* model = TorchStage::loadFromFile("./testmodel.bin");
