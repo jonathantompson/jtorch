@@ -162,8 +162,6 @@ res = model4:forward(data_in)
 saveArray(res, "test_data/spatial_subtractive_normalization_2d.bin")
 print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization_2d.bin')
 
-error('early out')
-
 -- Test SpatialDivisiveNormalization
 model5 = nn.Sequential()
 normkernel = image.gaussian1D(7)
