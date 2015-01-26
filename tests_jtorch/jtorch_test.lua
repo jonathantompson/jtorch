@@ -142,54 +142,48 @@ saveArray(res, "test_data/spatial_max_pooling.bin")
 print('Spatial Max Pooling result result saved to test_data/spatial_max_pooling.bin')
 
 -- Test SpatialSubtractiveNormalization
-do
-  model4 = nn.Sequential()
-  normkernel = image.gaussian1D(7)
-  print('Normalization Kernel1D')
-  print(normkernel)
-  norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
-  model4:add(norm)
-  res = model4:forward(data_in)
-  saveArray(res, "test_data/spatial_subtractive_normalization.bin")
-  print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
-end
+model4 = nn.Sequential()
+normkernel = image.gaussian1D(7)
+print('Normalization Kernel1D')
+print(normkernel)
+norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+model4:add(norm)
+res = model4:forward(data_in)
+saveArray(res, "test_data/spatial_subtractive_normalization.bin")
+print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
 
-do
-  model4 = nn.Sequential()
-  normkernel = image.gaussian(7)
-  print('Normalization Kernel2D')
-  print(normkernel)
-  norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
-  model4:add(norm)
-  res = model4:forward(data_in)
-  saveArray(res, "test_data/spatial_subtractive_normalization_2d.bin")
-  print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
-end
+model4 = nn.Sequential()
+normkernel = image.gaussian(7)
+print('Normalization Kernel2D')
+print(normkernel)
+norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+model4:add(norm)
+res = model4:forward(data_in)
+saveArray(res, "test_data/spatial_subtractive_normalization_2d.bin")
+print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization_2d.bin')
+
+error('early out')
 
 -- Test SpatialDivisiveNormalization
-do
-  model5 = nn.Sequential()
-  normkernel = image.gaussian1D(7)
-  print('Normalization Kernel1D')
-  print(normkernel)
-  spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
-  model5:add(spatial_div_norm)
-  res = model5:forward(data_in)
-  saveArray(res, "test_data/spatial_divisive_normalization.bin")
-  print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
-end
+model5 = nn.Sequential()
+normkernel = image.gaussian1D(7)
+print('Normalization Kernel1D')
+print(normkernel)
+spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+model5:add(spatial_div_norm)
+res = model5:forward(data_in)
+saveArray(res, "test_data/spatial_divisive_normalization.bin")
+print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
 
-do
-  model5 = nn.Sequential()
-  normkernel = image.gaussian(7)
-  print('Normalization Kernel2D')
-  print(normkernel)
-  spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
-  model5:add(spatial_div_norm)
-  res = model5:forward(data_in)
-  saveArray(res, "test_data/spatial_divisive_normalization_2d.bin")
-  print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
-end
+model5 = nn.Sequential()
+normkernel = image.gaussian(7)
+print('Normalization Kernel2D')
+print(normkernel)
+spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+model5:add(spatial_div_norm)
+res = model5:forward(data_in)
+saveArray(res, "test_data/spatial_divisive_normalization_2d.bin")
+print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization_2d.bin')
 
 -- return spatial_div_norm.localstds
 
