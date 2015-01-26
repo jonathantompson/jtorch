@@ -169,6 +169,8 @@ namespace jtorch {
   }
 
   TorchStage* SpatialSubtractiveNormalization::loadFromFile(std::ifstream& file) {
+#error (This needs to be fixed... It has changed)
+
     // This whole thing is a little wasteful.  I copy to GPU here, and then
     // I copy it back down in the constructor anyway...  But it's good enough
     // for now.

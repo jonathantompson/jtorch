@@ -26,6 +26,7 @@ namespace jtorch {
 
 
   TorchStage* JoinTable::loadFromFile(std::ifstream& file) {
+#error (this has changed, now saving dimension)
     int32_t output_dim;
     file.read((char*)(&output_dim), sizeof(output_dim));
     // But we don't really use it...
@@ -34,13 +35,13 @@ namespace jtorch {
 
   void JoinTable::init(TorchData& input) {
     if (input.type() != TorchDataType::TABLE_DATA) {
-      throw std::runtime_error("Parallel::forwardProp() - "
+      throw std::runtime_error("JoinTable::forwardProp() - "
         "Table expected!");
     }
     Table& in = (Table&)input;
 
     if (in.tableSize() == 0) {
-      throw std::runtime_error("Parallel::forwardProp() - "
+      throw std::runtime_error("JoinTable::forwardProp() - "
         "Empty input Table!");
     }
 
@@ -48,7 +49,7 @@ namespace jtorch {
     int size = 0;
     for (uint32_t i = 0; i < in.tableSize(); i++) {
       if (in(i)->type() != TENSOR_DATA) {
-        throw std::runtime_error("Parallel::forwardProp() - "
+        throw std::runtime_error("JoinTable::forwardProp() - "
           "Table of float tensors expected!");
       }
       size += in(i)->dataSize();
