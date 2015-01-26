@@ -19,7 +19,7 @@ namespace jtorch {
   SpatialSubtractiveNormalization::SpatialSubtractiveNormalization(
     const Tensor<float>& kernel) : TorchStage() {
     if (kernel.dim()[0] % 2 == 0 || kernel.dim()[1] % 2 == 0 ||
-      kernel.dim()[2] != 1) {
+        kernel.dim()[2] != 1) {
       throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
         "Averaging kernel must have odd size!");
     }

@@ -83,7 +83,7 @@ __kernel void SpatialSubtractiveNormalization2D(
       int u = x_out + u_offset;
       int u_filt = u_offset + filt_rad_u;
 	    if (v >= 0 && v < height && u >= 0 && u < width) {
-	      sum += kernel2d[v_filt * filt_size_u + u_filt] * 
+        sum += kernel2d[v_filt * filt_size_u + u_filt] * 
           input[iout + v_offset * width + u_offset];
       }
     }
