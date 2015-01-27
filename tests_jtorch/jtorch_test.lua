@@ -284,8 +284,7 @@ print('Test model result saved to test_data/test_model_result.bin')
 -- test SpatialUpSamplingNearest
 do
   local model = nn.SpatialUpSamplingNearest(4)
-  local input = image.gaussian(7):resize(1,7,7)
-  local res = model:forward(input)
+  local res = model:forward(data_in)
   saveArray(res, "test_data/spatial_up_sampling_nearest.bin")
   print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
 end
