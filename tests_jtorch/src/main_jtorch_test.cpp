@@ -381,6 +381,8 @@ int main(int argc, char *argv[]) {
       assertTrue(test_passed, "SelectTable");
     }
 
+    // TODO: Test CAddTable
+
     // ***********************************************
     // Test Loading a model
     {

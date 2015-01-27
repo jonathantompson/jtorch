@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\jtorch\c_add_table.h" />
     <ClInclude Include="include\jtorch\identity.h" />
     <ClInclude Include="include\jtorch\select_table.h" />
     <ClInclude Include="include\jtorch\spatial_convolution.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="include\jtorch\transpose.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\jtorch\c_add_table.cpp" />
     <ClCompile Include="src\jtorch\identity.cpp" />
     <ClCompile Include="src\jtorch\join_table.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -95,14 +97,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="kernels\accumulate.cl" />
+    <None Include="kernels\add.cl" />
+    <None Include="kernels\copy.cl" />
+    <None Include="kernels\div.cl" />
     <None Include="kernels\join_table.cl" />
     <None Include="kernels\linear.cl" />
+    <None Include="kernels\mul.cl" />
     <None Include="kernels\spatial_convolution.cl" />
     <None Include="kernels\spatial_divisive_normalization.cl" />
     <None Include="kernels\spatial_max_pooling.cl" />
     <None Include="kernels\spatial_subtractive_normalization.cl" />
     <None Include="kernels\tanh.cl" />
-    <None Include="kernels\tensor.cl" />
+    <None Include="kernels\zero.cl" />
     <None Include="kernels\threshold.cl" />
     <None Include="README.md" />
   </ItemGroup>
