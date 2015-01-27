@@ -86,7 +86,7 @@ end
 model:add(spat_conv_map)
 res = model:forward(data_in)
 saveArray(res, "test_data/spatial_convolution_map.bin")
-print('Spatial Convolution Map result result saved to test_data/spatial_convolution_map.bin')
+print('Spatial Convolution Map result saved to test_data/spatial_convolution_map.bin')
 
 -- Test SpatialConvolution
 n_states_in = num_feats_in
@@ -120,7 +120,7 @@ end
 -- print(spat_conv.weight)
 res = spat_conv:forward(model:get(2).output)
 saveArray(res, "test_data/spatial_convolution.bin")
-print('Spatial Convolution result result saved to test_data/spatial_convolution.bin')
+print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
 
 -- Test SpatialLPPooling
 pnorm = 2.0
@@ -131,7 +131,7 @@ pool_stage = nn.SpatialLPPooling(nstates, poolsize_u, poolsize_v, poolsize_u, po
 model:add(pool_stage)
 res = model:forward(data_in)
 saveArray(res, "test_data/spatial_lp_pooling.bin")
-print('Spatial LP Pooling result result saved to test_data/spatial_lp_pooling.bin')
+print('Spatial LP Pooling result saved to test_data/spatial_lp_pooling.bin')
 
 -- Test SpatialMaxPooling
 model3 = nn.Sequential()
@@ -139,7 +139,7 @@ max_pool_stage = nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsi
 model3:add(max_pool_stage)
 res = model3:forward(data_in)
 saveArray(res, "test_data/spatial_max_pooling.bin")
-print('Spatial Max Pooling result result saved to test_data/spatial_max_pooling.bin')
+print('Spatial Max Pooling result saved to test_data/spatial_max_pooling.bin')
 
 -- Test SpatialSubtractiveNormalization
 model4 = nn.Sequential()
@@ -150,7 +150,7 @@ norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
 model4:add(norm)
 res = model4:forward(data_in)
 saveArray(res, "test_data/spatial_subtractive_normalization.bin")
-print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization.bin')
+print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization.bin')
 
 model4 = nn.Sequential()
 normkernel = image.gaussian(7)
@@ -160,7 +160,7 @@ norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
 model4:add(norm)
 res = model4:forward(data_in)
 saveArray(res, "test_data/spatial_subtractive_normalization_2d.bin")
-print('SpatialSubtractiveNormalization result result saved to test_data/spatial_subtractive_normalization_2d.bin')
+print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization_2d.bin')
 
 -- Test SpatialDivisiveNormalization
 model5 = nn.Sequential()
@@ -171,7 +171,7 @@ spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
 model5:add(spatial_div_norm)
 res = model5:forward(data_in)
 saveArray(res, "test_data/spatial_divisive_normalization.bin")
-print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization.bin')
+print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization.bin')
 
 model5 = nn.Sequential()
 normkernel = image.gaussian(7)
@@ -181,7 +181,7 @@ spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
 model5:add(spatial_div_norm)
 res = model5:forward(data_in)
 saveArray(res, "test_data/spatial_divisive_normalization_2d.bin")
-print('SpatialDivisiveNormalization result result saved to test_data/spatial_divisive_normalization_2d.bin')
+print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization_2d.bin')
 
 -- return spatial_div_norm.localstds
 
@@ -280,6 +280,15 @@ test_model = torch.load("testmodel.torch.bin")
 res = test_model:forward(data_in)
 saveArray(res, "test_data/test_model_result.bin")
 print('Test model result saved to test_data/test_model_result.bin')
+
+-- test SpatialUpSamplingNearest
+do
+  local model = nn.SpatialUpSamplingNearest(4)
+  local input = image.gaussian(7):resize(1,7,7)
+  local res = model:forward(input)
+  saveArray(res, "test_data/spatial_up_sampling_nearest.bin")
+  print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
+end
 
 -- Save the Test model
 --[[
