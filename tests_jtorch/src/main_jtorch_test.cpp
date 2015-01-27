@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 #include <limits>
+#include <assert.h>
 #include "jtorch/torch_stage.h"
 #include "jtorch/jtorch.h"
 #include "jtorch/tensor.h"
@@ -25,6 +26,7 @@
 #include "jtorch/table.h"
 #include "jtorch/join_table.h"
 #include "jtorch/select_table.h"
+#include "jtorch/c_add_table.h"
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 #include "debug_util.h"
@@ -116,7 +118,7 @@ int main(int argc, char *argv[]) {
 #if defined(_DEBUG) || defined(DEBUG)
   jcl::debug::EnableMemoryLeakChecks();
   // jcl::debug::EnableAggressiveMemoryLeakChecks();
-  // jcl::debug::SetBreakPointOnAlocation(2014);
+  // jcl::debug::SetBreakPointOnAlocation(2384);
 #endif
 
   try {
@@ -381,7 +383,44 @@ int main(int argc, char *argv[]) {
       assertTrue(test_passed, "SelectTable");
     }
 
-    // TODO: Test CAddTable
+    // ***********************************************
+    // Test CAddTable
+    {
+      const int32_t table_size = 5;
+      const int32_t tensor_size = 5;
+      Table input;
+      for (int32_t i = 0; i < table_size; i++) {
+        input.add(Tensor<float>::gaussian(tensor_size));  // Transfers ownership
+        Tensor<float>::mul(*(Tensor<float>*)input(i), i+1);
+      }
+
+      // Add the tensors to get the ground truth
+      float* gt = new float[tensor_size * tensor_size];
+      float* temp = new float[tensor_size * tensor_size];
+      memset(gt, 0, sizeof(gt[0]) * tensor_size * tensor_size);
+      for (int32_t i = 0; i < table_size; i++) {
+        assert(input(i)->dataSize() == tensor_size * tensor_size);
+        ((Tensor<float>*)input(i))->getData(temp);
+        for (uint32_t i = 0; i < tensor_size * tensor_size; i++) {
+          gt[i] += temp[i];
+        }
+      }
+
+      CAddTable* module = new CAddTable();
+      module->forwardProp(input);
+      ((Tensor<float>*)module->output)->getData(temp);
+
+      bool test_passed = true;
+      for (int32_t i = 0; i < tensor_size * tensor_size; i++) {
+        test_passed = test_passed && 
+          (fabsf(temp[i] - gt[i]) < JTORCH_FLOAT_PRECISION);
+      }
+      assertTrue(test_passed, "CAddTable");
+
+      delete module;
+      delete[] gt;
+      delete[] temp;
+    }
 
     // ***********************************************
     // Test Loading a model
