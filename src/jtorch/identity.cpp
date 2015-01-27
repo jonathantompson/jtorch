@@ -20,6 +20,7 @@ namespace jtorch {
   }
 
   Identity::~Identity() {
+    // Nothing to do for output (we don't own it)
   }
 
   TorchStage* Identity::loadFromFile(std::ifstream& file) {

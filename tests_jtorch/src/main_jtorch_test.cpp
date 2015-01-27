@@ -313,6 +313,7 @@ int main(int argc, char *argv[]) {
     delete kernel2;
 
     // TODO: Test Identity
+    // TODO: Test SelectTable
 
     // ***********************************************
     // Test Loading a model
