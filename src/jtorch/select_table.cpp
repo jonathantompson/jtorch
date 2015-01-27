@@ -16,8 +16,9 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  SelectTable::SelectTable() {
+  SelectTable::SelectTable(int32_t index) {
     output = NULL;
+    index_ = index;
   }
 
   SelectTable::~SelectTable() {
@@ -26,9 +27,9 @@ namespace jtorch {
 
 
   TorchStage* SelectTable::loadFromFile(std::ifstream& file) {
-    SelectTable* module = new SelectTable();
-    file.read((char*)(&module->index_), sizeof(module->index_));
-    return module;
+    int32_t index;
+    file.read((char*)(&index), sizeof(index));
+    return new SelectTable(index);
   }
 
   void SelectTable::forwardProp(TorchData& input) {
@@ -39,7 +40,7 @@ namespace jtorch {
 
     Table& in = (Table&)input;
 
-    if (in.tableSize() <= index_) {
+    if ((int32_t)in.tableSize() <= index_) {
       throw std::runtime_error("SelectTable::forwardProp() - "
         "Input table is too small!");
     }

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\jtorch\identity.h" />
+    <ClInclude Include="include\jtorch\select_table.h" />
     <ClInclude Include="include\jtorch\spatial_convolution.h" />
     <ClInclude Include="include\jtorch\tensor.h" />
     <ClInclude Include="include\jtorch\join_table.h" />
@@ -52,6 +53,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\jtorch\select_table.cpp" />
     <ClCompile Include="src\jtorch\sequential.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>

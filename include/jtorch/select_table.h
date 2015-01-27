@@ -17,7 +17,7 @@ namespace jtorch {
   class SelectTable : public TorchStage {
   public:
     // Constructor / Destructor
-    SelectTable();
+    SelectTable(int32_t index);
     virtual ~SelectTable();
 
     virtual TorchStageType type() const { return SELECT_TABLE_STAGE; }
