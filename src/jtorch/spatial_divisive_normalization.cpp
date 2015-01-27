@@ -17,15 +17,15 @@ namespace jtorch {
   // kernel1d default is either TorchStage::gaussian1D<float>(n) or just a
   // vector of 1 values.
   SpatialDivisiveNormalization::SpatialDivisiveNormalization(
-    const Tensor<float>& kernel1d, const float threshold) : TorchStage() {
-    if (kernel1d.dim()[0] % 2 == 0 || kernel1d.dim()[1] % 2 == 0 ||
-        kernel1d.dim()[2] != 1) {
+    const Tensor<float>& kernel, const float threshold) : TorchStage() {
+    if (kernel.dim()[0] % 2 == 0 || kernel.dim()[1] % 2 == 0 ||
+        kernel.dim()[2] != 1) {
       throw std::runtime_error("SpatialDivisiveNormalization() - ERROR: "
         "Averaging kernel must be odd size!");
     }
 
-    kernel_ = kernel1d.copy();  // Normalization is input size dependant
-    kernel_norm_ = NULL;
+    kernel_ = Tensor<float>::clone(kernel);
+    kernel_norm_ = NULL;   // Normalization is input size dependant
 
     output = NULL;
     std_coef_ = NULL;
@@ -73,21 +73,14 @@ namespace jtorch {
       //  ((Tensor<float>*)output)->dim(), local_worgroup_size_3d);
     }
     if (kernel_norm_ == NULL) {
-      kernel_norm_ = kernel_->copy();
-      float* kernel_norm_cpu = new float[kernel_norm_->dataSize()];
-      kernel_norm_->getData(kernel_norm_cpu);
-      // Now normalize the kernel!
-      const float n_feats = (float)in.dim()[2];
-      float sum = 0.0f;
-      for (uint32_t i = 0; i < kernel_norm_->dataSize(); i++) {
-        sum += kernel_norm_cpu[i];
-      }
       bool onedim_kernel = kernel_->dim()[1] == 1;
-      for (uint32_t i = 0; i < kernel_norm_->dataSize(); i++) {
-        kernel_norm_cpu[i] /= onedim_kernel ? (sum * sqrtf(n_feats)) : (sum * n_feats);
-      }
-      kernel_norm_->setData(kernel_norm_cpu);
-      delete[] kernel_norm_cpu;
+      const float n_feats = (float)in.dim()[2];
+
+      // Clone and normalize the input kernel
+      kernel_norm_ = Tensor<float>::clone(*kernel_);
+      float sum = Tensor<float>::slowSum(*kernel_norm_);
+      float div_val = onedim_kernel ? (sum * sqrtf(n_feats)) : (sum * n_feats);
+      Tensor<float>::div(*kernel_norm_, div_val);
     }
     if (std_coef_ == NULL) {
       Int3 std_coeff_dim(((Tensor<float>*)output)->dim());

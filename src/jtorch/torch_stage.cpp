@@ -19,6 +19,8 @@
 #include "jtorch/join_table.h"
 #include "jtorch/transpose.h"
 #include "jtorch/identity.h"
+#include "jtorch/select_table.h"
+#include "jtorch/c_add_table.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -108,13 +110,13 @@ namespace jtorch {
       return Identity::loadFromFile(ifile);
     case SELECT_TABLE_STAGE:
       std::cout << "\tLoading SelectTable..." << std::endl;
-      throw std::runtime_error("TODO: Implement this");
+      return SelectTable::loadFromFile(ifile);
     case SPATIAL_UP_SAMPLING_NEAREST_STAGE:
       std::cout << "\tLoading SpatialUpSamplingNearestStage..." << std::endl;
       throw std::runtime_error("TODO: Implement this");
     case C_ADD_TABLE_STAGE:
       std::cout << "\tLoading CAddTable..." << std::endl;
-      throw std::runtime_error("TODO: Implement this");
+      return CAddTable::loadFromFile(ifile);
     default:
       throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
         "Node type not recognized!");

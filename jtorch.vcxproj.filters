@@ -83,6 +83,12 @@
     <ClInclude Include="include\jtorch\identity.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
+    <ClInclude Include="include\jtorch\select_table.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
+    <ClInclude Include="include\jtorch\c_add_table.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\jtorch\join_table.cpp">
@@ -145,6 +151,12 @@
     <ClCompile Include="src\jtorch\identity.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
+    <ClCompile Include="src\jtorch\select_table.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jtorch\c_add_table.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kernels\tanh.cl">
@@ -171,9 +183,24 @@
     <None Include="kernels\join_table.cl">
       <Filter>kernels</Filter>
     </None>
-    <None Include="kernels\tensor.cl">
+    <None Include="README.md" />
+    <None Include="kernels\copy.cl">
       <Filter>kernels</Filter>
     </None>
-    <None Include="README.md" />
+    <None Include="kernels\add.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\zero.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\accumulate.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\mul.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\div.cl">
+      <Filter>kernels</Filter>
+    </None>
   </ItemGroup>
 </Project>

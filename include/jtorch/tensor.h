@@ -38,7 +38,7 @@ namespace jtorch {
 
     // setData and getData are EXPENSIVE --> They require a CPU to GPU copy
     void setData(const T* data);
-    void getData(T* data);
+    void getData(T* data) const;
 
     const jcl::math::Int3& dim() const { return dim_; }
 
@@ -48,17 +48,25 @@ namespace jtorch {
       const jcl::math::Int2& interval1, 
       const jcl::math::Int2& interval2);
 
-    // Deep copy (not too expensive since it'll copy GPU mem to GPU mem)
-    Tensor<T>* copy() const;
-    void zeroTensor() const;
-
-    // gaussian1D In torch: >> normkernel = image.gaussian1D(n)
-    // It's a gaussian of x = -2*sigma to 2*sigma, where sigma = size / 2
-    static Tensor<T>* gaussian1D(const int32_t kernel_size);
+    // Some simple tensor math operations
+    static void copy(Tensor<T>& dst, const Tensor<T>& src);
+    static void add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y);
+    static void mul(Tensor<T>& x, float mul_value);
+    static void div(Tensor<T>& x, float div_value);
+    static void accumulate(Tensor<T>& dst, const Tensor<T>& src);
+    static void zero(Tensor<T>& x);
+    // slowSum - This does a CPU copy because I haven't written a reduction 
+    // operator yet
+    static float slowSum(const Tensor<T>& x);  
+    
+    // Some tensor math operations that return new tensors
+    static Tensor<T>* clone(const Tensor<T>& x);
+    static Tensor<T>* gaussian1D(const int32_t kernel_size);  // sigma = size / 2
     static Tensor<T>* gaussian(const int32_t kernel_size);
     static Tensor<T>* ones1D(const int32_t kernel_size);
+    
 
-    inline jcl::JCLBuffer data() { return data_; }
+    inline const jcl::JCLBuffer& data() const { return data_; }
     inline uint32_t dataSize() const { return dim_[0]*dim_[1]*dim_[2]; }
 
   protected:
@@ -76,7 +84,7 @@ namespace jtorch {
     dim_.set(dim[0], dim[1], dim[2]);
     data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
       dim_[0], dim_[1], dim_[2]);
-    zeroTensor();
+    zero(*this);
 
   }
 
@@ -85,7 +93,7 @@ namespace jtorch {
     dim_.set(dim[0], dim[1], 1);
     data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
       dim_[0], dim_[1], dim_[2]);
-    zeroTensor();
+    zero(*this);
   }
 
   template <typename T>
@@ -93,7 +101,7 @@ namespace jtorch {
     dim_.set(dim, 1, 1);
     data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
       dim_[0], dim_[1], dim_[2]);
-    zeroTensor();
+    zero(*this);
   }
 
   template <typename T>
@@ -107,7 +115,7 @@ namespace jtorch {
   }
 
   template <typename T>
-  void Tensor<T>::getData(T* data) {
+  void Tensor<T>::getData(T* data) const {
     jtorch::cl_context->readFromBuffer(data, jtorch::deviceid, data_, true);
   }
 
@@ -261,22 +269,80 @@ namespace jtorch {
   }
 
   template <typename T>
-  Tensor<T>* Tensor<T>::copy() const {
-    Tensor<T>* ret = new Tensor<T>(dim_);
-    std::string kernel = jtorch::jtorch_path + "kernels/tensor.cl";
+  Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
+    Tensor<T>* ret = new Tensor<T>(x.dim_);
+    std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
     cl_context->useKernel(kernel.c_str(), "Copy");
-    cl_context->setArg(0, const_cast<Tensor<T>*>(this)->data());
+    cl_context->setArg(0, x.data());
     cl_context->setArg(1, ret->data());
     cl_context->runKernel1D(jtorch::deviceid, ret->dataSize(), false);
     return ret;
   }
   
   template <typename T>
-  void Tensor<T>::zeroTensor() const {
-    std::string kernel = jtorch::jtorch_path + "kernels/tensor.cl";
+  void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
+    std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
+    cl_context->useKernel(kernel.c_str(), "Copy");
+    cl_context->setArg(0, src.data());
+    cl_context->setArg(1, dst.data());
+    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+  }
+
+  template <typename T>
+  void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
+    std::string kernel = jtorch::jtorch_path + "kernels/add.cl";
+    cl_context->useKernel(kernel.c_str(), "Add");
+    cl_context->setArg(0, src1.data());
+    cl_context->setArg(1, src2.data());
+    cl_context->setArg(2, dst.data());
+    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+  }
+
+  template <typename T>
+  void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
+    std::string kernel = jtorch::jtorch_path + "kernels/mul.cl";
+    cl_context->useKernel(kernel.c_str(), "Mul");
+    cl_context->setArg(0, mul_val);
+    cl_context->setArg(1, x.data());
+    cl_context->runKernel1D(jtorch::deviceid, x.dataSize(), false);
+  }
+
+  template <typename T>
+  void Tensor<T>::div(Tensor<T>& x, float div_val) {
+    std::string kernel = jtorch::jtorch_path + "kernels/div.cl";
+    cl_context->useKernel(kernel.c_str(), "Div");
+    cl_context->setArg(0, div_val);
+    cl_context->setArg(1, x.data());
+    cl_context->runKernel1D(jtorch::deviceid, x.dataSize(), false);
+  }
+
+  template <typename T>
+  void Tensor<T>::accumulate(Tensor<T>& dst, const Tensor<T>& src) {
+    std::string kernel = jtorch::jtorch_path + "kernels/accumulate.cl";
+    cl_context->useKernel(kernel.c_str(), "Accumulate");
+    cl_context->setArg(0, src.data());
+    cl_context->setArg(1, dst.data());
+    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+  }
+
+  template <typename T>
+  void Tensor<T>::zero(Tensor<T>& dst) {
+    std::string kernel = jtorch::jtorch_path + "kernels/zero.cl";
     cl_context->useKernel(kernel.c_str(), "Zero");
-    cl_context->setArg(0, const_cast<Tensor<T>*>(this)->data());
-    cl_context->runKernel1D(jtorch::deviceid, this->dataSize(), false);
+    cl_context->setArg(0, dst.data());
+    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+  }
+
+  template <typename T>
+  float Tensor<T>::slowSum(const Tensor<T>& x) {
+    float* temp = new float[x.dataSize()];
+    x.getData(temp);
+    float sum = 0.0f;
+    for (uint32_t i = 0; i < x.dataSize(); i++) {
+      sum += temp[i];
+    }
+    delete[] temp;
+    return sum;
   }
 
 };  // namespace jtorch

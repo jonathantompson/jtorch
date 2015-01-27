@@ -24,19 +24,10 @@ namespace jtorch {
         "Averaging kernel must have odd size!");
     }
 
-    kernel_ = kernel.copy();
-    float* kernel_cpu = new float[kernel_->dataSize()];
-    kernel_->getData(kernel_cpu);
-    // Now normalize the kernel!
-    float sum = 0.0f;
-    for (uint32_t i = 0; i < kernel_->dataSize(); i++) {
-      sum += kernel_cpu[i];
-    }
-    for (uint32_t i = 0; i < kernel_->dataSize(); i++) {
-      kernel_cpu[i] /= sum;
-    }
-    kernel_->setData(kernel_cpu);
-    delete[] kernel_cpu;
+    // Clone and normalize the input kernel
+    kernel_ = Tensor<float>::clone(kernel);
+    float sum = Tensor<float>::slowSum(*kernel_);
+    Tensor<float>::div(*kernel_, sum);
 
     output = NULL;
     mean_coef_ = NULL;
