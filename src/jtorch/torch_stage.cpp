@@ -21,6 +21,7 @@
 #include "jtorch/identity.h"
 #include "jtorch/select_table.h"
 #include "jtorch/c_add_table.h"
+#include "jtorch/spatial_up_sampling_nearest.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -112,8 +113,8 @@ namespace jtorch {
       std::cout << "\tLoading SelectTable..." << std::endl;
       return SelectTable::loadFromFile(ifile);
     case SPATIAL_UP_SAMPLING_NEAREST_STAGE:
-      std::cout << "\tLoading SpatialUpSamplingNearestStage..." << std::endl;
-      throw std::runtime_error("TODO: Implement this");
+      std::cout << "\tLoading SpatialUpSamplingNearest..." << std::endl;
+      return SpatialUpSamplingNearest::loadFromFile(ifile);
     case C_ADD_TABLE_STAGE:
       std::cout << "\tLoading CAddTable..." << std::endl;
       return CAddTable::loadFromFile(ifile);

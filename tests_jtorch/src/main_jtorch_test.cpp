@@ -16,6 +16,7 @@
 #include "jtorch/spatial_subtractive_normalization.h"
 #include "jtorch/spatial_divisive_normalization.h"
 #include "jtorch/spatial_contrastive_normalization.h"
+#include "jtorch/spatial_up_sampling_nearest.h"
 #include "jtorch/identity.h"
 #include "jtorch/linear.h"
 #include "jtorch/reshape.h"
@@ -391,7 +392,7 @@ int main(int argc, char *argv[]) {
       Table input;
       for (int32_t i = 0; i < table_size; i++) {
         input.add(Tensor<float>::gaussian(tensor_size));  // Transfers ownership
-        Tensor<float>::mul(*(Tensor<float>*)input(i), i+1);
+        Tensor<float>::mul(*(Tensor<float>*)input(i), (float)(i+1));
       }
 
       // Add the tensors to get the ground truth
@@ -420,6 +421,16 @@ int main(int argc, char *argv[]) {
       delete module;
       delete[] gt;
       delete[] temp;
+    }
+
+    // ***********************************************
+    // Test SpatialUpSamplingNearest
+    {
+      int32_t scale = 4;
+      SpatialUpSamplingNearest module(scale);
+      module.forwardProp(data_in);
+      testJTorchValue((jtorch::Tensor<float>*)module.output, 
+        "./test_data/spatial_up_sampling_nearest.bin");
     }
 
     // ***********************************************

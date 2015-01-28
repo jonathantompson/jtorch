@@ -15,6 +15,7 @@
     <ClInclude Include="include\jtorch\identity.h" />
     <ClInclude Include="include\jtorch\select_table.h" />
     <ClInclude Include="include\jtorch\spatial_convolution.h" />
+    <ClInclude Include="include\jtorch\spatial_up_sampling_nearest.h" />
     <ClInclude Include="include\jtorch\tensor.h" />
     <ClInclude Include="include\jtorch\join_table.h" />
     <ClInclude Include="include\jtorch\jtorch.h" />
@@ -82,6 +83,7 @@
     <ClCompile Include="src\jtorch\spatial_subtractive_normalization.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\jtorch\spatial_up_sampling_nearest.cpp" />
     <ClCompile Include="src\jtorch\table.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -108,6 +110,7 @@
     <None Include="kernels\spatial_divisive_normalization.cl" />
     <None Include="kernels\spatial_max_pooling.cl" />
     <None Include="kernels\spatial_subtractive_normalization.cl" />
+    <None Include="kernels\spatial_up_sampling_nearest.cl" />
     <None Include="kernels\tanh.cl" />
     <None Include="kernels\zero.cl" />
     <None Include="kernels\threshold.cl" />
