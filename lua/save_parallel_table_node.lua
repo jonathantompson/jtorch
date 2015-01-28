@@ -1,4 +1,4 @@
-function saveParallelNode(node, ofile)
+function saveParallelTableNode(node, ofile)
   -- Write the number of nodes
   ofile:writeInt(#node.modules)
   -- Now just save each node recursively

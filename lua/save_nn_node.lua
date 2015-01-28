@@ -1,5 +1,5 @@
 dofile(jtorch_root..'/lua/save_sequential_node.lua')
-dofile(jtorch_root..'/lua/save_parallel_node.lua')
+dofile(jtorch_root..'/lua/save_parallel_table_node.lua')
 dofile(jtorch_root..'/lua/save_tanh_node.lua')
 dofile(jtorch_root..'/lua/save_threshold_node.lua')
 dofile(jtorch_root..'/lua/save_linear_node.lua')
@@ -44,7 +44,7 @@ function saveNNNode(node, ofile)
      saveSequentialNode(node, ofile)
   elseif (class_str == "nn.ParallelTable") then
      ofile:writeInt(2)
-     saveParallelNode(node, ofile)
+     saveParallelTableNode(node, ofile)
   elseif (class_str == "nn.Tanh") then
      ofile:writeInt(3)
      saveTanhNode(node, ofile)
