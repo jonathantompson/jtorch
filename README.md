@@ -21,22 +21,24 @@ dofile("../jtorch/jtorch.lua")
 saveModel(model, "my_model.bin")
 ```
 
-The library also contains a CPP framework for loading it and doing the forward prop.  See jtorch_test for more details of usage.  It uses OpenCL for all GPU computing.  The following stages have full  implementations:
+The library also contains a CPP framework for loading it and doing the forward prop.  See jtorch_test for more details of usage.  It uses OpenCL for all GPU computing.  The following stages have full implementations (without batch support):
 
-- SpatialConvolution
-- SpatialConvolutionCUDA  --> Only 3D tensor is supported (no batch processing)
-- SpatialConvolutionMap   --> Full implementation but it is slow (all on CPU)
-- Sequential
-- Parallel  --> Uses the c++ jtorch::Table as a container for multiple jtorch::Tensor<float> instances
-- Tanh
-- Threshold
+- CAddTable
+- Identity
 - Linear
+- Parallel
+- SelectTable
+- Sequential
+- SpatialContrastiveNormalization
+- SpatialConvolution
+- SpatialConvolutionMap   --> Full implementation but it is slow (all on CPU)
+- SpatialDivisiveNormalization
 - SpatialLPPooling  --> Full implementation but it is slow (all on CPU)
 - SpatialMaxPooling
-- SpatialMaxPoolingCUDA  --> Only 3D tensor is supported (no batch processing)
 - SpatialSubtractiveNormalization
-- SpatialDivisiveNormalization
-- SpatialContrastiveNormalization
+- SpatialUpSamplingNearest
+- Tanh
+- Threshold
 
 The following stages have partial implementations:
 - JoinTable --> Nothing fancy.  Just concatenates along the 0th dimension. The output is always 1D.

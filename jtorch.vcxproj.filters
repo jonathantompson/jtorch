@@ -89,6 +89,9 @@
     <ClInclude Include="include\jtorch\c_add_table.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
+    <ClInclude Include="include\jtorch\spatial_up_sampling_nearest.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\jtorch\join_table.cpp">
@@ -157,6 +160,9 @@
     <ClCompile Include="src\jtorch\c_add_table.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
+    <ClCompile Include="src\jtorch\spatial_up_sampling_nearest.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kernels\tanh.cl">
@@ -200,6 +206,9 @@
       <Filter>kernels</Filter>
     </None>
     <None Include="kernels\div.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\spatial_up_sampling_nearest.cl">
       <Filter>kernels</Filter>
     </None>
   </ItemGroup>
