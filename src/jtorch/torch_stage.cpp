@@ -4,7 +4,7 @@
 #include <fstream>
 #include "jtorch/torch_stage.h"
 #include "jtorch/linear.h"
-#include "jtorch/parallel.h"
+#include "jtorch/parallel_table.h"
 #include "jtorch/reshape.h"
 #include "jtorch/sequential.h"
 #include "jtorch/spatial_contrastive_normalization.h"
@@ -60,13 +60,15 @@ namespace jtorch {
     // Read in the enum type:
     int type;
     ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
+
+    // Now load in the module
     switch (type) {
     case SEQUENTIAL_STAGE:
       std::cout << "\tLoading Sequential..." << std::endl;
       return Sequential::loadFromFile(ifile);
-    case PARALLEL_STAGE:
-      std::cout << "\tLoading Parallel..." << std::endl;
-      return Parallel::loadFromFile(ifile);
+    case PARALLEL_TABLE_STAGE:
+      std::cout << "\tLoading ParallelTable..." << std::endl;
+      return ParallelTable::loadFromFile(ifile);
     case TANH_STAGE:
       std::cout << "\tLoading Tanh..." << std::endl;
       return Tanh::loadFromFile(ifile);

@@ -20,7 +20,7 @@
     <ClInclude Include="include\jtorch\join_table.h" />
     <ClInclude Include="include\jtorch\jtorch.h" />
     <ClInclude Include="include\jtorch\linear.h" />
-    <ClInclude Include="include\jtorch\parallel.h" />
+    <ClInclude Include="include\jtorch\parallel_table.h" />
     <ClInclude Include="include\jtorch\reshape.h" />
     <ClInclude Include="include\jtorch\sequential.h" />
     <ClInclude Include="include\jtorch\spatial_contrastive_normalization.h" />
@@ -48,7 +48,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\jtorch\parallel.cpp">
+    <ClCompile Include="src\jtorch\parallel_table.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClCompile>

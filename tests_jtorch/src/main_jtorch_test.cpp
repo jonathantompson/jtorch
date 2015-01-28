@@ -23,7 +23,7 @@
 #include "jtorch/tanh.h"
 #include "jtorch/threshold.h"
 #include "jtorch/sequential.h"
-#include "jtorch/parallel.h"
+#include "jtorch/parallel_table.h"
 #include "jtorch/table.h"
 #include "jtorch/join_table.h"
 #include "jtorch/select_table.h"

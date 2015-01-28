@@ -1,4 +1,4 @@
-#include "jtorch/parallel.h"
+#include "jtorch/parallel_table.h"
 #include "jtorch/tensor.h"
 #include "jtorch/table.h"
 #include "jcl/threading/thread.h"
@@ -15,13 +15,13 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  Parallel::Parallel() {
+  ParallelTable::ParallelTable() {
     // Create an empty container
     network_ = new VectorManaged<TorchStage*>(1);
     output = NULL;
   }
 
-  Parallel::~Parallel() {
+  ParallelTable::~ParallelTable() {
     SAFE_DELETE(network_);
     if (output != NULL) {
       Table* out = (Table*)output;
@@ -31,15 +31,15 @@ namespace jtorch {
     SAFE_DELETE(output);
   }
 
-  void Parallel::add(TorchStage* stage) {
+  void ParallelTable::add(TorchStage* stage) {
     network_->pushBack(stage);
     output = NULL;
   }
 
-  TorchStage* Parallel::loadFromFile(std::ifstream& file) {
+  TorchStage* ParallelTable::loadFromFile(std::ifstream& file) {
     int n_nodes;
     file.read(reinterpret_cast<char*>(&n_nodes), sizeof(n_nodes));
-    Parallel* ret = new Parallel();
+    ParallelTable* ret = new ParallelTable();
     ret->network_->capacity(n_nodes);
     for (int32_t i = 0; i < n_nodes; i++) {
       ret->network_->pushBack(TorchStage::loadFromFile(file));
@@ -47,7 +47,7 @@ namespace jtorch {
     return ret;
   }
 
-  void Parallel::initOutput() {
+  void ParallelTable::initOutput() {
     if (output == NULL) {
       output = new Table();
     }
@@ -55,11 +55,11 @@ namespace jtorch {
     Table* out = (Table*)output;
     out->clearNoDelete();
     for (uint32_t i = 0; i < network_->size(); i++) {
-      out->add((Tensor<float>*)(*network_)[i]->output);
+      out->add((*network_)[i]->output);
     }
   }
 
-  void Parallel::forwardProp(TorchData& input) {
+  void ParallelTable::forwardProp(TorchData& input) {
     if (input.type() != TorchDataType::TABLE_DATA) {
       throw std::runtime_error("Parallel::forwardProp() - "
         "Table expected!");
@@ -76,7 +76,7 @@ namespace jtorch {
                    // of all the parallel stages and fills up a table with them
   }
 
-  uint32_t Parallel::numBanks() const {
+  uint32_t ParallelTable::numBanks() const {
     if (network_ == NULL) {
       throw std::runtime_error("Parallel::output() - ERROR: "
         "Network is empty!");
@@ -84,7 +84,7 @@ namespace jtorch {
     return (*network_).size();
   }
 
-  TorchStage* Parallel::get(const uint32_t i) {
+  TorchStage* ParallelTable::get(const uint32_t i) {
     if (network_ == NULL) {
       throw std::runtime_error("Parallel::output() - ERROR: "
         "Network is empty!");

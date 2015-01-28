@@ -21,7 +21,7 @@ namespace jtorch {
   typedef enum {
     UNDEFINED_STAGE = 0,
     SEQUENTIAL_STAGE = 1,
-    PARALLEL_STAGE = 2,
+    PARALLEL_TABLE_STAGE = 2,
     TANH_STAGE = 3,
     THRESHOLD_STAGE = 4,
     LINEAR_STAGE = 5,

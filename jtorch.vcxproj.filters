@@ -26,9 +26,6 @@
     <ClInclude Include="include\jtorch\linear.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
-    <ClInclude Include="include\jtorch\parallel.h">
-      <Filter>Header Files\jtorch</Filter>
-    </ClInclude>
     <ClInclude Include="include\jtorch\reshape.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
@@ -92,15 +89,15 @@
     <ClInclude Include="include\jtorch\spatial_up_sampling_nearest.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
+    <ClInclude Include="include\jtorch\parallel_table.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\jtorch\join_table.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
     <ClCompile Include="src\jtorch\linear.cpp">
-      <Filter>Source Files\jtorch</Filter>
-    </ClCompile>
-    <ClCompile Include="src\jtorch\parallel.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
     <ClCompile Include="src\jtorch\reshape.cpp">
@@ -161,6 +158,9 @@
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
     <ClCompile Include="src\jtorch\spatial_up_sampling_nearest.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jtorch\parallel_table.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
   </ItemGroup>

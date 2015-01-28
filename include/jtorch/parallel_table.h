@@ -1,10 +1,7 @@
 //
-//  parallel.h
+//  parallel_table.h
 //
 //  Created by Jonathan Tompson on 4/8/13.
-//
-//  Note: For now the output of each network in the parallel stage must be
-//  a FloatTensor.
 //
 
 #pragma once
@@ -19,13 +16,13 @@ namespace jcl { namespace data_str { template <typename T> class VectorManaged; 
 
 namespace jtorch {
   
-  class Parallel : public TorchStage {
+  class ParallelTable : public TorchStage {
   public:
     // Constructor / Destructor
-    Parallel();
-    virtual ~Parallel();
+    ParallelTable();
+    virtual ~ParallelTable();
 
-    virtual TorchStageType type() const { return PARALLEL_STAGE; }
+    virtual TorchStageType type() const { return PARALLEL_TABLE_STAGE; }
     virtual void forwardProp(TorchData& input);
 
     void add(TorchStage* stage);
@@ -42,8 +39,8 @@ namespace jtorch {
     void initOutput();
 
     // Non-copyable, non-assignable.
-    Parallel(Parallel&);
-    Parallel& operator=(const Parallel&);
+    ParallelTable(ParallelTable&);
+    ParallelTable& operator=(const ParallelTable&);
   };
 
 };  // namespace jtorch
