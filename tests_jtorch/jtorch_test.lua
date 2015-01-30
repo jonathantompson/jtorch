@@ -5,6 +5,10 @@ require 'optim'
 require 'sys'
 torch.setdefaulttensortype('torch.FloatTensor')
 
+torch.setnumthreads(3)
+torch.manualSeed(1)
+math.randomseed(1)
+
 dofile("save_array.lua")
 
 num_feats_in = 5
@@ -121,6 +125,18 @@ end
 res = spat_conv:forward(model:get(2).output)
 saveArray(res, "test_data/spatial_convolution.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
+
+-- Test SpatialConvolutionMM with padding
+padding = 6
+spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, padding)
+spat_conv_mm.bias:copy(spat_conv.bias)
+spat_conv_mm.weight:copy(spat_conv.weight)
+-- print('Spatial Convolution Weights')
+-- print(spat_conv.weight)
+res = spat_conv:forward(model:get(2).output)
+saveArray(res, "test_data/spatial_convolution_mm_padding.bin")
+print('Spatial Convolution result saved to test_data/spatial_convolution_mm_padding.bin')
+
 
 -- Test SpatialLPPooling
 pnorm = 2.0
@@ -259,14 +275,13 @@ saveArray(res, "test_data/linear.bin")
 print('Linear result saved to test_data/linear.bin')
 
 -- Test model
---[[
 test_model = nn.Sequential()
 n_states_in = num_feats_in
 n_states_out = num_feats_out
 fan_in = n_states_in
 filt_width = 5
 filt_height = 5
-test_model:add(nn.SpatialConvolution(n_states_in, n_states_out, filt_width, filt_height))
+test_model:add(nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height))
 test_model:add(nn.Tanh())
 test_model:add(nn.Threshold())
 test_model:add(nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsize_v))
@@ -275,8 +290,7 @@ height_out = (height - filt_height + 1) / 2
 lin_size_in = n_states_out * height_out * width_out
 test_model:add(nn.Reshape(lin_size_in))
 test_model:add(nn.Linear(lin_size_in, 6))
---]]
-test_model = torch.load("testmodel.torch.bin")
+
 res = test_model:forward(data_in)
 saveArray(res, "test_data/test_model_result.bin")
 print('Test model result saved to test_data/test_model_result.bin')
@@ -290,114 +304,9 @@ do
 end
 
 -- Save the Test model
---[[
-jtorch_root = "../jtorch/"
-dofile("../jtorch/jtorch.lua")
+jtorch_root = "../"
+dofile("../jtorch.lua")
 saveModel(test_model, "testmodel.bin")
 torch.save("testmodel.torch.bin", test_model)
---]]
 
--- Check the real model
---[[
-require 'nn'
-require 'image'
-require 'torch'
-require 'optim'
-require 'sys'
-torch.setdefaulttensortype('torch.FloatTensor')
-require 'cunn'
-require 'cutorch'
-model = torch.load("../HandNets/handmodel.net")
-collectgarbage()
 
-width = 96
-height = 96
-bank_dim = {}
-num_banks = 3
-data_file_size = 0
-num_features = 8
-heat_map_width = 24
-heat_map_height = 24
-im_data = { data = {}, size = function() return 1 end, 
-  heat_maps = torch.FloatTensor(1, num_features * heat_map_width * heat_map_height) }
-w = width
-h = height
-for i=1,num_banks do
-  table.insert(bank_dim, {h, w})
-  data_file_size = data_file_size + w * h
-  w = w / 2
-  h = h / 2
-  table.insert(im_data.data, torch.FloatTensor(1, 1, bank_dim[i][1], 
-    bank_dim[i][2]))
-end
-w = nil
-h = nil
-filename = "../data/hand_depth_data_processed_for_CN/hpf_processed_1294371228_hands0_263917398000.bin"
-hpf_depth_file = torch.DiskFile(filename,'r')
-hpf_depth_file:binary()
-hpf_depth_data = hpf_depth_file:readFloat(data_file_size)
-hpf_depth_file:close()
-ind = 1
-for j=1,num_banks do
-  im_data.data[j][{1, 1, {}, {}}] = torch.FloatTensor(
-    hpf_depth_data, ind, torch.LongStorage{bank_dim[j][1], bank_dim[j][2]}):float()
-  ind = ind + (bank_dim[j][1]*bank_dim[j][2]) -- Move pointer forward
-end
-filename = "../data/heatmaps/heatmap_hpf_processed_1294371228_hands0_263917398000.bin"
-heatmap_file = torch.DiskFile(filename, 'r')
-heatmap_file:binary()
-heatmap_data = heatmap_file:readFloat(num_features * heat_map_width * heat_map_height)
-heatmap_file:close()
-im_data.heat_maps[{1,{}}]:copy(torch.FloatTensor(heatmap_data, 1,
-  torch.LongStorage{num_features * heat_map_width * heat_map_height}):float())
-dofile("../HandNets/visualize_data.lua")
--- VisualizeImage(im_data, 1, 1, 0)
-
-for j=1,num_banks do
-  im_data.data[j] = im_data.data[j]:cuda()
-end
-
-im_data.heat_maps = model:forward(im_data.data)
-VisualizeImage(im_data, 1, 1, 0)
-print("First 30 numbers of the output: ")
-print(im_data.heat_maps[{{},{1,30}}])
-print("First bank last module (before reshape)")
-print(model:get(1):get(1):get(14))
-print("First 6x6 of the 2nd feature of the first bank output: ")
-print(model:get(1):get(1):get(14).output[{1, 2, {1,6}, {1,6}}])
-print("First 6x6 of the 10th feature of the second bank output: ")
-print(model:get(1):get(2):get(14).output[{1, 10, {1,6}, {1,6}}])
-print("0:30 of the join table stage: ")
-print(model:get(2).output[{1, {1, 30}}])
-print("7000:7030 of the 1st linear stage output: ")
-print(model:get(2).output[{1, {7001, 7031}}])
-
--- See how fast / slow the model is:
-print("profiling model for 5 seconds...")
-time_accum = 0;
-num_iterations = 0;
-while (time_accum < 5) do
-  time0 = sys.clock()
-  res = model:forward(im_data.data)
-  time1 = sys.clock()
-  time_accum = time_accum + (time1 - time0)
-  num_iterations = num_iterations + 1
-end
-print("time per evaluation: " .. (1000 * (time_accum / num_iterations)) .. "ms")
-
-VisualizeImage(im_data, 1, 1, 0)
-
-file = torch.DiskFile("convnet_output.bin", 'r')
-file:binary()
-cpp_out = file:readFloat(num_features * heat_map_width * heat_map_height)
-cpp_out = torch.FloatTensor(cpp_out, 1, 
-  torch.LongStorage{num_features, heat_map_width, heat_map_height}):float()
-file:close()
-
-zoom_factor = 0.5 * 5 * height / heat_map_height
-image.display{image=cpp_out, padding=2, nrow=4, zoom=zoom_factor, scaleeach=false}
-
--- Print out a few odd numbers
-print(model:get(1):get(1):get(4).output[{1, 1, {1,20}, {1,6}}])  -- First threshold out
-print(res[{1,{1,10}}])
---]]

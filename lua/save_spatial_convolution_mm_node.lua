@@ -4,13 +4,15 @@ function saveSpatialConvolutionMMNode(node, ofile)
   -- 2. filter height (int)
   -- 3. filter input features (int)
   -- 4. filter output features (int)
-  -- 5. filter weights (float array)
-  -- 6. filter Biases (float)
+  -- 5. padding
+  -- 6. filter weights (float array)
+  -- 7. filter Biases (float)
 
   ofile:writeInt(node.kW)
   ofile:writeInt(node.kH)
   ofile:writeInt(node.nInputPlane)
   ofile:writeInt(node.nOutputPlane)
+  ofile:writeInt(node.padding)
 
   local fanin = node.nInputPlane
 

@@ -8,3 +8,4 @@ ipch
 *.opensdf
 build
 *.asv
+*.swp
