@@ -128,12 +128,12 @@ print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
 
 -- Test SpatialConvolutionMM with padding
 padding = 6
-spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, padding)
+spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, 1, 1, padding)
 spat_conv_mm.bias:copy(spat_conv.bias)
 spat_conv_mm.weight:copy(spat_conv.weight)
 -- print('Spatial Convolution Weights')
 -- print(spat_conv.weight)
-res = spat_conv:forward(model:get(2).output)
+res = spat_conv_mm:forward(model:get(2).output)
 saveArray(res, "test_data/spatial_convolution_mm_padding.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution_mm_padding.bin')
 
@@ -295,6 +295,11 @@ res = test_model:forward(data_in)
 saveArray(res, "test_data/test_model_result.bin")
 print('Test model result saved to test_data/test_model_result.bin')
 
+-- Save the Test model
+jtorch_root = "../"
+dofile("../jtorch.lua")
+saveModel(test_model, "testmodel.bin")
+
 -- test SpatialUpSamplingNearest
 do
   local model = nn.SpatialUpSamplingNearest(4)
@@ -302,11 +307,4 @@ do
   saveArray(res, "test_data/spatial_up_sampling_nearest.bin")
   print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
 end
-
--- Save the Test model
-jtorch_root = "../"
-dofile("../jtorch.lua")
-saveModel(test_model, "testmodel.bin")
-torch.save("testmodel.torch.bin", test_model)
-
 
