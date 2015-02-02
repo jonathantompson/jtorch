@@ -281,10 +281,11 @@ n_states_out = num_feats_out
 fan_in = n_states_in
 filt_width = 5
 filt_height = 5
-test_model:add(nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height))
+test_model:add(nn.SpatialConvolution(n_states_in, n_states_out, filt_width, filt_height))
 test_model:add(nn.Tanh())
 test_model:add(nn.Threshold())
 test_model:add(nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsize_v))
+-- test_model:add(nn.SpatialConvolutionMM(n_states_out, n_states_out, filt_width, filt_height, 1, 1, math.floor(filt_width / 2)))
 width_out = (width - filt_width + 1) / 2
 height_out = (height - filt_height + 1) / 2
 lin_size_in = n_states_out * height_out * width_out
@@ -298,7 +299,7 @@ print('Test model result saved to test_data/test_model_result.bin')
 -- Save the Test model
 jtorch_root = "../"
 dofile("../jtorch.lua")
-saveModel(test_model, "testmodel.bin")
+saveModel(test_model, "test_data/testmodel.bin")
 
 -- test SpatialUpSamplingNearest
 do

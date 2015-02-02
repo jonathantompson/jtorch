@@ -17,7 +17,9 @@ function saveSpatialConvolutionNode(node, ofile)
   local fanin = node.nInputPlane
 
   assert(node.weight:dim() == 4, 'weight tensor is not 4D!')
-  saveFloatTensorSafe(ofile, node.weight)
+  local w = node.weight:view(node.nOutputPlane * node.nInputPlane, node.kH,
+    node.kW)
+  saveFloatTensorSafe(ofile, w)
   assert(node.bias:dim() == 1, 'bias vector is not 1D!')
   saveFloatTensorSafe(ofile, node.bias)
 
