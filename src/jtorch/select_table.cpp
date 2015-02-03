@@ -29,6 +29,7 @@ namespace jtorch {
   TorchStage* SelectTable::loadFromFile(std::ifstream& file) {
     int32_t index;
     file.read((char*)(&index), sizeof(index));
+    index = index - 1;  // We index from 0 in C++
     return new SelectTable(index);
   }
 

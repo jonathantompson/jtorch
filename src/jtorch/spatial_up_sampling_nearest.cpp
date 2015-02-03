@@ -10,7 +10,6 @@
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
 
 using namespace jcl::threading;
-using namespace jcl::math;
 using namespace jcl::data_str;
 using namespace jcl;
 
@@ -20,10 +19,12 @@ namespace jtorch {
     : TorchStage() {
     scale_ = scale;
     output = NULL;
+    out_size_ = NULL;
   }
 
   SpatialUpSamplingNearest::~SpatialUpSamplingNearest() {
     SAFE_DELETE(output);
+    SAFE_DELETE_ARR(out_size_);
   }
 
   void SpatialUpSamplingNearest::init(TorchData& input)  {
@@ -33,21 +34,43 @@ namespace jtorch {
     }
 
     Tensor<float>& in = (Tensor<float>&)input;
-    Int3 out_dim(in.dim());
-    out_dim[0] *= scale_;
-    out_dim[1] *= scale_;
-   
+    Tensor<float>* out = (Tensor<float>*)output;
+
+    if (in.dim() < 2) {
+      throw std::runtime_error("SpatialConvolution::init() - "
+        "Input must be 2D or larger!");
+    }
+
+    if (output != NULL && in.dim() != out->dim()) {
+      SAFE_DELETE(output);
+    }
+
+    // Check that the inner 2 dimensions differ by a single scale
     if (output != NULL) {
-      if (!Int3::equal(out_dim, ((Tensor<float>*)output)->dim())) {
-        // Input dimension has changed!
+      if (in.size()[0] * scale_ != out->size()[0] || 
+          in.size()[1] * scale_ != out->size()[1]) {
         SAFE_DELETE(output);
       }
     }
 
+    // Check that the remaining dimensions are the same size
+    if (output != NULL) {
+      for (uint32_t i = 2; i < in.dim() && output != NULL; i++) {
+        if (in.size()[i] != out->size()[i]) {
+          SAFE_DELETE(output);
+        }
+      }
+    }
+
     if (output == NULL) {
-      output = new Tensor<float>(out_dim);
-      //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
-      //  ((Tensor<float>*)output)->dim(), local_worgroup_size);
+      uint32_t* out_size = new uint32_t[in.dim()];
+      memcpy(out_size, in.size(), sizeof(out_size[0]) * in.dim());
+      out_size[0] *= scale_;
+      out_size[1] *= scale_;
+
+      output = new Tensor<float>(in.dim(), out_size);
+      
+      SAFE_DELETE_ARR(out_size);
     }
   }
 
@@ -56,12 +79,16 @@ namespace jtorch {
 
     Tensor<float>& in = (Tensor<float>&)input;
     std::string kernel = jtorch::jtorch_path + "kernels/spatial_up_sampling_nearest.cl";
-    cl_context->useKernel(kernel.c_str(), "SpatialUpSamplingNearest");
-    cl_context->setArg(0, ((Tensor<float>&)input).data());
-    cl_context->setArg(1, ((Tensor<float>*)output)->data());
-    cl_context->setArg(2, scale_);
-    cl_context->runKernel3D(jtorch::deviceid, ((Tensor<float>*)output)->dim(),
-      false);
+    if (in.dim() == 2) {
+      cl_context->useKernel(kernel.c_str(), "SpatialUpSamplingNearest2D");
+    } else {
+      cl_context->useKernel(kernel.c_str(), "SpatialUpSamplingNearest");
+    }
+    cl_context->setArg(0, ((Tensor<float>&)input).storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(2, (int)scale_);
+    cl_context->runKernel(jtorch::deviceid, TO_TENSOR_PTR(output)->dim(),
+      TO_TENSOR_PTR(output)->size(), false);
   }
 
   TorchStage* SpatialUpSamplingNearest::loadFromFile(std::ifstream& file) {

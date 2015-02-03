@@ -23,14 +23,22 @@ namespace jtorch {
     const Tensor<float>* kernel, const float threshold) : TorchStage() {
     const Tensor<float>* cur_kernel;
     if (kernel) {
-      if (kernel->dim()[0] % 2 == 0 || kernel->dim()[1] % 2 == 0 ||
-        kernel->dim()[2] != 1) {
+      if (kernel->dim() > 2) {
+        throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
+          "Averaging kernel must be 1D or 2D!");
+      }
+      if (kernel->size()[0] % 2 == 0 || 
+        (kernel->dim() == 2 && kernel->size()[1] % 2 == 0)) {
         throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
           "Averaging kernel must have odd size!");
       }
       cur_kernel = kernel;
     } else {
-      cur_kernel = Tensor<float>::ones1D(7);
+      uint32_t dim = 1;
+      uint32_t size = 7;
+      Tensor<float>* kernel = new Tensor<float>(dim, &size);
+      Tensor<float>::fill(*kernel, 1);
+      cur_kernel = kernel;
     }
 
     network_ = new Sequential();
@@ -63,12 +71,16 @@ namespace jtorch {
     Tensor<float>* kernel;
     if (kernel_size_2 > 1) {
       // The kernel is 2D
-      kernel = new Tensor<float>(Int2(kernel_size_1, kernel_size_2));
+      uint32_t dim = 2;
+      uint32_t size[2] = {kernel_size_1, kernel_size_2};
+      kernel = new Tensor<float>(dim, size);
     } else {
-      kernel = new Tensor<float>(kernel_size_1);
+      uint32_t dim = 1;
+      uint32_t size[1] = {kernel_size_1};
+      kernel = new Tensor<float>(dim, size);
     }
-    float* kernel_cpu = new float[kernel->dataSize()];
-    file.read((char*)(kernel_cpu), kernel->dataSize() * sizeof(*kernel_cpu));
+    float* kernel_cpu = new float[kernel->nelems()];
+    file.read((char*)(kernel_cpu), kernel->nelems() * sizeof(*kernel_cpu));
     kernel->setData(kernel_cpu);
     float threshold;
     file.read((char*)(&threshold), sizeof(threshold));

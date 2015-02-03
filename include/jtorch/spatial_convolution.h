@@ -22,8 +22,9 @@ namespace jtorch {
   class SpatialConvolution : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialConvolution(const int32_t feats_in, const int32_t feats_out,
-      const int32_t filt_height, const int32_t filt_width);
+    SpatialConvolution(const uint32_t feats_in, const uint32_t feats_out,
+      const uint32_t filt_height, const uint32_t filt_width, 
+      const uint32_t padding = 0);
     virtual ~SpatialConvolution();
 
     virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_STAGE; }
@@ -37,10 +38,11 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    int32_t filt_width_;
-    int32_t filt_height_;
-    int32_t feats_in_;
-    int32_t feats_out_;
+    uint32_t filt_width_;
+    uint32_t filt_height_;
+    uint32_t feats_in_;
+    uint32_t feats_out_;
+    uint32_t padding_;
 
     // weights_buf_:    dim[2] --> matrix_index (size = feats_out_ * feats_in) 
     //                  dim[1] --> filter height
@@ -48,8 +50,6 @@ namespace jtorch {
     Tensor<float>* weights_;
     // biases_buf_:     dim[0] --> feats_out_t
     Tensor<float>* biases_;
-
-    jcl::math::Int3 local_worgroup_size;
 
     void init(TorchData& input);
 

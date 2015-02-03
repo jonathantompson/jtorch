@@ -17,6 +17,8 @@
 
 namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
+#define TO_TABLE_PTR(x) (x->type() == TABLE_DATA ? (Table*)x : NULL)
+
 namespace jtorch {
   
   class Table : public TorchData {
@@ -34,7 +36,6 @@ namespace jtorch {
 
     virtual TorchDataType type() const { return TABLE_DATA; }
     virtual void print();  // print to std::cout
-    virtual uint32_t dataSize() const;
     
     uint32_t tableSize() const;
 

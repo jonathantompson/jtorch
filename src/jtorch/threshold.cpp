@@ -32,16 +32,14 @@ namespace jtorch {
     }
     Tensor<float>& in = (Tensor<float>&)input;
     if (output != NULL) {
-      if (!Int3::equal(in.dim(), ((Tensor<float>*)output)->dim())) {
+      if (!in.isSameSizeAs(*TO_TENSOR_PTR(output))){
         // Input dimension has changed!
         delete output;
         output = NULL;
       }
     }
     if (output == NULL) {
-      output = new Tensor<float>(in.dim());
-      //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
-      //  ((Tensor<float>*)output)->dim(), local_worgroup_size);
+      output = new Tensor<float>(in.dim(), in.size());
     }
   }
 
@@ -49,12 +47,13 @@ namespace jtorch {
     init(input);
     std::string kernel = jtorch::jtorch_path + "kernels/threshold.cl";
     cl_context->useKernel(kernel.c_str(), "Threshold1D");
-    cl_context->setArg(0, ((Tensor<float>&)input).data());
-    cl_context->setArg(1, ((Tensor<float>*)output)->data());
+    cl_context->setArg(0, ((Tensor<float>&)input).storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
     cl_context->setArg(2, threshold);
     cl_context->setArg(3, val);
-    cl_context->runKernel1D(jtorch::deviceid, output->dataSize(),
-      false);
+    uint32_t dim = 1;
+    uint32_t nelem = TO_TENSOR_PTR(output)->nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   TorchStage* Threshold::loadFromFile(std::ifstream& file) {

@@ -196,9 +196,6 @@
     <None Include="kernels\add.cl">
       <Filter>kernels</Filter>
     </None>
-    <None Include="kernels\zero.cl">
-      <Filter>kernels</Filter>
-    </None>
     <None Include="kernels\accumulate.cl">
       <Filter>kernels</Filter>
     </None>
@@ -209,6 +206,9 @@
       <Filter>kernels</Filter>
     </None>
     <None Include="kernels\spatial_up_sampling_nearest.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\fill.cl">
       <Filter>kernels</Filter>
     </None>
   </ItemGroup>

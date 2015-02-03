@@ -32,7 +32,6 @@ namespace jtorch {
 
   protected:
     void init(TorchData& input);
-    jcl::math::Int3 local_worgroup_size;
 
     // Non-copyable, non-assignable.
     Threshold(Threshold&);

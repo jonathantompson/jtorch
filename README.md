@@ -27,13 +27,14 @@ The library also contains a CPP framework for loading it and doing the forward p
 - Identity
 - Linear
 - Parallel
+- Reshape
 - SelectTable
 - Sequential
 - SpatialContrastiveNormalization
 - SpatialConvolution
-- SpatialConvolutionMap   --> Full implementation but it is slow (all on CPU)
+- SpatialConvolutionMap   --> (only on CPU)
 - SpatialDivisiveNormalization
-- SpatialLPPooling  --> Full implementation but it is slow (all on CPU)
+- SpatialLPPooling  --> (only on CPU)
 - SpatialMaxPooling
 - SpatialSubtractiveNormalization
 - SpatialUpSamplingNearest
@@ -41,8 +42,7 @@ The library also contains a CPP framework for loading it and doing the forward p
 - Threshold
 
 The following stages have partial implementations:
-- JoinTable --> Nothing fancy.  Just concatenates along the 0th dimension. The output is always 1D.
-- Reshape --> Only reshapes from a flattened N-D to 1-D vector (ie, for use before a linear stage after a convolution stage).  Even then, it wont do the copy, it just points to the previous stage's output.
+- JoinTable --> Only joins along the top most dimension are allowed for now
 - Transpose --> Just a pass through stage.  Again, it just points to the previous stage's output.
 
 **Compilation**

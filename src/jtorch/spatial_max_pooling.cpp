@@ -14,8 +14,8 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  SpatialMaxPooling::SpatialMaxPooling(const int32_t poolsize_v, 
-    const int32_t poolsize_u) : TorchStage() {
+  SpatialMaxPooling::SpatialMaxPooling(const uint32_t poolsize_v, 
+    const uint32_t poolsize_u) : TorchStage() {
     poolsize_v_ = poolsize_v;
     poolsize_u_ = poolsize_u;
     output = NULL;
@@ -31,40 +31,66 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
+    if (in.dim() != 2 && in.dim() != 3) {
+      throw std::runtime_error("Input dimension must be 2D or 3D!");
+    }
+
+    if (output != NULL && TO_TENSOR_PTR(output)->dim() != in.dim()) {
+      // Input dimension has changed!
+      SAFE_DELETE(output);
+    }
+
     if (output != NULL) {
-      if (!Int3::equal(in.dim(), ((Tensor<float>*)output)->dim())) {
-        // Input dimension has changed!
+      // Check that the dimensions above the lowest 2 match
+      for (uint32_t i = 2; i < in.dim() && output != NULL; i++) {
+        if (TO_TENSOR_PTR(output)->size()[i] != in.size()[i]) {
+          SAFE_DELETE(output);
+        }
+      }
+    }
+
+    if (output != NULL) {
+      // Check that the lowest 2 dimensions are the correct size
+      if (TO_TENSOR_PTR(output)->size()[0] != in.size()[0] / poolsize_u_ ||
+        TO_TENSOR_PTR(output)->size()[1] != in.size()[1] / poolsize_v_) {
         SAFE_DELETE(output);
       }
     }
+
     if (output == NULL) {
-      if (in.dim()[0] % poolsize_u_ != 0 || 
-        in.dim()[1] % poolsize_v_ != 0) {
+      if (in.size()[0] % poolsize_u_ != 0 || 
+          in.size()[1] % poolsize_v_ != 0) {
         throw std::runtime_error("width or height is not a multiple of "
           "the poolsize!");
       }
-      Int3 out_dim(in.dim());
-      out_dim[0] /= poolsize_u_;
-      out_dim[1] /= poolsize_v_;
-      output = new Tensor<float>(out_dim);
-
-      //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
-      //  ((Tensor<float>*)output)->dim(), local_worgroup_size);
+      uint32_t* out_size = new uint32_t[in.dim()];
+      out_size[0] = in.size()[0] / poolsize_u_;
+      out_size[1] = in.size()[1] / poolsize_v_;
+      for (uint32_t i = 2; i < in.dim(); i++) {
+        out_size[i] = in.size()[i];
+      }
+      output = new Tensor<float>(in.dim(), out_size);
+      SAFE_DELETE_ARR(out_size);
     }
   }
 
   void SpatialMaxPooling::forwardProp(TorchData& input) { 
     init(input);
     std::string kernel = jtorch::jtorch_path + "kernels/spatial_max_pooling.cl";
-    cl_context->useKernel(kernel.c_str(), "SpatialMaxPooling");
-    cl_context->setArg(0, ((Tensor<float>&)input).data());
-    cl_context->setArg(1, ((Tensor<float>*)output)->data());
-    cl_context->setArg(2, ((Tensor<float>&)input).dim()[1]);
-    cl_context->setArg(3, ((Tensor<float>&)input).dim()[0]);
-    cl_context->setArg(4, poolsize_v_);
-    cl_context->setArg(5, poolsize_u_);
-    cl_context->runKernel3D(jtorch::deviceid, ((Tensor<float>*)output)->dim(),
-      false);
+    bool two_dim = ((Tensor<float>&)input).dim() == 2;
+    if (two_dim) {
+      cl_context->useKernel(kernel.c_str(), "SpatialMaxPooling2D");
+    } else {
+      cl_context->useKernel(kernel.c_str(), "SpatialMaxPooling");
+    }
+    cl_context->setArg(0, ((Tensor<float>&)input).storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(2, (int)((Tensor<float>&)input).size()[1]);
+    cl_context->setArg(3, (int)((Tensor<float>&)input).size()[0]);
+    cl_context->setArg(4, (int)poolsize_v_);
+    cl_context->setArg(5, (int)poolsize_u_);
+    cl_context->runKernel(jtorch::deviceid, TO_TENSOR_PTR(output)->dim(),
+      TO_TENSOR_PTR(output)->size(), false);
   }
 
   TorchStage* SpatialMaxPooling::loadFromFile(std::ifstream& file) {

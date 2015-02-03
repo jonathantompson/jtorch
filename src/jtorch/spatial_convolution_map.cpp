@@ -14,9 +14,9 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  SpatialConvolutionMap::SpatialConvolutionMap(const int32_t feats_in, 
-    const int32_t feats_out, const int32_t fan_in, const int32_t filt_height, 
-    const int32_t filt_width) 
+  SpatialConvolutionMap::SpatialConvolutionMap(const uint32_t feats_in, 
+    const uint32_t feats_out, const uint32_t fan_in, 
+    const uint32_t filt_height, const uint32_t filt_width) 
     : TorchStage() {
     filt_width_ = filt_width;
     filt_height_ = filt_height;
@@ -30,11 +30,11 @@ namespace jtorch {
     input_cpu_ = NULL;
 
     weights = new float*[feats_out_ * fan_in_];
-    for (int32_t i = 0; i < feats_out_ * fan_in_; i++) {
+    for (uint32_t i = 0; i < feats_out_ * fan_in_; i++) {
       weights[i] = new float[filt_width_ * filt_height_];
     }
     conn_table = new int16_t*[feats_out_];
-    for (int32_t i = 0; i < feats_out_; i++) {
+    for (uint32_t i = 0; i < feats_out_; i++) {
       conn_table[i] = new int16_t[fan_in_ * 2];
     }
     biases = new float[feats_out_];
@@ -52,11 +52,11 @@ namespace jtorch {
     SAFE_DELETE_ARR(output_cpu_);
     SAFE_DELETE_ARR(input_cpu_);
     SAFE_DELETE(thread_cbs_);
-    for (int32_t i = 0; i < feats_out_ * fan_in_; i++) {
+    for (uint32_t i = 0; i < feats_out_ * fan_in_; i++) {
       SAFE_DELETE_ARR(weights[i]);
     }
     SAFE_DELETE(weights);
-    for (int32_t i = 0; i < feats_out_; i++) {
+    for (uint32_t i = 0; i < feats_out_; i++) {
       SAFE_DELETE_ARR(conn_table[i]);
     }
     SAFE_DELETE(conn_table);
@@ -70,16 +70,19 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
-    if (in.dim()[2] != feats_in_) {
+    if (in.dim() != 3) {
+      throw std::runtime_error("SpatialConvolution::init() - Input not 3D!");
+    }
+    if (in.size()[2] != feats_in_) {
       throw std::runtime_error("SpatialConvolutionMap::init() - ERROR: "
         "incorrect number of input features!");
     }
     if (output != NULL) {
-      Int3 out_dim(in.dim());
-      out_dim[0] = out_dim[0] - filt_width_ + 1;
-      out_dim[1] = out_dim[1] - filt_height_ + 1;
-      out_dim[2] = feats_out_;
-      if (!Int3::equal(out_dim, ((Tensor<float>*)output)->dim())) {
+      uint32_t owidth = in.size()[0] - filt_width_ + 1;
+      uint32_t oheight = in.size()[1] - filt_height_ + 1;
+      const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
+      if (out_size[0] != owidth || out_size[1] != oheight || 
+          out_size[2] != feats_out_) {
         // Input dimension has changed!
         SAFE_DELETE(output);
         SAFE_DELETE_ARR(output_cpu_);
@@ -88,19 +91,19 @@ namespace jtorch {
       }
     }
     if (output == NULL) {
-      Int3 out_dim(in.dim());
-      out_dim[0] = out_dim[0] - filt_width_ + 1;
-      out_dim[1] = out_dim[1] - filt_height_ + 1;
+      uint32_t out_dim[3];
+      out_dim[0] = in.size()[0] - filt_width_ + 1;
+      out_dim[1] = in.size()[1] - filt_height_ + 1;
       out_dim[2] = feats_out_;
-      output = new Tensor<float>(out_dim);
-      input_cpu_ = new float[input.dataSize()];
-      output_cpu_ = new float[output->dataSize()];
+      output = new Tensor<float>(3, out_dim);
+      input_cpu_ = new float[in.nelems()];
+      output_cpu_ = new float[TO_TENSOR_PTR(output)->nelems()];
     }
     if (thread_cbs_ == NULL) {
-      int32_t n_feats = feats_out_;
-      int32_t n_threads = n_feats;
+      uint32_t n_feats = feats_out_;
+      uint32_t n_threads = n_feats;
       thread_cbs_ = new VectorManaged<Callback<void>*>(n_threads);
-      for (int32_t dim2 = 0; dim2 < n_feats; dim2++) {
+      for (uint32_t dim2 = 0; dim2 < n_feats; dim2++) {
         thread_cbs_->pushBack(MakeCallableMany(
           &SpatialConvolutionMap::forwardPropThread, 
           this, dim2));
@@ -114,16 +117,16 @@ namespace jtorch {
     Tensor<float>* out = (Tensor<float>*)output;
     in.getData(input_cpu_);  // Expensive O(n) copy from the GPU
     const int32_t n_banks = 1;  // No longer using 4D data
-    const uint32_t in_bank_size = in.dim()[0] * in.dim()[1] * in.dim()[2];
-    const uint32_t out_bank_size = out->dim()[0] * out->dim()[1] * out->dim()[2];
+    const uint32_t in_bank_size = in.size()[0] * in.size()[1] * in.size()[2];
+    const uint32_t out_bank_size = out->size()[0] * out->size()[1] * out->size()[2];
     for (int32_t bank = 0; bank < n_banks; bank++) {
       cur_input_ = &input_cpu_[bank * in_bank_size];
       cur_output_ = &output_cpu_[bank * out_bank_size];
-      cur_input_width_ = in.dim()[0];
-      cur_input_height_ = in.dim()[1];
+      cur_input_width_ = in.size()[0];
+      cur_input_height_ = in.size()[1];
 
       threads_finished_ = 0;
-      for (int32_t i = 0; i < feats_out_; i++) {
+      for (uint32_t i = 0; i < feats_out_; i++) {
         tp_->addTask((*thread_cbs_)[i]);
       } 
 
@@ -138,33 +141,33 @@ namespace jtorch {
     out->setData(output_cpu_);
   }
 
-  void SpatialConvolutionMap::forwardPropThread(const int32_t outf) {
-    const int32_t out_w = ((Tensor<float>*)output)->dim()[0];
-    const int32_t out_h = ((Tensor<float>*)output)->dim()[1];
-    const int32_t out_dim = out_w * out_h;
-    const int32_t in_dim = cur_input_width_ * cur_input_height_;
+  void SpatialConvolutionMap::forwardPropThread(const uint32_t outf) {
+    const uint32_t out_w = TO_TENSOR_PTR(output)->size()[0];
+    const uint32_t out_h = TO_TENSOR_PTR(output)->size()[1];
+    const uint32_t out_dim = out_w * out_h;
+    const uint32_t in_dim = cur_input_width_ * cur_input_height_;
 
     // Initialize the output array to the convolution bias:
     // http://www.torch.ch/manual/nn/index#spatialconvolution
     // Set the output layer to the current bias
-    for (int32_t uv = outf * out_dim; uv < ((outf+1) * out_dim); uv++) {
+    for (uint32_t uv = outf * out_dim; uv < ((outf+1) * out_dim); uv++) {
       cur_output_[uv] = biases[outf];
     }
 
     // Now iterate through the connection table:
-    for (int32_t inf = 0; inf < fan_in_; inf++) {
-      int32_t inf_index = (int32_t)conn_table[outf][inf * 2];
-      int32_t weight_index = (int32_t)conn_table[outf][inf * 2 + 1];
+    for (uint32_t inf = 0; inf < fan_in_; inf++) {
+      uint32_t inf_index = (int32_t)conn_table[outf][inf * 2];
+      uint32_t weight_index = (int32_t)conn_table[outf][inf * 2 + 1];
       float* cur_filt = weights[weight_index];
 
       // for each output pixel, perform the convolution over the input
-      for (int32_t outv = 0; outv < out_h; outv++) {
-        for (int32_t outu = 0; outu < out_w; outu++) {
+      for (uint32_t outv = 0; outv < out_h; outv++) {
+        for (uint32_t outu = 0; outu < out_w; outu++) {
           // Now perform the convolution of the inputs
-          for (int32_t filtv = 0; filtv < filt_height_; filtv++) {
-            for (int32_t filtu = 0; filtu < filt_width_; filtu++) {
-              int32_t inu = outu + filtu;
-              int32_t inv = outv + filtv;
+          for (uint32_t filtv = 0; filtv < filt_height_; filtv++) {
+            for (uint32_t filtu = 0; filtu < filt_width_; filtu++) {
+              uint32_t inu = outu + filtu;
+              uint32_t inv = outv + filtv;
               cur_output_[outf * out_dim + outv * out_w + outu] +=
                 (cur_filt[filtv * filt_width_ + filtu] *
                 cur_input_[inf_index * in_dim + inv * cur_input_width_ + inu]);

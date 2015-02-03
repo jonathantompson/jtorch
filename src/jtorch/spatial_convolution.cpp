@@ -16,20 +16,21 @@ using namespace jcl;
 
 namespace jtorch {
 
-  SpatialConvolution::SpatialConvolution(const int32_t feats_in, 
-    const int32_t feats_out, const int32_t filt_height, 
-    const int32_t filt_width) 
-    : TorchStage() {
+  SpatialConvolution::SpatialConvolution(const uint32_t feats_in, 
+    const uint32_t feats_out, const uint32_t filt_height, 
+    const uint32_t filt_width, const uint32_t padding) : TorchStage() {
     filt_width_ = filt_width;
     filt_height_ = filt_height;
     feats_in_ = feats_in;
     feats_out_ = feats_out;
+    padding_ = padding;
 
     output = NULL;
 
-    weights_ = new Tensor<float>(Int3(filt_width_, filt_height_,
-      feats_out_ * feats_in_));
-    biases_ = new Tensor<float>(feats_out_);
+    uint32_t dim = 4;
+    uint32_t size[4] = {filt_width_, filt_height_, feats_in_, feats_out_};
+    weights_ = new Tensor<float>(dim, size);
+    biases_ = new Tensor<float>(1, &feats_out_);
   }
 
   SpatialConvolution::~SpatialConvolution() {
@@ -52,28 +53,32 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
-    if (in.dim()[2] != feats_in_) {
+    if (in.dim() != 3) {
+      throw std::runtime_error("SpatialConvolution::init() - Input not 3D!");
+    }
+    if (in.size()[2] != feats_in_) {
       throw std::runtime_error("SpatialConvolution::init() - ERROR: "
         "incorrect number of input features!");
     }
+    if (padding_ % 2 != 0) {
+      throw std::runtime_error("SpatialConvolution::init() - ERROR: "
+        "Only even size padding is supported for now!");
+    }
     if (output != NULL) {
-      Int3 out_dim(in.dim());
-      out_dim[0] = out_dim[0] - filt_width_ + 1;
-      out_dim[1] = out_dim[1] - filt_height_ + 1;
-      out_dim[2] = feats_out_;
-      if (!Int3::equal(out_dim, ((Tensor<float>*)output)->dim())) {
-        // Input dimension has changed!
+      uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
+      uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;
+      const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
+      if (out_size[0] != owidth || out_size[1] != oheight || 
+        out_size[2] != feats_out_) {
         SAFE_DELETE(output);
       }
     }
     if (output == NULL) {
-      Int3 out_dim(in.dim());
-      out_dim[0] = out_dim[0] - filt_width_ + 1;
-      out_dim[1] = out_dim[1] - filt_height_ + 1;
+      uint32_t out_dim[3];
+      out_dim[0] = in.size()[0] - filt_width_ + 1 + 2 * padding_;
+      out_dim[1] = in.size()[1] - filt_height_ + 1 + 2 * padding_;
       out_dim[2] = feats_out_;
-      output = new Tensor<float>(out_dim);
-      //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
-      //  ((Tensor<float>*)output)->dim(), local_worgroup_size);
+      output = new Tensor<float>(3, out_dim);
     }
   }
 
@@ -81,29 +86,39 @@ namespace jtorch {
     init(input);
     Tensor<float>& in = (Tensor<float>&)input;
     std::string kernel = jtorch::jtorch_path + "kernels/spatial_convolution.cl";
-    cl_context->useKernel(kernel.c_str(), "SpatialConvolution");
-    cl_context->setArg(0, ((Tensor<float>&)input).data());
-    cl_context->setArg(1, ((Tensor<float>*)output)->data());
-    cl_context->setArg(2, weights_->data());
-    cl_context->setArg(3, biases_->data());
-    cl_context->setArg(4, (int)in.dim()[2]);
-    cl_context->setArg(5, (int)in.dim()[1]);
-    cl_context->setArg(6, (int)in.dim()[0]);
+    if (padding_ > 0) {
+      cl_context->useKernel(kernel.c_str(), "SpatialConvolutionPadding");
+    } else {
+      cl_context->useKernel(kernel.c_str(), "SpatialConvolution");
+    }
+    cl_context->setArg(0, ((Tensor<float>&)input).storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(2, weights_->storage());
+    cl_context->setArg(3, biases_->storage());
+    cl_context->setArg(4, (int)in.size()[2]);
+    cl_context->setArg(5, (int)in.size()[1]);
+    cl_context->setArg(6, (int)in.size()[0]);
     cl_context->setArg(7, (int)filt_height_);
     cl_context->setArg(8, (int)filt_width_);
-    cl_context->runKernel3D(jtorch::deviceid, ((Tensor<float>*)output)->dim(),
-      false);
+    if (padding_ > 0) {
+      cl_context->setArg(9, (int)padding_);
+    }
+    uint32_t dim = 3;
+    cl_context->runKernel(jtorch::deviceid, dim, 
+      TO_TENSOR_PTR(output)->size(), false);
   }
 
   TorchStage* SpatialConvolution::loadFromFile(std::ifstream& file) {
-    int32_t filt_width, filt_height, n_input_features, n_output_features;
+    int32_t filt_width, filt_height, n_input_features, n_output_features,
+      padding;
     file.read((char*)(&filt_width), sizeof(filt_width));
     file.read((char*)(&filt_height), sizeof(filt_height));
     file.read((char*)(&n_input_features), sizeof(n_input_features));
     file.read((char*)(&n_output_features), sizeof(n_output_features));
+    file.read((char*)(&padding), sizeof(padding));
 
     SpatialConvolution* ret = new SpatialConvolution(n_input_features,
-      n_output_features, filt_height, filt_width);
+      n_output_features, filt_height, filt_width, padding);
 
     int32_t filt_dim = filt_width * filt_height;
     float* weights = new float[n_output_features * n_input_features * filt_dim];

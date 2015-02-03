@@ -16,7 +16,8 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  JoinTable::JoinTable() {
+  JoinTable::JoinTable(const uint32_t dimension) {
+    dimension_ = dimension;
     output = NULL;
   }
 
@@ -28,8 +29,9 @@ namespace jtorch {
   TorchStage* JoinTable::loadFromFile(std::ifstream& file) {
     int32_t dimension;
     file.read((char*)(&dimension), sizeof(dimension));
+    dimension = dimension - 1;  // We index from 0 in C++
     // But we don't really use it...
-    return new JoinTable();
+    return new JoinTable(dimension);
   }
 
   void JoinTable::init(TorchData& input) {
@@ -44,23 +46,53 @@ namespace jtorch {
         "Empty input Table!");
     }
 
-    // Check that it is a table of FloatTensors (since tables can be nested)
-    int size = 0;
+    // Check that it is a table of FloatTensors
     for (uint32_t i = 0; i < in.tableSize(); i++) {
       if (in(i)->type() != TENSOR_DATA) {
         throw std::runtime_error("JoinTable::forwardProp() - "
           "Table of float tensors expected!");
       }
-      size += in(i)->dataSize();
     }
-     
-    if (output != NULL && size != static_cast<int>(output->dataSize())) {
+
+    uint32_t dim = TO_TENSOR_PTR(in(0))->dim();
+    if (dim <= dimension_) {
+      throw std::runtime_error("JoinTable::forwardProp() - "
+        "Input is smaller than join dimension!");
+    }
+    uint32_t jdim = dim - dimension_ - 1;  // dimension_=0 is the top dim
+
+    // Make sure the dimensions OTHER than the join dimension are all the same
+    for (uint32_t d = 0; d < dim; d++) {
+      if (d != jdim) {
+        for (uint32_t j = 1; j < in.tableSize(); j++) {
+          if (TO_TENSOR_PTR(in(j))->size()[d] != TO_TENSOR_PTR(in(0))->size()[d]) {
+            throw std::runtime_error("JoinTable::forwardProp() - "
+              "Size mismatch!");
+          }
+        }
+        if (output != NULL && TO_TENSOR_PTR(output)->size()[d] != 
+          TO_TENSOR_PTR(in(0))->size()[d]) {
+            SAFE_DELETE(output);
+        }
+      }
+    }
+
+    uint32_t nelems_jdim = 0;
+    for (uint32_t j = 1; j < in.tableSize(); j++) {
+      nelems_jdim += TO_TENSOR_PTR(in(j))->size()[jdim];
+    }
+
+    if (output != NULL &&
+      TO_TENSOR_PTR(output)->size()[jdim] != nelems_jdim) {
       SAFE_DELETE(output);
     }
 
     if (output == NULL) {
-      Int3 out_dim(size, 1, 1);
-      output = new Tensor<float>(out_dim);
+      uint32_t* size = new uint32_t[dim];
+      memcpy(size, TO_TENSOR_PTR(in(0))->size(), sizeof(size[0]) * dim);
+      size[dimension_] = nelems_jdim;
+      output = new Tensor<float>(dim, size);
+      SAFE_DELETE_ARR(size);
     }
   }
 
@@ -69,20 +101,26 @@ namespace jtorch {
 
     Table& in = (Table&)input;
 
+    // AT THE MOMENT ONLY JOINS ALONG THE TOP DIMENSION ARE SUPPORTED
+    if (dimension_ != 0) {
+      throw std::runtime_error("JoinTable::forwardProp() - "
+        "Only dimension=0 is supported for now");
+    }
+
     // Copy each table element's raw data into the output
     std::string kernel = jtorch::jtorch_path + "kernels/join_table.cl";
     cl_context->useKernel(kernel.c_str(), "JoinTable1D");
     int out_offset = 0;
     for (uint32_t i = 0; i < in.tableSize(); i++) {
-      Int3 local_worgroup_size;
       Tensor<float>* cur_input = (Tensor<float>*)in(i);
-      cl_context->setArg(0, cur_input->data());
-      cl_context->setArg(1, ((Tensor<float>*)output)->data());
+      cl_context->setArg(0, cur_input->storage());
+      cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
       cl_context->setArg(2, out_offset);
-      cl_context->runKernel1D(jtorch::deviceid, cur_input->dataSize(),
-        false);
+      uint32_t dim = 1;
+      uint32_t nelem = cur_input->nelems();
+      cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
 
-      out_offset += cur_input->dataSize();
+      out_offset += nelem;
     }
   }
 

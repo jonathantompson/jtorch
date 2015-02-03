@@ -31,7 +31,9 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    int32_t scale_;
+    uint32_t scale_;
+    uint32_t out_dim_;
+    uint32_t* out_size_;
 
     void init(TorchData& input);
 

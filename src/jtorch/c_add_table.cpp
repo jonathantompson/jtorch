@@ -51,25 +51,25 @@ namespace jtorch {
       }
     }
 
-    const Int3& dim = ((Tensor<float>*)in(0))->dim();
     for (uint32_t i = 1; i < in.tableSize(); i++) {
-      if (!Int3::equal(dim, ((Tensor<float>*)in(i))->dim())) {
+      if (!TO_TENSOR_PTR(in(0))->isSameSizeAs(*TO_TENSOR_PTR(in(i)))) {
         throw std::runtime_error("SelectTable::forwardProp() - "
           "Table of equal size Tensors expected!");
       }
     }
 
-    if (output == NULL || !Int3::equal(dim, ((Tensor<float>*)output)->dim())) {
+    if (output == NULL || 
+      !TO_TENSOR_PTR(in(0))->isSameSizeAs(*TO_TENSOR_PTR(output))) {
       // Reinitialize the output Tensor
       SAFE_DELETE(output);
-      output = new Tensor<float>(dim);
+      output = new Tensor<float>(TO_TENSOR_PTR(in(0))->dim(), 
+        TO_TENSOR_PTR(in(0))->size());
     }
 
     // TODO: We can probabily parallelize these calls accross multiple tensors
-    Tensor<float>* out = (Tensor<float>*)output;
-    Tensor<float>::copy(*out, *(Tensor<float>*)in(0));
+    Tensor<float>::copy(*TO_TENSOR_PTR(output), *TO_TENSOR_PTR(in(0)));
     for (uint32_t i = 1; i < in.tableSize(); i++) {
-      Tensor<float>::accumulate(*out, *(Tensor<float>*)in(i));
+      Tensor<float>::accumulate(*TO_TENSOR_PTR(output), *TO_TENSOR_PTR(in(i)));
     }
 
   }

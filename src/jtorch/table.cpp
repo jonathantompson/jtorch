@@ -40,10 +40,6 @@ namespace jtorch {
     data_->clear();
   }
 
-  uint32_t Table::dataSize() const {
-    return data_->size();
-  }
-
   uint32_t Table::tableSize() const {
     return data_->size();
   }

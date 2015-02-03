@@ -99,21 +99,66 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="kernels\accumulate.cl" />
-    <None Include="kernels\add.cl" />
-    <None Include="kernels\copy.cl" />
-    <None Include="kernels\div.cl" />
-    <None Include="kernels\join_table.cl" />
-    <None Include="kernels\linear.cl" />
-    <None Include="kernels\mul.cl" />
-    <None Include="kernels\spatial_convolution.cl" />
-    <None Include="kernels\spatial_divisive_normalization.cl" />
-    <None Include="kernels\spatial_max_pooling.cl" />
-    <None Include="kernels\spatial_subtractive_normalization.cl" />
-    <None Include="kernels\spatial_up_sampling_nearest.cl" />
-    <None Include="kernels\tanh.cl" />
-    <None Include="kernels\zero.cl" />
-    <None Include="kernels\threshold.cl" />
+    <None Include="kernels\accumulate.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\add.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\copy.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\div.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\join_table.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\linear.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\mul.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\spatial_convolution.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\spatial_divisive_normalization.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\spatial_max_pooling.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\spatial_subtractive_normalization.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\spatial_up_sampling_nearest.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\tanh.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\fill.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
+    <None Include="kernels\threshold.cl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
     <None Include="README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

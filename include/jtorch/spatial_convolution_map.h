@@ -30,9 +30,9 @@ namespace jtorch {
   class SpatialConvolutionMap : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialConvolutionMap(const int32_t feats_in, const int32_t feats_out,
-      const int32_t fan_in, const int32_t filt_height, 
-      const int32_t filt_width);
+    SpatialConvolutionMap(const uint32_t feats_in, const uint32_t feats_out,
+      const uint32_t fan_in, const uint32_t filt_height, 
+      const uint32_t filt_width);
     virtual ~SpatialConvolutionMap();
 
     virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_MAP_STAGE; }
@@ -49,11 +49,11 @@ namespace jtorch {
   protected:
     float* input_cpu_;
     float* output_cpu_;
-    int32_t filt_width_;
-    int32_t filt_height_;
-    int32_t feats_in_;
-    int32_t feats_out_;
-    int32_t fan_in_;
+    uint32_t filt_width_;
+    uint32_t filt_height_;
+    uint32_t feats_in_;
+    uint32_t feats_out_;
+    uint32_t fan_in_;
 
     // Multithreading primatives and functions
     jcl::threading::ThreadPool* tp_;
@@ -66,7 +66,7 @@ namespace jtorch {
     std::condition_variable not_finished_;
     jcl::data_str::VectorManaged<jcl::threading::Callback<void>*>* thread_cbs_; 
 
-    void forwardPropThread(const int32_t outf);
+    void forwardPropThread(const uint32_t outf);
 
     void init(TorchData& input, jcl::threading::ThreadPool& tp);
 

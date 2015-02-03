@@ -23,15 +23,14 @@
 
 namespace jcl { namespace threading { class ThreadPool; } }
 
+#define TO_TENSOR_PTR(x) (x->type() == TENSOR_DATA ? (Tensor<float>*)x : NULL)
+
 namespace jtorch {
   
   template <typename T>
   class Tensor : public TorchData {
   public:
-    // Constructor / Destructor
-    Tensor(const jcl::math::Int3& dim);  // Assumes dim[3]=1
-    Tensor(const jcl::math::Int2& dim);  // Assumes dim[3]=1, dim[2]=1
-    Tensor(const int dim);  // Assumes dim[3]=1, dim[2]=1, dim[1]=1
+    Tensor(const uint32_t dim, const uint32_t* size);
     virtual ~Tensor();
 
     virtual TorchDataType type() const { return TENSOR_DATA; }
@@ -40,13 +39,16 @@ namespace jtorch {
     void setData(const T* data);
     void getData(T* data) const;
 
-    const jcl::math::Int3& dim() const { return dim_; }
+    // View returns a new view on the same object.  The caller owns the new
+    // memory (ie, it is transferred).
+    Tensor<T>* view(const uint32_t dim, const uint32_t* size);
+
+    const uint32_t dim() const { return dim_; }
+    const uint32_t* size() const { return size_; }
+    const bool isSameSizeAs(const Tensor<T>& src) const;
 
     // Print --> EXPENSIVE
     virtual void print();  // print to std::cout
-    void print(const jcl::math::Int2& interval0, 
-      const jcl::math::Int2& interval1, 
-      const jcl::math::Int2& interval2);
 
     // Some simple tensor math operations
     static void copy(Tensor<T>& dst, const Tensor<T>& src);
@@ -55,6 +57,7 @@ namespace jtorch {
     static void div(Tensor<T>& x, float div_value);
     static void accumulate(Tensor<T>& dst, const Tensor<T>& src);
     static void zero(Tensor<T>& x);
+    static void fill(Tensor<T>& x, float value);
     // slowSum - This does a CPU copy because I haven't written a reduction 
     // operator yet
     static float slowSum(const Tensor<T>& x);  
@@ -63,16 +66,19 @@ namespace jtorch {
     static Tensor<T>* clone(const Tensor<T>& x);
     static Tensor<T>* gaussian1D(const int32_t kernel_size);  // sigma = size / 2
     static Tensor<T>* gaussian(const int32_t kernel_size);
-    static Tensor<T>* ones1D(const int32_t kernel_size);
-    
 
-    inline const jcl::JCLBuffer& data() const { return data_; }
-    inline uint32_t dataSize() const { return dim_[0]*dim_[1]*dim_[2]; }
+    inline const jcl::JCLBuffer& storage() const { return storage_; }
+    inline uint32_t nelems() const;
+
+    uint32_t* calcStride() const;  // memory returned is owned by caller
 
   protected:
-    jcl::JCLBuffer data_;  // Internal data
-    jcl::math::Int3 dim_;  // dim_[0] is lowest contiguous dimension, 
-                           // dim_[2] is highest dimension
+    jcl::JCLBuffer storage_;  // Internal data
+    uint32_t dim_;
+    uint32_t* size_;  // size_[0] is lowest contiguous dimension, 
+                      // size_[2] is highest dimension
+
+    Tensor();  // Default constructor used internally (in view function)
 
     // Non-copyable, non-assignable.
     Tensor(Tensor&);
@@ -80,78 +86,196 @@ namespace jtorch {
   };
 
   template <typename T>
-  Tensor<T>::Tensor(const jcl::math::Int3& dim) {
-    dim_.set(dim[0], dim[1], dim[2]);
-    data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
-      dim_[0], dim_[1], dim_[2]);
+  Tensor<T>::Tensor(const uint32_t dim, const uint32_t* size) {
+    this->dim_ = dim;
+    this->size_ = new uint32_t[dim];
+    memcpy(this->size_, size, sizeof(this->size_[0]) * dim);
+    storage_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
+      nelems());
     zero(*this);
 
   }
 
   template <typename T>
-  Tensor<T>::Tensor(const jcl::math::Int2& dim) {
-    dim_.set(dim[0], dim[1], 1);
-    data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
-      dim_[0], dim_[1], dim_[2]);
-    zero(*this);
-  }
-
-  template <typename T>
-  Tensor<T>::Tensor(const int dim) {
-    dim_.set(dim, 1, 1);
-    data_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
-      dim_[0], dim_[1], dim_[2]);
-    zero(*this);
+  Tensor<T>::Tensor() {
+    // Default constructor returns an empty header.  Used internally (ie 
+    // private).
+    dim_ = 0;
+    size_ = NULL;
+    storage_ = (jcl::JCLBuffer)-1;
   }
 
   template <typename T>
   Tensor<T>::~Tensor() {
-    // Nothing to do
+    if (size_) {
+      delete[] size_;
+    }
+  }
+
+  template <typename T>
+  uint32_t* Tensor<T>::calcStride() const {
+    uint32_t* stride = new uint32_t[dim_];
+    stride[0] = 1;
+    for (uint32_t i = 1; i < dim_; i++) {
+      stride[i] = stride[i-1] * size_[i-1];
+    }
+    return stride;
+  }
+
+  template <typename T>
+  uint32_t Tensor<T>::nelems() const {
+    uint32_t nelem = 1;
+    for (uint32_t i = 0; i < dim_; i++) {
+      nelem *= size_[i];
+    }
+    return nelem;
+  }
+
+  template <typename T>
+  const bool Tensor<T>::isSameSizeAs(const Tensor<T>& src) const {
+    if (dim_ != src.dim_) {
+      return false;
+    }
+    for (uint32_t i = 0; i < dim_; i++) {
+      if (size_[i] != src.size_[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template <typename T>
+  Tensor<T>* Tensor<T>::view(const uint32_t dim, const uint32_t* size) {
+    if (dim == 0) {
+      throw std::runtime_error("ERROR - view() - zero dimension not allowed!"); 
+    }
+    int32_t view_nelem = 1;
+    for (uint32_t i = 0; i < dim; i++) {
+      view_nelem *= size[i];
+    }
+
+    if (view_nelem != nelems()) {
+      throw std::runtime_error("ERROR - view() - Size mismatch!"); 
+    }
+
+    Tensor<T>* return_header = new Tensor<T>();
+    return_header->dim_ = dim;
+    return_header->size_ = new uint32_t[dim];
+    memcpy(return_header->size_, size, sizeof(return_header->size_[0]) * dim);
+    return_header->storage_ = storage_;
+    return return_header;
   }
 
   template <typename T>
   void Tensor<T>::setData(const T* data) {
-    jtorch::cl_context->writeToBuffer(data, jtorch::deviceid, data_, true);
+    jtorch::cl_context->writeToBuffer(data, jtorch::deviceid, storage_, true);
   }
 
   template <typename T>
   void Tensor<T>::getData(T* data) const {
-    jtorch::cl_context->readFromBuffer(data, jtorch::deviceid, data_, true);
+    jtorch::cl_context->readFromBuffer(data, jtorch::deviceid, storage_, true);
   }
 
   template <typename T>
   void Tensor<T>::print() {
     std::streamsize prec = std::cout.precision();
     std::cout.precision(JTORCH_TENSOR_PRECISON);
-    T* d = new T[dataSize()];
+    T* d = new T[nelems()];
     getData(d);
-    const int32_t dim = dim_[0] * dim_[1];
-    for (int32_t i = 0; i < dim_[2]; i++) {
+    T max_val = std::numeric_limits<T>::min();
+    for (uint32_t i = 0; i < nelems(); i++) {
+      max_val = std::max<T>(max_val, d[i]);
+    }
+    T scale = (T)pow(10.0, floor(log10((double)max_val + EPSILON)));
+
 #if defined(WIN32) || defined(_WIN32)
       std::cout.setf(0, std::ios::showpos);
 #else
       std::cout.setf(std::ios::showpos);
 #endif
-      std::cout << "  3dtensor[" << i << ", *, *] =";
-      std::cout << std::endl;
-      T* data = &d[i * dim_[1]*dim_[0]];
-      for (int32_t v = 0; v < dim_[1]; v++) {
-        if (v == 0) {
-          std::cout << "    (0,0) ";
+
+    if (dim_ == 1) {
+      // Print a 1D tensor
+      std::cout << "  tensor[*] =" << std::endl;
+      if (fabsf((float)scale - 1.0f) > EPSILON) {
+        std::cout << " " << scale << " * " << std::endl;
+      }
+      std::cout.setf(std::ios::showpos);
+      for (uint32_t u = 0; u < size_[0]; u++) {
+        if (u == 0) {
+          std::cout << " (0) ";
         } else {
-          std::cout << "          ";
+          std::cout << "     ";
+        }
+        std::cout << std::fixed << d[u] / scale << std::endl;;
+        std::cout.unsetf(std::ios_base::floatfield);
+      }
+    } else if (dim_ == 2) {
+      // Print a 2D tensor
+      std::cout << "  tensor[*,*] =" << std::endl;
+      if (fabsf((float)scale - 1.0f) > EPSILON) {
+        std::cout << " " << scale << " * " << std::endl;
+      }
+      std::cout.setf(std::ios::showpos);
+      for (uint32_t v = 0; v < size_[1]; v++) {
+        if (v == 0) {
+          std::cout << " (0,0) ";
+        } else {
+          std::cout << "       ";
         }
         std::cout.setf(std::ios::showpos);
-        for (int32_t u = 0; u < dim_[0]; u++) {
-          std::cout << std::fixed << data[v * dim_[0] + u];
+        for (uint32_t u = 0; u < size_[0]; u++) {
+          std::cout << std::fixed << d[v * size_[0] + u] / scale;
           std::cout.unsetf(std::ios_base::floatfield);
-          if (u != dim_[0] - 1) {
+          if (u != size_[0] - 1) {
             std::cout << ", ";
           } else {
             std::cout << std::endl;
           }
         }
       }
+    } else {
+      // Print a nD tensor
+      int32_t odim = 1;
+      for (uint32_t i = 2; i < dim_; i++) {
+        odim *= size_[i];
+      }
+
+      uint32_t* stride = calcStride();
+
+      for (int32_t i = 0; i < odim; i++) {
+        std::cout << "  tensor[";
+        for (uint32_t cur_dim = dim_-1; cur_dim >= 2; cur_dim--) {
+          std::cout << (i % stride[cur_dim]) << ",";
+        }
+
+        std::cout << "*,*] =";
+        std::cout << std::endl;
+        if (fabsf((float)scale - 1.0f) > EPSILON) {
+          std::cout << " " << scale << " * " << std::endl;
+        }
+
+        T* data = &d[i * size_[1] * size_[0]];
+        for (uint32_t v = 0; v < size_[1]; v++) {
+          if (v == 0) {
+            std::cout << " (0,0) ";
+          } else {
+            std::cout << "       ";
+          }
+          std::cout.setf(std::ios::showpos);
+          for (uint32_t u = 0; u < size_[0]; u++) {
+            std::cout << std::fixed << data[v * size_[0] + u] / scale;
+            std::cout.unsetf(std::ios_base::floatfield);
+            if (u != size_[0] - 1) {
+              std::cout << ", ";
+            } else {
+              std::cout << std::endl;
+            }
+          }
+        }
+      }
+
+      delete[] stride;
     }
     std::cout.precision(prec);
     std::cout << std::resetiosflags(std::ios_base::showpos);
@@ -159,76 +283,27 @@ namespace jtorch {
 
     std::cout << "[jtorch.";
     std::cout << jcl::JCL::CLDeviceToString(jtorch::cl_context->device());
-    std::cout << " of dimension " << dim_[2] << "x" << dim_[1] << "x";
-    std::cout << dim_[0] << "]" << std::endl;
+    std::cout << " of dimension ";
+    for (int32_t i = (int32_t)dim_-1; i >= 0; i--) {
+      std::cout << size_[i];
+      if (i > 0) {
+        std::cout << "x";
+      }
+    }
+    std::cout << "]" << std::endl;
   };
 
   template <typename T>
-  void Tensor<T>::print(const jcl::math::Int2& interval0, 
-    const jcl::math::Int2& interval1, const jcl::math::Int2& interval2) {
-    if (interval0[0] > interval0[1] || interval1[0] > interval1[1] || 
-      interval2[0] > interval2[1]) {
-      throw std::runtime_error("Tensor<T>::print() - ERROR: "
-        "intervals must be monotonic");
-    }
-    if (interval0[0] < 0 || interval0[1] >= dim_[0] || 
-        interval1[0] < 0 || interval1[1] >= dim_[1] ||
-        interval2[0] < 0 || interval2[1] >= dim_[2]) {
-      throw std::runtime_error("Tensor<T>::print() - ERROR: "
-        "intervals out of range");
-    }
-    std::streamsize prec = std::cout.precision();
-    std::cout.precision(JTORCH_TENSOR_PRECISON);
-    T* d = new T[dataSize()];
-    getData(d);
-    for (int32_t f = interval2[0]; f <= interval2[1]; f++) {
-#if defined(WIN32) || defined(_WIN32)
-      std::cout.setf(0, std::ios::showpos);
-#else
-      std::cout.setf(std::ios::showpos);
-#endif
-      std::cout << "  3dtensor[" << f << ", *, *] =";
-      std::cout << std::endl;
-      T* data = &d[f * dim_[1]*dim_[0]];
-      for (int32_t v = interval1[0]; v <= interval1[1]; v++) {
-        if (v == interval1[0]) {
-          std::cout << "    (" << interval1[0] << "," <<  interval0[0] << ") ";
-        } else {
-          std::cout << "          ";
-        }
-        std::cout.setf(std::ios::showpos);
-        for (int32_t u = interval0[0]; u <= interval0[1]; u++) {
-          std::cout << std::fixed << data[v * dim_[0] + u];
-          std::cout.unsetf(std::ios_base::floatfield);
-          if (u != interval0[1]) {
-            std::cout << ", ";
-          } else {
-            std::cout << std::endl;
-          }
-        }
-      }
-    }
-    std::cout.precision(prec);
-    std::cout << std::resetiosflags(std::ios_base::showpos);
-    delete[] d;
-
-    std::cout << "[jtorch.";
-    std::cout << jcl::JCL::CLDeviceToString(jtorch::cl_context->device());
-    std::cout << " of dimension " << dim_[2] << "x" << dim_[1] << "x";
-    std::cout << dim_[0] << "]" << std::endl;
-  }
-
-  template <typename T>
   Tensor<T>* Tensor<T>::gaussian1D(const int32_t kernel_size) {
-    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, 1, 1));
+    const uint32_t size = kernel_size;
+    Tensor<T>* ret = new Tensor<T>(1, &size);
     const float sigma = 0.25f;
     const float amplitude = 1.0f;
-    const float size = (float)kernel_size;
-    const float center = size/2.0f + 0.5f;
+    const float center = (float)kernel_size/2.0f + 0.5f;
     T* data = new T[kernel_size];
     for (int32_t i = 0; i < kernel_size; i++) {
       data[i] = (T)amplitude * expf(-(powf(((float)(i+1) - center) / 
-        (sigma*size), 2.0f) / 2.0f));
+        (sigma*(float)kernel_size), 2.0f) / 2.0f));
     }
     ret->setData(data);
     delete[] data;
@@ -237,16 +312,16 @@ namespace jtorch {
 
   template <typename T>
   Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
-    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, kernel_size, 1));
+    const uint32_t size[2] = {kernel_size, kernel_size};
+    Tensor<T>* ret = new Tensor<T>(2, size);
     const float sigma = 0.25f;
     const float amplitude = 1.0f;
-    const float size = (float)kernel_size;
-    const float center = size/2.0f + 0.5f;
+    const float center = (float)kernel_size/2.0f + 0.5f;
     T* data = new T[kernel_size * kernel_size];
     for (int32_t v = 0; v < kernel_size; v++) {
       for (int32_t u = 0; u < kernel_size; u++) {
-        float du = ((float)(u+1) - center) / (sigma*size);
-        float dv = ((float)(v+1) - center) / (sigma*size);
+        float du = ((float)(u+1) - center) / (sigma*(float)kernel_size);
+        float dv = ((float)(v+1) - center) / (sigma*(float)kernel_size);
         data[v * kernel_size + u] = (T)amplitude * expf(-(du * du + dv * dv) / 
           2.0f);
       }
@@ -257,25 +332,15 @@ namespace jtorch {
   }
 
   template <typename T>
-  Tensor<T>* Tensor<T>::ones1D(const int32_t kernel_size) {
-    Tensor<T>* ret = new Tensor<T>(jcl::math::Int3(kernel_size, 1, 1));
-    T* data = new T[kernel_size];
-    for (int32_t i = 0; i < kernel_size; i++) {
-      data[i] = (T)1;
-    }
-    ret->setData(data);
-    delete[] data;
-    return ret;
-  }
-
-  template <typename T>
   Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
-    Tensor<T>* ret = new Tensor<T>(x.dim_);
+    Tensor<T>* ret = new Tensor<T>(x.dim_, x.size_);
     std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
     cl_context->useKernel(kernel.c_str(), "Copy");
-    cl_context->setArg(0, x.data());
-    cl_context->setArg(1, ret->data());
-    cl_context->runKernel1D(jtorch::deviceid, ret->dataSize(), false);
+    cl_context->setArg(0, x.storage());
+    cl_context->setArg(1, ret->storage());
+    uint32_t dim = 1;
+    uint32_t nelem = x.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
     return ret;
   }
   
@@ -283,19 +348,23 @@ namespace jtorch {
   void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
     std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
     cl_context->useKernel(kernel.c_str(), "Copy");
-    cl_context->setArg(0, src.data());
-    cl_context->setArg(1, dst.data());
-    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+    cl_context->setArg(0, src.storage());
+    cl_context->setArg(1, dst.storage());
+    uint32_t dim = 1;
+    uint32_t nelem = dst.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
   void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
     std::string kernel = jtorch::jtorch_path + "kernels/add.cl";
     cl_context->useKernel(kernel.c_str(), "Add");
-    cl_context->setArg(0, src1.data());
-    cl_context->setArg(1, src2.data());
-    cl_context->setArg(2, dst.data());
-    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+    cl_context->setArg(0, src1.storage());
+    cl_context->setArg(1, src2.storage());
+    cl_context->setArg(2, dst.storage());
+    uint32_t dim = 1;
+    uint32_t nelem = dst.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
@@ -303,8 +372,10 @@ namespace jtorch {
     std::string kernel = jtorch::jtorch_path + "kernels/mul.cl";
     cl_context->useKernel(kernel.c_str(), "Mul");
     cl_context->setArg(0, mul_val);
-    cl_context->setArg(1, x.data());
-    cl_context->runKernel1D(jtorch::deviceid, x.dataSize(), false);
+    cl_context->setArg(1, x.storage());
+    uint32_t dim = 1;
+    uint32_t nelem = x.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
@@ -312,33 +383,45 @@ namespace jtorch {
     std::string kernel = jtorch::jtorch_path + "kernels/div.cl";
     cl_context->useKernel(kernel.c_str(), "Div");
     cl_context->setArg(0, div_val);
-    cl_context->setArg(1, x.data());
-    cl_context->runKernel1D(jtorch::deviceid, x.dataSize(), false);
+    cl_context->setArg(1, x.storage());
+    uint32_t dim = 1;
+    uint32_t nelem = x.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
   void Tensor<T>::accumulate(Tensor<T>& dst, const Tensor<T>& src) {
     std::string kernel = jtorch::jtorch_path + "kernels/accumulate.cl";
     cl_context->useKernel(kernel.c_str(), "Accumulate");
-    cl_context->setArg(0, src.data());
-    cl_context->setArg(1, dst.data());
-    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+    cl_context->setArg(0, src.storage());
+    cl_context->setArg(1, dst.storage());
+    uint32_t dim = 1;
+    uint32_t nelem = dst.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
   void Tensor<T>::zero(Tensor<T>& dst) {
-    std::string kernel = jtorch::jtorch_path + "kernels/zero.cl";
-    cl_context->useKernel(kernel.c_str(), "Zero");
-    cl_context->setArg(0, dst.data());
-    cl_context->runKernel1D(jtorch::deviceid, dst.dataSize(), false);
+    Tensor<T>::fill(dst, 0);
+  }
+
+  template <typename T>
+  void Tensor<T>::fill(Tensor<T>& dst, float value) {
+    std::string kernel = jtorch::jtorch_path + "kernels/fill.cl";
+    cl_context->useKernel(kernel.c_str(), "Fill");
+    cl_context->setArg(0, dst.storage());
+    cl_context->setArg(1, value);
+    uint32_t dim = 1;
+    uint32_t nelem = dst.nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   template <typename T>
   float Tensor<T>::slowSum(const Tensor<T>& x) {
-    float* temp = new float[x.dataSize()];
+    float* temp = new float[x.nelems()];
     x.getData(temp);
     float sum = 0.0f;
-    for (uint32_t i = 0; i < x.dataSize(); i++) {
+    for (uint32_t i = 0; i < x.nelems(); i++) {
       sum += temp[i];
     }
     delete[] temp;

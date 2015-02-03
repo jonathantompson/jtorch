@@ -26,7 +26,7 @@ namespace jtorch {
     static TorchStage* loadFromFile(std::ifstream& file);
 
   protected:
-    int32_t index_;
+    uint32_t index_;
 
     // Non-copyable, non-assignable.
     SelectTable(SelectTable&);

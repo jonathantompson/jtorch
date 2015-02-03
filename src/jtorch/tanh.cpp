@@ -28,16 +28,17 @@ namespace jtorch {
       throw std::runtime_error("Tanh::init() - FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
+    Tensor<float>* out = (Tensor<float>*)output;
     if (output != NULL) {
-      if (!Int3::equal(in.dim(), ((Tensor<float>*)output)->dim())) {
+      if (!out->isSameSizeAs(in)) {
         // Input dimension has changed!
         SAFE_DELETE(output);
       }
     }
     if (output == NULL) {
-      output = new Tensor<float>(in.dim());
+      output = new Tensor<float>(in.dim(), in.size());
       //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
-      //  ((Tensor<float>*)output)->dim(), local_worgroup_size);
+      //  TO_TENSOR_PTR(output)->dim(), local_worgroup_size);
     }
   }
 
@@ -45,10 +46,11 @@ namespace jtorch {
     init(input);
     std::string kernel = jtorch::jtorch_path + "kernels/tanh.cl";
     cl_context->useKernel(kernel.c_str(), "TanH1D");
-    cl_context->setArg(0, ((Tensor<float>&)input).data());
-    cl_context->setArg(1, ((Tensor<float>*)output)->data());
-    cl_context->runKernel1D(jtorch::deviceid, output->dataSize(),
-      false);
+    cl_context->setArg(0, ((Tensor<float>&)input).storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    uint32_t dim = 1;
+    uint32_t nelem = TO_TENSOR_PTR(output)->nelems();
+    cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
   }
 
   TorchStage* Tanh::loadFromFile(std::ifstream& file) {

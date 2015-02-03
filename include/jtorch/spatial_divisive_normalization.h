@@ -43,10 +43,8 @@ namespace jtorch {
     Tensor<float>* std_pass2_;  // 3D - Vertical + normalization pass
     float threshold_;
 
-    jcl::math::Int3 local_worgroup_size_3d;
-    jcl::math::Int3 local_worgroup_size_2d;
-
     void init(TorchData& input);
+    void cleanup();
 
     // Non-copyable, non-assignable.
     SpatialDivisiveNormalization(SpatialDivisiveNormalization&);

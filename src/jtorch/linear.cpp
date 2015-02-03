@@ -15,15 +15,18 @@ using namespace jcl::data_str;
 
 namespace jtorch {
 
-  Linear::Linear(const int32_t n_inputs, const int32_t n_outputs) 
+  Linear::Linear(const uint32_t n_inputs, const uint32_t n_outputs) 
     : TorchStage() {
     n_inputs_ = n_inputs;
     n_outputs_ = n_outputs;
 
-    output = new Tensor<float>(Int3(n_outputs_, 1, 1));
+    output = new Tensor<float>(1, &n_outputs_);
 
-    weights_ = new Tensor<float>(Int3(n_inputs_, n_outputs_, 1));
-    biases_ = new Tensor<float>(n_outputs_);
+    // NOTE: For efficiency we store the weight matrix transposed!
+    // (we want the matrix vector multiply to be strided properly)
+    uint32_t size_[2] = {n_outputs_, n_inputs_};
+    weights_ = new Tensor<float>(2, size_);
+    biases_ = new Tensor<float>(1, &n_outputs_);
   }
 
   Linear::~Linear() {
@@ -46,7 +49,7 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
-    if (static_cast<int32_t>(in.dataSize()) != n_inputs_) {
+    if (in.dim() != 1 || in.size()[0] != n_inputs_) {
       throw std::runtime_error("Linear::init() - ERROR: input size mismatch!");
     }
   }
@@ -58,50 +61,56 @@ namespace jtorch {
 #ifdef SIMPLE_LINEAR
     std::string kernel = jtorch::jtorch_path + "kernels/linear.cl";
     cl_context->useKernel(kernel.c_str(), "MatVecMultSimple");
-    cl_context->setArg(0, weights_->data());
-    cl_context->setArg(1, ((Tensor<float>&)input).data());
-    cl_context->setArg(2, ((Tensor<float>*)output)->data());
-    cl_context->setArg(3, n_outputs_);
-    cl_context->setArg(4, n_inputs_);
-    cl_context->runKernel1D(jtorch::deviceid, output->dataSize(), false);
+    cl_context->setArg(0, weights_->storage());
+    cl_context->setArg(1, ((Tensor<float>&)input).storage());
+    cl_context->setArg(2, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(3, (int)n_outputs_);
+    cl_context->setArg(4, (int)n_inputs_);
+    uint32_t dim = 1;
+    cl_context->runKernel(jtorch::deviceid, dim, &n_outputs_, false);
 #else
     std::string kernel = jtorch::jtorch_path + "kernels/linear.cl";
     cl_context->useKernel(kernel.c_str(), "MatVecMultThreads");
 
-    int32_t max_worksize =
+    uint32_t max_worksize =
       cl_context->queryMaxWorkgroupSizeForCurKernel(jtorch::deviceid);
     // http://www.bealto.com/gpu-gemv_v2.html
     // Try and find a good local workgroup size allocation (that is legal)
     // TODO: This is a mess.  Clean it up.
-    Int3 max_item_size;
-    cl_context->getMaxWorkitemSizes(jtorch::deviceid, max_item_size);
+    uint32_t max_item_size[3];
+    for (uint32_t i = 0; i < 3; i++) {
+      max_item_size[i] = cl_context->getMaxWorkitemSize(jtorch::deviceid, i);
+    }
+
     uint32_t p = std::min<int32_t>(16, std::min<int32_t>(max_item_size[1],
       max_worksize));
-    Int2 global_size(n_outputs_, p);
-    Int2 local_size(std::min<int>(n_outputs_ / p + 1, 
-      cl_context->getMaxWorkgroupSize(jtorch::deviceid) / p), p);  // Maximum
+    uint32_t global_size[2] = {n_outputs_, p};
+    uint32_t local_size[2] = {std::min<int>(n_outputs_ / p + 1, 
+      cl_context->getMaxWorkgroupSize(jtorch::deviceid) / p), p};  // Maximum
     while ((n_outputs_ % local_size[0] != 0 ||
       local_size[0] * local_size[1] > max_worksize) && local_size[0] > 1) {
       local_size[0]--;
     }
 
-    cl_context->setArg(0, weights_->data());
-    cl_context->setArg(1, in.data());
-    cl_context->setArg(2, ((Tensor<float>*)output)->data());
+    cl_context->setArg(0, weights_->storage());
+    cl_context->setArg(1, in.storage());
+    cl_context->setArg(2, TO_TENSOR_PTR(output)->storage());
     float dummy; static_cast<void>(dummy);
     // setArg with NULL --> Local memory allocation (per local workgroup)
     cl_context->setArg(3, sizeof(dummy) * local_size[0] * local_size[1], NULL);
-    cl_context->setArg(4, n_outputs_);
-    cl_context->setArg(5, n_inputs_);
-
-    cl_context->runKernel2D(jtorch::deviceid, global_size, local_size, false);
+    cl_context->setArg(4, (int)n_outputs_);
+    cl_context->setArg(5, (int)n_inputs_);
+    uint32_t dim = 2;
+    cl_context->runKernel(jtorch::deviceid, dim, global_size, local_size, 
+      false);
 #endif
 
     // Now add in the bias
     cl_context->useKernel(kernel.c_str(), "Accum");
-    cl_context->setArg(0, ((Tensor<float>*)output)->data());
-    cl_context->setArg(1, biases_->data());
-    cl_context->runKernel1D(jtorch::deviceid, output->dataSize(), false);
+    cl_context->setArg(0, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(1, biases_->storage());
+    dim = 1;
+    cl_context->runKernel(jtorch::deviceid, dim, &n_outputs_, false);
   }
 
   TorchStage* Linear::loadFromFile(std::ifstream& file) {
@@ -114,6 +123,7 @@ namespace jtorch {
     int32_t n_weights = n_outputs * n_inputs;
     float* weights_cpu = new float[n_weights];
     file.read((char*)(weights_cpu), sizeof(weights_cpu[0]) * n_weights);
+
     ret->setWeights(weights_cpu);
     delete[] weights_cpu;
 

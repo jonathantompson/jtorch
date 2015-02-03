@@ -36,10 +36,8 @@ namespace jtorch {
     Tensor<float>* mean_pass1_;  // 3D - Horizontal pass
     Tensor<float>* mean_pass2_;  // 3D - Vertical + normalization pass
 
-    jcl::math::Int3 local_worgroup_size_3d;
-    jcl::math::Int3 local_worgroup_size_2d;
-
     void init(TorchData& input);
+    void cleanup();
 
     // Non-copyable, non-assignable.
     SpatialSubtractiveNormalization(SpatialSubtractiveNormalization&);

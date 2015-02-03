@@ -63,19 +63,19 @@ float cweights[num_feats_out * num_feats_in * filt_height * filt_width];
 float cbiases[num_feats_out];
 
 // CPU weights and biases for Linear stage
-const int32_t lin_size_in = num_feats_in * width * height;
-const int32_t lin_size_out = 20;
+const uint32_t lin_size_in = num_feats_in * width * height;
+const uint32_t lin_size_out = 20;
 float lweights[lin_size_in * lin_size_out];
 float lbiases[lin_size_out];
 
 void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
-  float* correct_data = new float[data->dataSize()];
-  float* model_data = new float[data->dataSize()];
-  memset(model_data, 0, sizeof(model_data[0]) * data->dataSize());
-  LoadArrayFromFile<float>(correct_data, data->dataSize(), filename);
+  float* correct_data = new float[data->nelems()];
+  float* model_data = new float[data->nelems()];
+  memset(model_data, 0, sizeof(model_data[0]) * data->nelems());
+  LoadArrayFromFile<float>(correct_data, data->nelems(), filename);
   data->getData(model_data);
   bool data_correct = true;
-  for (uint32_t i = 0; i < data->dataSize() && data_correct; i++) {
+  for (uint32_t i = 0; i < data->nelems() && data_correct; i++) {
     float delta = fabsf(model_data[i] - correct_data[i]) ;
     if (delta > JTORCH_FLOAT_PRECISION && (delta /
       std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > JTORCH_FLOAT_PRECISION) {
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
 #if defined(_DEBUG) || defined(DEBUG)
   jcl::debug::EnableMemoryLeakChecks();
   // jcl::debug::EnableAggressiveMemoryLeakChecks();
-  // jcl::debug::SetBreakPointOnAlocation(2384);
+  // jcl::debug::SetBreakPointOnAlocation(2561);
 #endif
 
   try {
@@ -128,8 +128,10 @@ int main(int argc, char *argv[]) {
     const bool use_cpu = false;
     jtorch::InitJTorch("../", use_cpu);
 
-    Tensor<float> data_in(Int3(width, height, num_feats_in));
-    Tensor<float> data_out(Int3(width, height, num_feats_out));
+    const uint32_t isize[3] = {width, height, num_feats_in};
+    Tensor<float> data_in(3, isize);
+    const uint32_t osize[3] = {width, height, num_feats_in};
+    Tensor<float> data_out(3, osize);
 
     for (uint32_t f = 0; f < num_feats_in; f++) {
       float val = (f+1) - (float)(width * height) / 16.0f;
@@ -230,6 +232,15 @@ int main(int argc, char *argv[]) {
       conv.forwardProp(*stages.get(1)->output);
       testJTorchValue((jtorch::Tensor<float>*)conv.output, 
         "./test_data/spatial_convolution.bin");
+
+      const uint32_t padding = 6;
+      SpatialConvolution convmm(num_feats_in, num_feats_out, filt_height, 
+        filt_width, padding);
+      Tensor<float>::copy(*convmm.weights(), *conv.weights());
+      Tensor<float>::copy(*convmm.biases(), *conv.biases());
+      convmm.forwardProp(*stages.get(1)->output);
+      testJTorchValue((jtorch::Tensor<float>*)convmm.output, 
+        "./test_data/spatial_convolution_mm_padding.bin");
     }
     
     // ***********************************************
@@ -247,8 +258,8 @@ int main(int argc, char *argv[]) {
     // ***********************************************
     // Test SpatialMaxPooling
     {
-      const int32_t pool_u = 2;
-      const int32_t pool_v = 2;
+      const uint32_t pool_u = 2;
+      const uint32_t pool_v = 2;
       SpatialMaxPooling max_pool_stage(pool_v, pool_u);
       max_pool_stage.forwardProp(data_in);
       testJTorchValue((jtorch::Tensor<float>*)max_pool_stage.output, 
@@ -300,21 +311,24 @@ int main(int argc, char *argv[]) {
     // ***********************************************
     // Test SpatialContrastiveNormalization
     {
-      const int32_t lena_width = 512;
-      const int32_t lena_height = 512;
-      Tensor<float> lena(Int2(lena_width, lena_height));
-      float* lena_cpu = new float[lena.dataSize()];
+      const uint32_t lena_width = 512;
+      const uint32_t lena_height = 512;
+      const uint32_t size[3] = {lena_width, lena_height, 1};
+      Tensor<float> lena(3, size);
+      float* lena_cpu = new float[lena.nelems()];
       jcl::file_io::LoadArrayFromFile<float>(lena_cpu, 
         lena_width * lena_height, "lena_image.bin");
       lena.setData(lena_cpu);
       delete[] lena_cpu;
 
-      uint32_t kernel_size = 7;
-      Tensor<float>* kernel2 = Tensor<float>::ones1D(kernel_size);
+      const uint32_t kernel_size = 7;
+      Tensor<float>* kernel2 = new Tensor<float>(1, &kernel_size);
+      Tensor<float>::fill(*kernel2, 1);
       SpatialContrastiveNormalization cont_norm_stage(kernel2);
       cont_norm_stage.forwardProp(lena);
-      float* cont_norm_output_cpu = new float[cont_norm_stage.output->dataSize()];
-      ((Tensor<float>*)cont_norm_stage.output)->getData(cont_norm_output_cpu);
+      float* cont_norm_output_cpu = 
+        new float[TO_TENSOR_PTR(cont_norm_stage.output)->nelems()];
+      TO_TENSOR_PTR(cont_norm_stage.output)->getData(cont_norm_output_cpu);
       jcl::file_io::SaveArrayToFile<float>(cont_norm_output_cpu, 
         lena_width * lena_height, "lena_image_processed.bin");
 
@@ -329,7 +343,7 @@ int main(int argc, char *argv[]) {
     // Test Linear
     {
       Sequential lin_stage;
-      lin_stage.add(new Reshape());
+      lin_stage.add(new Reshape(1, &lin_size_in));
 
       Linear* lin = new Linear(lin_size_in, lin_size_out);
       lin_stage.add(lin);
@@ -378,7 +392,7 @@ int main(int argc, char *argv[]) {
         SelectTable* module = new SelectTable(i);
         module->forwardProp(input);
         test_passed = test_passed && module->output == input(i);
-        test_passed = test_passed && module->output->dataSize() == i+1;
+        test_passed = test_passed && TO_TENSOR_PTR(module->output)->nelems() == i+1;
         delete module;
       }
       assertTrue(test_passed, "SelectTable");
@@ -401,7 +415,7 @@ int main(int argc, char *argv[]) {
       memset(gt, 0, sizeof(gt[0]) * tensor_size * tensor_size);
       for (int32_t i = 0; i < table_size; i++) {
         assert(input(i)->dataSize() == tensor_size * tensor_size);
-        ((Tensor<float>*)input(i))->getData(temp);
+        TO_TENSOR_PTR(input(i))->getData(temp);
         for (uint32_t i = 0; i < tensor_size * tensor_size; i++) {
           gt[i] += temp[i];
         }
@@ -409,7 +423,7 @@ int main(int argc, char *argv[]) {
 
       CAddTable* module = new CAddTable();
       module->forwardProp(input);
-      ((Tensor<float>*)module->output)->getData(temp);
+      TO_TENSOR_PTR(module->output)->getData(temp);
 
       bool test_passed = true;
       for (int32_t i = 0; i < tensor_size * tensor_size; i++) {
@@ -436,7 +450,7 @@ int main(int argc, char *argv[]) {
     // ***********************************************
     // Test Loading a model
     {
-      TorchStage* model = TorchStage::loadFromFile("./testmodel.bin");
+      TorchStage* model = TorchStage::loadFromFile("./test_data/testmodel.bin");
 
       model->forwardProp(data_in);
       testJTorchValue((jtorch::Tensor<float>*)model->output,
@@ -444,7 +458,21 @@ int main(int argc, char *argv[]) {
 
       // Some debugging if things go wrong:
       if (model->type() != SEQUENTIAL_STAGE) {
-        throw std::runtime_error("main() - ERROR: Expecting sequential!");
+        throw std::runtime_error("main() - ERROR: Expecting Sequential!");
+      }
+      const TorchStageType stages[] = {SPATIAL_CONVOLUTION_STAGE, TANH_STAGE,
+        THRESHOLD_STAGE, SPATIAL_MAX_POOLING_STAGE, SPATIAL_CONVOLUTION_STAGE,
+        RESHAPE_STAGE, LINEAR_STAGE};
+
+      if (((Sequential*)model)->size() != sizeof(stages) / sizeof(stages[0])) {
+        throw std::runtime_error("main() - ERROR: Badly formatted model!");
+      }
+
+      for (uint32_t i = 0; i < sizeof(stages) / sizeof(stages[0]); i++) {
+        TorchStage* stage = ((Sequential*)model)->get(i);
+        if (stage->type() != stages[i]) {
+          throw std::runtime_error("main() - ERROR: Badly formatted model!");
+        }
       }
 
       delete model;
