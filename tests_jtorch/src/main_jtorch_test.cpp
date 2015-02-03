@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 #if defined(_DEBUG) || defined(DEBUG)
   jcl::debug::EnableMemoryLeakChecks();
   // jcl::debug::EnableAggressiveMemoryLeakChecks();
-  // jcl::debug::SetBreakPointOnAlocation(2561);
+  // jcl::debug::SetBreakPointOnAlocation(1898);
 #endif
 
   try {
@@ -330,6 +330,7 @@ int main(int argc, char *argv[]) {
       testJTorchValue(TO_TENSOR_PTR(cont_norm_stage.output), 
         "./test_data/spatial_contrastive_normalization.bin");
 
+      delete lena;
       delete kernel2;
     }
 
