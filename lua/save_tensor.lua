@@ -6,8 +6,12 @@ function saveTensor(tensor, filename)
   for i = 1, tensor:dim() do
     sz = sz * tensor:size(i)
   end
-  assert(tensor:storage():size() == sz,
-    'underlining storage is not the same size as the tensor')
+
+  if (tensor:storage():size() ~= sz) then
+    print 'WARNING: underlining storage is not the same size as the tensor'
+    print '         saveTensor will clone the tensor and save the clone to disk'
+    tensor = tensor:clone()
+  end
 
   ofile:writeInt(tensor:dim())
   for i = 1, tensor:dim() do
