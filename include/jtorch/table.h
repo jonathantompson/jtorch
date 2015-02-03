@@ -17,7 +17,7 @@
 
 namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 
-#define TO_TABLE_PTR(x) (x->type() == TABLE_DATA ? (Table*)x : NULL)
+#define TO_TABLE_PTR(x) (x->type() == jtorch::TorchDataType::TABLE_DATA ? (jtorch::Table*)x : NULL)
 
 namespace jtorch {
   
