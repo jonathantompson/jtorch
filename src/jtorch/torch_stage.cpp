@@ -47,9 +47,10 @@ namespace jtorch {
       // Now recursively load the network
       std::cout << "Loading torch model..." << std::endl;
       ret = TorchStage::loadFromFile(ifile);
+      ifile.close();
     } else {
       std::stringstream ss;
-      ss << "HandNet::loadFromFile() - ERROR: Could not open modelfile";
+      ss << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
       ss << " file " << file << std::endl;
       throw std::runtime_error(ss.str());
     }
