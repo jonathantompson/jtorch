@@ -72,37 +72,46 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
   float* correct_data = new float[data->nelems()];
   float* model_data = new float[data->nelems()];
   memset(model_data, 0, sizeof(model_data[0]) * data->nelems());
-  LoadArrayFromFile<float>(correct_data, data->nelems(), filename);
-  data->getData(model_data);
-  bool data_correct = true;
-  for (uint32_t i = 0; i < data->nelems() && data_correct; i++) {
-    float delta = fabsf(model_data[i] - correct_data[i]) ;
-    if (delta > JTORCH_FLOAT_PRECISION && (delta /
-      std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > JTORCH_FLOAT_PRECISION) {
-      data_correct = false;
-      for (uint32_t repeat = 0; repeat < 5; repeat++) {
-        for (uint32_t cnt = 0; cnt < 60; cnt++) {
-          std::cout << "*";
+  memset(correct_data, 0, sizeof(correct_data[0]) * data->nelems());
+
+  jtorch::Tensor<float>* correct_data_tensor = Tensor<float>::loadFromFile(filename);
+
+  if (!correct_data_tensor->isSameSizeAs(*data)) {
+    std::cout << "Test FAILED (size mismatch)!: " << filename << std::endl;
+  } else {
+    correct_data_tensor->getData(correct_data);
+    data->getData(model_data);
+    bool data_correct = true;
+    for (uint32_t i = 0; i < data->nelems() && data_correct; i++) {
+      float delta = fabsf(model_data[i] - correct_data[i]) ;
+      if (delta > JTORCH_FLOAT_PRECISION && (delta /
+        std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > JTORCH_FLOAT_PRECISION) {
+        data_correct = false;
+        for (uint32_t repeat = 0; repeat < 5; repeat++) {
+          for (uint32_t cnt = 0; cnt < 60; cnt++) {
+            std::cout << "*";
+          }
+          std::cout << std::endl;
         }
-        std::cout << std::endl;
-      }
-      std::cout << "index " << i << " incorrect!: " << std::endl;
-      std::cout << std::fixed << std::setprecision(15); 
-      std::cout << "model_data[" << i << "] = " << model_data[i] << std::endl;
-      std::cout << "correct_data[" << i << "] = " << correct_data[i] << std::endl;
-      for (uint32_t repeat = 0; repeat < 5; repeat++) {
-        for (uint32_t cnt = 0; cnt < 60; cnt++) {
-          std::cout << "*";
+        std::cout << "index " << i << " incorrect!: " << std::endl;
+        std::cout << std::fixed << std::setprecision(15); 
+        std::cout << "model_data[" << i << "] = " << model_data[i] << std::endl;
+        std::cout << "correct_data[" << i << "] = " << correct_data[i] << std::endl;
+        for (uint32_t repeat = 0; repeat < 5; repeat++) {
+          for (uint32_t cnt = 0; cnt < 60; cnt++) {
+            std::cout << "*";
+          }
+          std::cout << std::endl;
         }
-        std::cout << std::endl;
       }
     }
+    if (data_correct) {
+      std::cout << "Test PASSED: " << filename << std::endl;
+    } else {
+      std::cout << "Test FAILED!: " << filename << std::endl;
+    }
   }
-  if (data_correct) {
-    std::cout << "Test PASSED: " << filename << std::endl;
-  } else {
-    std::cout << "Test FAILED!: " << filename << std::endl;
-  }
+  delete correct_data_tensor;
   delete[] model_data;
   delete[] correct_data;
 }
@@ -153,7 +162,7 @@ int main(int argc, char *argv[]) {
       // Test Tanh
       stages.add(new Tanh());
       stages.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)stages.output, 
+      testJTorchValue(TO_TENSOR_PTR(stages.output), 
         "./test_data/tanh_result.bin");
     
       // ***********************************************
@@ -164,7 +173,7 @@ int main(int argc, char *argv[]) {
       ((jtorch::Threshold*)stages.get(1))->threshold = threshold;
       ((jtorch::Threshold*)stages.get(1))->val = val;
       stages.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)stages.output, 
+      testJTorchValue(TO_TENSOR_PTR(stages.output), 
         "./test_data/threshold.bin");
     
       // ***********************************************
@@ -198,7 +207,7 @@ int main(int argc, char *argv[]) {
         }
       }
       stages.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)stages.output, 
+      testJTorchValue(TO_TENSOR_PTR(stages.output), 
         "./test_data/spatial_convolution_map.bin");
     }
 
@@ -230,7 +239,7 @@ int main(int argc, char *argv[]) {
       conv.setBiases(cbiases);
       // TODO: This shouldn't use the output from the previous test
       conv.forwardProp(*stages.get(1)->output);
-      testJTorchValue((jtorch::Tensor<float>*)conv.output, 
+      testJTorchValue(TO_TENSOR_PTR(conv.output), 
         "./test_data/spatial_convolution.bin");
 
       const uint32_t padding = 6;
@@ -239,7 +248,7 @@ int main(int argc, char *argv[]) {
       Tensor<float>::copy(*convmm.weights(), *conv.weights());
       Tensor<float>::copy(*convmm.biases(), *conv.biases());
       convmm.forwardProp(*stages.get(1)->output);
-      testJTorchValue((jtorch::Tensor<float>*)convmm.output, 
+      testJTorchValue(TO_TENSOR_PTR(convmm.output), 
         "./test_data/spatial_convolution_mm_padding.bin");
     }
     
@@ -251,7 +260,7 @@ int main(int argc, char *argv[]) {
       const int32_t pool_v = 2;
       stages.add(new SpatialLPPooling(pnorm, pool_v, pool_u));
       stages.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)stages.output, 
+      testJTorchValue(TO_TENSOR_PTR(stages.output), 
         "./test_data/spatial_lp_pooling.bin");
     }
 
@@ -262,7 +271,7 @@ int main(int argc, char *argv[]) {
       const uint32_t pool_v = 2;
       SpatialMaxPooling max_pool_stage(pool_v, pool_u);
       max_pool_stage.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)max_pool_stage.output, 
+      testJTorchValue(TO_TENSOR_PTR(max_pool_stage.output), 
         "./test_data/spatial_max_pooling.bin");
     }
   
@@ -275,12 +284,12 @@ int main(int argc, char *argv[]) {
 
       SpatialSubtractiveNormalization sub_norm_stage(*kernel_1d);
       sub_norm_stage.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)sub_norm_stage.output, 
+      testJTorchValue(TO_TENSOR_PTR(sub_norm_stage.output), 
         "./test_data/spatial_subtractive_normalization.bin");
 
       SpatialSubtractiveNormalization sub_norm_stage_2d(*kernel_2d);
       sub_norm_stage_2d.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)sub_norm_stage_2d.output, 
+      testJTorchValue(TO_TENSOR_PTR(sub_norm_stage_2d.output), 
         "./test_data/spatial_subtractive_normalization_2d.bin");
 
       delete kernel_1d;
@@ -296,12 +305,12 @@ int main(int argc, char *argv[]) {
 
       SpatialDivisiveNormalization div_norm_stage(*kernel_1d);
       div_norm_stage.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)div_norm_stage.output, 
+      testJTorchValue(TO_TENSOR_PTR(div_norm_stage.output), 
         "./test_data/spatial_divisive_normalization.bin");
 
       SpatialDivisiveNormalization div_norm_stage_2d(*kernel_2d);
       div_norm_stage_2d.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)div_norm_stage_2d.output, 
+      testJTorchValue(TO_TENSOR_PTR(div_norm_stage_2d.output), 
         "./test_data/spatial_divisive_normalization_2d.bin");
 
       delete kernel_1d;
@@ -311,31 +320,16 @@ int main(int argc, char *argv[]) {
     // ***********************************************
     // Test SpatialContrastiveNormalization
     {
-      const uint32_t lena_width = 512;
-      const uint32_t lena_height = 512;
-      const uint32_t size[3] = {lena_width, lena_height, 1};
-      Tensor<float> lena(3, size);
-      float* lena_cpu = new float[lena.nelems()];
-      jcl::file_io::LoadArrayFromFile<float>(lena_cpu, 
-        lena_width * lena_height, "lena_image.bin");
-      lena.setData(lena_cpu);
-      delete[] lena_cpu;
+      Tensor<float>* lena = Tensor<float>::loadFromFile("./test_data/lena_image.bin");
 
       const uint32_t kernel_size = 7;
       Tensor<float>* kernel2 = new Tensor<float>(1, &kernel_size);
       Tensor<float>::fill(*kernel2, 1);
       SpatialContrastiveNormalization cont_norm_stage(kernel2);
-      cont_norm_stage.forwardProp(lena);
-      float* cont_norm_output_cpu = 
-        new float[TO_TENSOR_PTR(cont_norm_stage.output)->nelems()];
-      TO_TENSOR_PTR(cont_norm_stage.output)->getData(cont_norm_output_cpu);
-      jcl::file_io::SaveArrayToFile<float>(cont_norm_output_cpu, 
-        lena_width * lena_height, "lena_image_processed.bin");
+      cont_norm_stage.forwardProp(*lena);
+      testJTorchValue(TO_TENSOR_PTR(cont_norm_stage.output), 
+        "./test_data/spatial_contrastive_normalization.bin");
 
-      std::cout << "\tSpatialContrastiveNormalization output saved: ";
-      std::cout << "lena_image_processed.bin" << endl;
-
-      delete[] cont_norm_output_cpu;
       delete kernel2;
     }
 
@@ -363,7 +357,7 @@ int main(int argc, char *argv[]) {
       lin->setBiases(lbiases);
       lin->setWeights(lweights);
       lin_stage.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)lin_stage.output, 
+      testJTorchValue(TO_TENSOR_PTR(lin_stage.output), 
         "./test_data/linear.bin");
     }
 
@@ -443,7 +437,7 @@ int main(int argc, char *argv[]) {
       int32_t scale = 4;
       SpatialUpSamplingNearest module(scale);
       module.forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)module.output, 
+      testJTorchValue(TO_TENSOR_PTR(module.output), 
         "./test_data/spatial_up_sampling_nearest.bin");
     }
 
@@ -453,8 +447,6 @@ int main(int argc, char *argv[]) {
       TorchStage* model = TorchStage::loadFromFile("./test_data/testmodel.bin");
 
       model->forwardProp(data_in);
-      testJTorchValue((jtorch::Tensor<float>*)model->output,
-        "./test_data/test_model_result.bin");
 
       // Some debugging if things go wrong:
       if (model->type() != SEQUENTIAL_STAGE) {
@@ -474,6 +466,9 @@ int main(int argc, char *argv[]) {
           throw std::runtime_error("main() - ERROR: Badly formatted model!");
         }
       }
+
+      testJTorchValue((jtorch::Tensor<float>*)model->output,
+        "./test_data/test_model_result.bin");
 
       delete model;
     }

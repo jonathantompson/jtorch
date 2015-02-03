@@ -60,10 +60,6 @@ namespace jtorch {
       throw std::runtime_error("SpatialConvolution::init() - ERROR: "
         "incorrect number of input features!");
     }
-    if (padding_ % 2 != 0) {
-      throw std::runtime_error("SpatialConvolution::init() - ERROR: "
-        "Only even size padding is supported for now!");
-    }
     if (output != NULL) {
       uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
       uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;

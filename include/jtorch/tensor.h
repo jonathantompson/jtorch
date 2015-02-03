@@ -13,6 +13,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
@@ -66,6 +67,7 @@ namespace jtorch {
     static Tensor<T>* clone(const Tensor<T>& x);
     static Tensor<T>* gaussian1D(const int32_t kernel_size);  // sigma = size / 2
     static Tensor<T>* gaussian(const int32_t kernel_size);
+    static Tensor<T>* loadFromFile(const std::string& file);
 
     inline const jcl::JCLBuffer& storage() const { return storage_; }
     inline uint32_t nelems() const;
@@ -426,6 +428,38 @@ namespace jtorch {
     }
     delete[] temp;
     return sum;
+  }
+
+  template <typename T>
+  Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
+    Tensor<T>* new_tensor = NULL;
+    std::ifstream ifile(file.c_str(), std::ios::in|std::ios::binary);
+    if (ifile.is_open()) {
+      ifile.seekg(0, std::ios::beg);
+      // Now load the Tensor
+      int32_t dim;
+      ifile.read((char*)(&dim), sizeof(dim));
+      uint32_t* size = new uint32_t[dim];
+      for (int32_t i = 0; i < dim; i++) {
+        int32_t cur_size;
+        ifile.read((char*)(&cur_size), sizeof(cur_size));
+        size[dim-i-1] = (uint32_t)cur_size;
+      }
+      new_tensor = new Tensor<T>(dim, size);
+
+      T* data = new T[new_tensor->nelems()];
+      ifile.read((char*)(data), sizeof(data[0]) * new_tensor->nelems());
+      new_tensor->setData(data);
+      delete[] data;
+      ifile.close();
+      delete[] size;
+    } else {
+      std::stringstream ss;
+      ss << "Tensor<T>::loadFromFile() - ERROR: Could not open file ";
+      ss << file << std::endl;
+      throw std::runtime_error(ss.str());
+    }
+    return new_tensor;
   }
 
 };  // namespace jtorch
