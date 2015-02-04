@@ -1,4 +1,4 @@
-require 'nn'
+require 'cunn'
 require 'image'
 require 'torch'
 require 'optim'
@@ -268,3 +268,32 @@ do
   print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
 end
 
+-- Profile convolutions
+do
+  local fin = 128
+  local fout = 512
+  local kw = 11
+  local kh = 11
+  local pad = 5
+  local imw = 90
+  local imh = 60
+  local t_test = 5  
+
+  local model = nn.SpatialConvolutionMM(fin, fout, kw, kh, 1, 1, pad):cuda()
+  local input = torch.ones(1,fin,imh,imw):cuda()
+  
+  print('Profiling convolution for ' .. t_test .. ' seconds')
+
+  sys.tic()
+  local t_start = sys.toc()
+  local t_end = t_start
+  local niters = 0
+  while (t_end - t_start < t_test) do
+    model:forward(input)
+    cutorch.synchronize()
+    niters = niters + 1
+    t_end = sys.toc()
+  end
+  print('Execution time: ' .. 1/(niters / (t_end - t_start)) .. 
+    ' seconds per FPROP')
+end
