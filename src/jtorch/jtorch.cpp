@@ -61,4 +61,8 @@ namespace jtorch {
     SAFE_DELETE(cl_context);
   }
 
+  void Sync() {
+    cl_context->sync(deviceid);
+  }
+
 }  // namespace jtorch

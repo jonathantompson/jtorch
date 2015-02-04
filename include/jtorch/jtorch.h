@@ -24,11 +24,12 @@ namespace jtorch {
   // path_to_jtorch should be the path to "/path/to/jtorch"
   // InitJTorch - Throws exception on multiple init
   void InitJTorch(const std::string& path_to_jtorch, 
-    const bool use_cpu = false);  
+    const bool use_cpu = false);  // Thread safe
   // InitJTorchSafe - Multiple init OK
   void InitJTorchSafe(const std::string& path_to_jtorch, 
-    const bool use_cpu = false);
-  void ShutdownJTorch();
+    const bool use_cpu = false);  // Thread safe
+  void ShutdownJTorch();  // Thread safe
+  void Sync();  // NOT Thread safe
 
   // Some constants and globals for the jtorch instance
   extern jcl::JCL* cl_context;

@@ -113,6 +113,12 @@ namespace jtorch {
     file.read((char*)(&n_output_features), sizeof(n_output_features));
     file.read((char*)(&padding), sizeof(padding));
 
+#if defined(DEBUG) || defined(_DEBUG)
+    std::cout << "\t\t(fout,fin,kh,kw,pad)=(" << n_output_features << "," << 
+      n_input_features << "," << filt_height << "," << filt_width << "," << 
+      padding << ")" << std::endl;
+#endif
+
     SpatialConvolution* ret = new SpatialConvolution(n_input_features,
       n_output_features, filt_height, filt_width, padding);
 

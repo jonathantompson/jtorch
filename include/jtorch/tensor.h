@@ -94,9 +94,8 @@ namespace jtorch {
     this->size_ = new uint32_t[dim];
     memcpy(this->size_, size, sizeof(this->size_[0]) * dim);
     storage_ = jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
-      nelems());
+      nelems());  // Adds a reference to the reference count
     zero(*this);
-
   }
 
   template <typename T>
@@ -110,6 +109,7 @@ namespace jtorch {
 
   template <typename T>
   Tensor<T>::~Tensor() {
+    jtorch::cl_context->releaseReference(storage_);
     if (size_) {
       delete[] size_;
     }
@@ -166,6 +166,7 @@ namespace jtorch {
     return_header->size_ = new uint32_t[dim];
     memcpy(return_header->size_, size, sizeof(return_header->size_[0]) * dim);
     return_header->storage_ = storage_;
+    jtorch::cl_context->addReference(storage_);
     return return_header;
   }
 

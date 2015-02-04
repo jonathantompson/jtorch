@@ -38,7 +38,7 @@
   #define snprintf _snprintf_s
 #endif
 
-#define JTORCH_FLOAT_PRECISION 1e-6
+#define JTORCH_FLOAT_PRECISION 1e-6f
 
 using namespace std;
 using namespace jtorch;
@@ -505,6 +505,38 @@ int main(int argc, char *argv[]) {
       delete input;
     }
 
+    // ***********************************************
+    // Profile convolution
+    {
+      const uint32_t fin = 128, fout = 512, kw = 11, kh = 11, pad = 5,
+        imw = 90, imh = 60;
+      const double t_test = 5.0;
+      SpatialConvolution conv(fin, fout, kh, kw, pad);
+      uint32_t size[3] = {imw, imh, fin};
+      Tensor<float>* input = new Tensor<float>(3, size);
+
+      Tensor<float>::fill(*conv.weights(), 1);
+      Tensor<float>::fill(*conv.biases(), 1);
+      Tensor<float>::fill(*input, 1);
+
+      std::cout << "\tProfiling convolution for " << t_test << " seconds" << 
+        std::endl;
+      clk::Clk clk;
+      const double t_start = clk.getTime();
+      double t_end = t_start;
+      uint64_t niters = 0;
+      while (t_end - t_start < t_test) {
+        conv.forwardProp(*input);
+        niters++;
+        t_end = clk.getTime();
+        jtorch::Sync();
+      }
+      std::cout << "\t\tExecution time: " << (double)niters /
+        (t_end - t_start) << " FPROPs / second" << std::endl;
+
+      delete input;
+    }
+
   } catch (std::runtime_error e) {
     std::cout << "Exception caught!" << std::endl;
     std::cout << e.what() << std::endl;
@@ -516,4 +548,5 @@ int main(int argc, char *argv[]) {
   cout << endl;
   system("PAUSE");
 #endif
+
 }
