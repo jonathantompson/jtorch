@@ -531,8 +531,8 @@ int main(int argc, char *argv[]) {
         t_end = clk.getTime();
         jtorch::Sync();
       }
-      std::cout << "\t\tExecution time: " << (double)niters /
-        (t_end - t_start) << " FPROPs / second" << std::endl;
+      std::cout << "\t\tExecution time: " << (t_end - t_start) / (double)niters
+         << " seconds per FPROP" << std::endl;
 
       delete input;
     }
