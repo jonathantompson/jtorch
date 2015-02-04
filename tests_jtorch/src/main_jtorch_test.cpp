@@ -38,7 +38,7 @@
   #define snprintf _snprintf_s
 #endif
 
-#define JTORCH_FLOAT_PRECISION 1e-5
+#define JTORCH_FLOAT_PRECISION 1e-6
 
 using namespace std;
 using namespace jtorch;
@@ -68,7 +68,8 @@ const uint32_t lin_size_out = 20;
 float lweights[lin_size_in * lin_size_out];
 float lbiases[lin_size_out];
 
-void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
+void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename,
+  float precision = JTORCH_FLOAT_PRECISION) {
   float* correct_data = new float[data->nelems()];
   float* model_data = new float[data->nelems()];
   memset(model_data, 0, sizeof(model_data[0]) * data->nelems());
@@ -84,8 +85,8 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename) {
     bool data_correct = true;
     for (uint32_t i = 0; i < data->nelems() && data_correct; i++) {
       float delta = fabsf(model_data[i] - correct_data[i]) ;
-      if (delta > JTORCH_FLOAT_PRECISION && (delta /
-        std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > JTORCH_FLOAT_PRECISION) {
+      if (delta > precision && (delta /
+        std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > precision) {
         data_correct = false;
         for (uint32_t repeat = 0; repeat < 5; repeat++) {
           for (uint32_t cnt = 0; cnt < 60; cnt++) {
@@ -281,16 +282,17 @@ int main(int argc, char *argv[]) {
       uint32_t gauss_size = 7;
       Tensor<float>* kernel_1d = Tensor<float>::gaussian1D(gauss_size);
       Tensor<float>* kernel_2d = Tensor<float>::gaussian(gauss_size);
+      const float precision = JTORCH_FLOAT_PRECISION * 10;
 
       SpatialSubtractiveNormalization sub_norm_stage(*kernel_1d);
       sub_norm_stage.forwardProp(data_in);
       testJTorchValue(TO_TENSOR_PTR(sub_norm_stage.output), 
-        "./test_data/spatial_subtractive_normalization.bin");
+        "./test_data/spatial_subtractive_normalization.bin", precision);
 
       SpatialSubtractiveNormalization sub_norm_stage_2d(*kernel_2d);
       sub_norm_stage_2d.forwardProp(data_in);
       testJTorchValue(TO_TENSOR_PTR(sub_norm_stage_2d.output), 
-        "./test_data/spatial_subtractive_normalization_2d.bin");
+        "./test_data/spatial_subtractive_normalization_2d.bin", precision);
 
       delete kernel_1d;
       delete kernel_2d;
@@ -302,16 +304,17 @@ int main(int argc, char *argv[]) {
       uint32_t gauss_size = 7;
       Tensor<float>* kernel_1d = Tensor<float>::gaussian1D(gauss_size);
       Tensor<float>* kernel_2d = Tensor<float>::gaussian(gauss_size);
+      const float precision = JTORCH_FLOAT_PRECISION * 10;
 
       SpatialDivisiveNormalization div_norm_stage(*kernel_1d);
       div_norm_stage.forwardProp(data_in);
       testJTorchValue(TO_TENSOR_PTR(div_norm_stage.output), 
-        "./test_data/spatial_divisive_normalization.bin");
+        "./test_data/spatial_divisive_normalization.bin", precision);
 
       SpatialDivisiveNormalization div_norm_stage_2d(*kernel_2d);
       div_norm_stage_2d.forwardProp(data_in);
       testJTorchValue(TO_TENSOR_PTR(div_norm_stage_2d.output), 
-        "./test_data/spatial_divisive_normalization_2d.bin");
+        "./test_data/spatial_divisive_normalization_2d.bin", precision);
 
       delete kernel_1d;
       delete kernel_2d;
@@ -327,8 +330,9 @@ int main(int argc, char *argv[]) {
       Tensor<float>::fill(*kernel2, 1);
       SpatialContrastiveNormalization cont_norm_stage(kernel2);
       cont_norm_stage.forwardProp(*lena);
+      const float precision = JTORCH_FLOAT_PRECISION * 10;
       testJTorchValue(TO_TENSOR_PTR(cont_norm_stage.output), 
-        "./test_data/spatial_contrastive_normalization.bin");
+        "./test_data/spatial_contrastive_normalization.bin", precision);
 
       delete lena;
       delete kernel2;
@@ -443,7 +447,7 @@ int main(int argc, char *argv[]) {
     }
 
     // ***********************************************
-    // Test Loading a model
+    // Test Loading and running a model
     {
       TorchStage* model = TorchStage::loadFromFile("./test_data/testmodel.bin");
 
@@ -468,10 +472,37 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      testJTorchValue((jtorch::Tensor<float>*)model->output,
+      testJTorchValue(TO_TENSOR_PTR(model->output),
         "./test_data/test_model_result.bin");
 
       delete model;
+    }
+
+    // ***********************************************
+    // Test Loading and running a big model (ie our body tracking model)
+    if (jcl::file_io::fileExists("./test_data/big_model.bin")) {
+      TorchStage* model = TorchStage::loadFromFile("./test_data/big_model.bin");
+
+      // The input is a nested table of tensors (one for each resolution bank)
+      Table* input = new Table();
+      const uint32_t num_banks = 3;
+      for (uint32_t i = 1; i <= num_banks; i++) {
+        std::stringstream ss;
+        ss << "./test_data/big_model_input_bank" << i << ".bin";
+        Table* cur_table = new Table();
+        cur_table->add(Tensor<float>::loadFromFile(ss.str()));
+        cur_table->add(NULL);
+        input->add(cur_table);
+      }
+
+      model->forwardProp(*input);
+
+      const float precision = JTORCH_FLOAT_PRECISION * 100;
+      testJTorchValue(TO_TENSOR_PTR(model->output),
+        "./test_data/big_model_output.bin", precision);
+
+      delete model;
+      delete input;
     }
 
   } catch (std::runtime_error e) {

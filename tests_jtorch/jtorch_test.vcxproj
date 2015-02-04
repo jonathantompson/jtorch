@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\debug_util_win32.cpp" />
+    <ClCompile Include="src\file_io.cpp" />
     <ClCompile Include="src\main_jtorch_test.cpp" />
   </ItemGroup>
   <ItemGroup>
