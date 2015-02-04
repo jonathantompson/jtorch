@@ -3,4 +3,5 @@ if (jtorch_root == nil) then
 end
 
 dofile(jtorch_root.."/lua/save_tensor.lua")
+dofile(jtorch_root.."/lua/load_tensor.lua")
 dofile(jtorch_root.."/lua/save_model.lua")
