@@ -68,6 +68,7 @@ namespace jtorch {
     static Tensor<T>* gaussian1D(const int32_t kernel_size);  // sigma = size / 2
     static Tensor<T>* gaussian(const int32_t kernel_size);
     static Tensor<T>* loadFromFile(const std::string& file);
+    static void saveToFile(const Tensor<T>* tensor, const std::string& file);
 
     inline const jcl::JCLBuffer& storage() const { return storage_; }
     inline uint32_t nelems() const;
@@ -460,6 +461,30 @@ namespace jtorch {
       throw std::runtime_error(ss.str());
     }
     return new_tensor;
+  }
+
+  template <typename T>
+  void Tensor<T>::saveToFile(const Tensor<T>* tensor, const std::string& file) {
+    std::ofstream ofile(file.c_str(), std::ios::out|std::ios::binary);
+    if (ofile.is_open()) {
+      // Now save the Tensor
+      int32_t dim = tensor->dim_;
+      ofile.write((char*)(&dim), sizeof(dim));
+      for (int32_t i = dim-1; i >= 0; i--) {
+        int32_t cur_size = tensor->size_[i];
+        ofile.write((char*)(&cur_size), sizeof(cur_size));
+      }
+      T* data = new T[tensor->nelems()];
+      tensor->getData(data);
+      ofile.write((char*)(data), sizeof(data[0]) * tensor->nelems());
+      delete[] data;
+      ofile.close();
+    } else {
+      std::stringstream ss;
+      ss << "Tensor<T>::saveToFile() - ERROR: Could not open file ";
+      ss << file << std::endl;
+      throw std::runtime_error(ss.str());
+    }
   }
 
 };  // namespace jtorch
