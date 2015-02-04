@@ -1,0 +1,25 @@
+Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
+----------------------------------------------------------------------
+
+ 1. git clone git@github.com:clMathLibraries/clBLAS.git
+ 2. Open cmake gui (You need 2.8 or greater)
+ 3. "Browse Source" --> C:/path/to/clBLAS/src
+ 4. "Browse Build" --> C:/path/to/clBLAS/build
+ 6. Press "Configure"
+ 7. Change CMAKE_BUILD_TYPE to RELEASE
+ 8. Press "Configure" again
+ 9. Press "Generate"
+10. Open C:/path/to/clBLAS/src/library/blas/generic/common.c
+    -> Comment out line 530: "    addBuildOpt(opts, BUILD_OPTS_MAXLEN, "-g");"
+10. Open C:/path/to/clBLAS/build/clBLAS.sln
+11. Change from Debug to Release
+12. Right click clBLAS in the Solution Explorer, 
+    -> change "Configuration Type" to "Static library"
+    -> change "Target Extension" to ".lib"
+13. Build->Build Solution
+14. Output library is in C:/path/to/clBLAS/build/staging/Release/clBLAS.lib
+15. <clBLAS.h> header is in C:/path/to/clBLAS/src/
+16. Change from Release to Debug
+12. Right click clBLAS in the Solution Explorer, 
+    -> change "Configuration Type" to "Static library"
+    -> change "Target Extension" to "_d.lib"
