@@ -22,6 +22,7 @@
 #include "jtorch/select_table.h"
 #include "jtorch/c_add_table.h"
 #include "jtorch/spatial_up_sampling_nearest.h"
+#include "jtorch/spatial_convolution_mm.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -63,68 +64,77 @@ namespace jtorch {
     ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
 
     // Now load in the module
+    TorchStage* node = NULL;
     switch (type) {
-    case SEQUENTIAL_STAGE:
-      std::cout << "\tLoading Sequential..." << std::endl;
-      return Sequential::loadFromFile(ifile);
+    case SEQUENTIAL_STAGE: 
+      node = Sequential::loadFromFile(ifile);
+      break;
     case PARALLEL_TABLE_STAGE:
-      std::cout << "\tLoading ParallelTable..." << std::endl;
-      return ParallelTable::loadFromFile(ifile);
+      node = ParallelTable::loadFromFile(ifile);
+      break;
     case TANH_STAGE:
-      std::cout << "\tLoading Tanh..." << std::endl;
-      return Tanh::loadFromFile(ifile);
+      node = Tanh::loadFromFile(ifile);
+      break;
     case THRESHOLD_STAGE:
-      std::cout << "\tLoading Threshold..." << std::endl;
-      return Threshold::loadFromFile(ifile);
+      node = Threshold::loadFromFile(ifile);
+      break;
     case LINEAR_STAGE:
-      std::cout << "\tLoading Linear..." << std::endl;
-      return Linear::loadFromFile(ifile);
+      node = Linear::loadFromFile(ifile);
+      break;
     case RESHAPE_STAGE:
-      std::cout << "\tLoading Reshape..." << std::endl;
-      return Reshape::loadFromFile(ifile);
+      node = Reshape::loadFromFile(ifile);
+      break;
     case SPATIAL_CONVOLUTION_STAGE:
-      std::cout << "\tLoading SpatialConvolution..." << std::endl;
-      return SpatialConvolution::loadFromFile(ifile);
+      node = SpatialConvolution::loadFromFile(ifile);
+      break;
     case SPATIAL_CONVOLUTION_MAP_STAGE:
-      std::cout << "\tLoading SpatialConvolutionMap..." << std::endl;
-      return SpatialConvolutionMap::loadFromFile(ifile);
+      node = SpatialConvolutionMap::loadFromFile(ifile);
+      break;
     case SPATIAL_LP_POOLING_STAGE:
-      std::cout << "\tLoading SpatialLPPooling..." << std::endl;
-      return SpatialLPPooling::loadFromFile(ifile);
+      node = SpatialLPPooling::loadFromFile(ifile);
+      break;
     case SPATIAL_MAX_POOLING_STAGE:
-      std::cout << "\tLoading SpatialMaxPooling..." << std::endl;
-      return SpatialMaxPooling::loadFromFile(ifile);
+      node = SpatialMaxPooling::loadFromFile(ifile);
+      break;
     case SPATIAL_SUBTRACTIVE_NORMALIZATION_STAGE:
-      std::cout << "\tLoading SpatialSubtractiveNormalization..." << std::endl;
-      return SpatialSubtractiveNormalization::loadFromFile(ifile);
+      node = SpatialSubtractiveNormalization::loadFromFile(ifile);
+      break;
     case SPATIAL_DIVISIVE_NORMALIZATION_STAGE:
-      std::cout << "\tLoading SpatialDivisiveNormalization..." << std::endl;
-      return SpatialDivisiveNormalization::loadFromFile(ifile);
+      node = SpatialDivisiveNormalization::loadFromFile(ifile);
+      break;
     case SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE:
-      std::cout << "\tLoading SpatialContrastiveNormalization..." << std::endl;
-      return SpatialContrastiveNormalization::loadFromFile(ifile);
+      node = SpatialContrastiveNormalization::loadFromFile(ifile);
+      break;
     case JOIN_TABLE_STAGE:
-      std::cout << "\tLoading JoinTable..." << std::endl;
-      return JoinTable::loadFromFile(ifile);
+      node = JoinTable::loadFromFile(ifile);
+      break;
     case TRANSPOSE_STAGE:
-      std::cout << "\tLoading Transpose..." << std::endl;
-      return Transpose::loadFromFile(ifile);
+      node = Transpose::loadFromFile(ifile);
+      break;
     case IDENTITY_STAGE:
-      std::cout << "\tLoading Identity..." << std::endl;
-      return Identity::loadFromFile(ifile);
+      node = Identity::loadFromFile(ifile);
+      break;
     case SELECT_TABLE_STAGE:
-      std::cout << "\tLoading SelectTable..." << std::endl;
-      return SelectTable::loadFromFile(ifile);
+      node = SelectTable::loadFromFile(ifile);
+      break;
     case SPATIAL_UP_SAMPLING_NEAREST_STAGE:
-      std::cout << "\tLoading SpatialUpSamplingNearest..." << std::endl;
-      return SpatialUpSamplingNearest::loadFromFile(ifile);
+      node = SpatialUpSamplingNearest::loadFromFile(ifile);
+      break;
     case C_ADD_TABLE_STAGE:
-      std::cout << "\tLoading CAddTable..." << std::endl;
-      return CAddTable::loadFromFile(ifile);
+      node = CAddTable::loadFromFile(ifile);
+      break;
+    case SPATIAL_CONVOLUTION_MM_STAGE:
+      node = SpatialConvolutionMM::loadFromFile(ifile);
+      break;
     default:
       throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
         "Node type not recognized!");
     }
+
+#if defined(DEBUG) || defined(_DEBUG)
+    std::cout << "\tLoaded " << node->name() << std::endl;
+#endif
+    return node;
   }
 
 }  // namespace jtorch

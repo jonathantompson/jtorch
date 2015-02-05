@@ -27,6 +27,7 @@ namespace jtorch {
     virtual ~Reshape();
 
     virtual TorchStageType type() const { return RESHAPE_STAGE; }
+    virtual std::string name() const { return "Reshape"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

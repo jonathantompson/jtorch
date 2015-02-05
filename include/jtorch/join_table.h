@@ -25,6 +25,7 @@ namespace jtorch {
     virtual ~JoinTable();
 
     virtual TorchStageType type() const { return JOIN_TABLE_STAGE; }
+    virtual std::string name() const { return "JoinTable"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

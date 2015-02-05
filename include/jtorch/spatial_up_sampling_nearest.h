@@ -26,6 +26,7 @@ namespace jtorch {
     virtual ~SpatialUpSamplingNearest();
 
     virtual TorchStageType type() const { return SPATIAL_UP_SAMPLING_NEAREST_STAGE; }
+    virtual std::string name() const { return "SpatialUpSamplingNearest"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

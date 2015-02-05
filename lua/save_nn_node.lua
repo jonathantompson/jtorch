@@ -65,12 +65,6 @@ function saveNNNode(node, ofile)
      --       as SpatialConvolution
      ofile:writeInt(7)
      saveSpatialConvolutionCUDANode(node, ofile)
-  elseif ((class_str == "nn.SpatialConvolutionMM") or 
-          (class_str == "nn.SpatialConvolutionMMOut")) then
-     -- Note: SpatialConvolutionMM gets saved with same index
-     --       as SpatialConvolution.
-     ofile:writeInt(7)
-     saveSpatialConvolutionMMNode(node, ofile)
   elseif (class_str == "nn.SpatialConvolutionMap") then
      ofile:writeInt(8)
      saveSpatialConvolutionMapNode(node, ofile)
@@ -115,6 +109,10 @@ function saveNNNode(node, ofile)
   elseif (class_str == "nn.CAddTable") then
      ofile:writeInt(19)
      saveCAddTableNode(node, ofile)
+  elseif ((class_str == "nn.SpatialConvolutionMM") or 
+          (class_str == "nn.SpatialConvolutionMMOut")) then
+     ofile:writeInt(20)
+     saveSpatialConvolutionMMNode(node, ofile)
   else
      error('Node type ' .. class_str .. ' is not recognized.')
      return

@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtorch_test", "tests_jtorch
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2} = {7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clblas_test", "clblas_test\clblas_test.vcxproj", "{A664ED26-BC75-48BD-A189-F51F8714C806}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -32,6 +34,10 @@ Global
 		{CD3A45CC-3DF2-45FA-A444-ED26CE254410}.Debug|x64.Build.0 = Debug|x64
 		{CD3A45CC-3DF2-45FA-A444-ED26CE254410}.Release|x64.ActiveCfg = Release|x64
 		{CD3A45CC-3DF2-45FA-A444-ED26CE254410}.Release|x64.Build.0 = Release|x64
+		{A664ED26-BC75-48BD-A189-F51F8714C806}.Debug|x64.ActiveCfg = Debug|x64
+		{A664ED26-BC75-48BD-A189-F51F8714C806}.Debug|x64.Build.0 = Debug|x64
+		{A664ED26-BC75-48BD-A189-F51F8714C806}.Release|x64.ActiveCfg = Release|x64
+		{A664ED26-BC75-48BD-A189-F51F8714C806}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

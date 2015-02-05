@@ -22,6 +22,7 @@ namespace jtorch {
     virtual ~Transpose();
 
     virtual TorchStageType type() const { return TRANSPOSE_STAGE; }
+    virtual std::string name() const { return "Transpose"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

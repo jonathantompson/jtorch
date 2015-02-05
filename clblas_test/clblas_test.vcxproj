@@ -13,6 +13,9 @@
   <ItemGroup>
     <ClCompile Include="src\main_clblas_test.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\clk\clk.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>

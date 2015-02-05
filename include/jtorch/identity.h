@@ -22,6 +22,7 @@ namespace jtorch {
     virtual ~Identity();
 
     virtual TorchStageType type() const { return IDENTITY_STAGE; }
+    virtual std::string name() const { return "Identity"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

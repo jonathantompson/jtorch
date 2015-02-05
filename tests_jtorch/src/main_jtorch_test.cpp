@@ -11,6 +11,7 @@
 #include "jtorch/tensor.h"
 #include "jtorch/spatial_convolution.h"
 #include "jtorch/spatial_convolution_map.h"
+#include "jtorch/spatial_convolution_mm.h"
 #include "jtorch/spatial_lp_pooling.h"
 #include "jtorch/spatial_max_pooling.h"
 #include "jtorch/spatial_subtractive_normalization.h"
@@ -244,7 +245,7 @@ int main(int argc, char *argv[]) {
         "./test_data/spatial_convolution.bin");
 
       const uint32_t padding = 6;
-      SpatialConvolution convmm(num_feats_in, num_feats_out, filt_height, 
+      SpatialConvolutionMM convmm(num_feats_in, num_feats_out, filt_height, 
         filt_width, padding);
       Tensor<float>::copy(*convmm.weights(), *conv.weights());
       Tensor<float>::copy(*convmm.biases(), *conv.biases());
@@ -511,25 +512,42 @@ int main(int argc, char *argv[]) {
       const uint32_t fin = 128, fout = 512, kw = 11, kh = 11, pad = 5,
         imw = 90, imh = 60;
       const double t_test = 5.0;
+      double t_start, t_end;
+      uint64_t niters;
       SpatialConvolution conv(fin, fout, kh, kw, pad);
+      SpatialConvolutionMM conv_mm(fin, fout, kh, kw, pad);
       uint32_t size[3] = {imw, imh, fin};
       Tensor<float>* input = new Tensor<float>(3, size);
+      clk::Clk clk;
 
       Tensor<float>::fill(*conv.weights(), 1);
       Tensor<float>::fill(*conv.biases(), 1);
       Tensor<float>::fill(*input, 1);
 
-      std::cout << "\tProfiling convolution for " << t_test << " seconds" << 
-        std::endl;
-      clk::Clk clk;
-      const double t_start = clk.getTime();
-      double t_end = t_start;
-      uint64_t niters = 0;
+      std::cout << "\tProfiling SpatialConvolutionMM for " << t_test << 
+        " seconds" << std::endl;
+      t_start = clk.getTime();
+      t_end = t_start;
+      niters = 0;
+      while (t_end - t_start < t_test) {
+        conv_mm.forwardProp(*input);
+        niters++;
+        jtorch::Sync();
+        t_end = clk.getTime();
+      }
+      std::cout << "\t\tExecution time: " << (t_end - t_start) / (double)niters
+         << " seconds per FPROP" << std::endl;
+
+      std::cout << "\tProfiling SpatialConvolution for " << t_test << 
+        " seconds" << std::endl;
+      t_start = clk.getTime();
+      t_end = t_start;
+      niters = 0;
       while (t_end - t_start < t_test) {
         conv.forwardProp(*input);
         niters++;
-        t_end = clk.getTime();
         jtorch::Sync();
+        t_end = clk.getTime();
       }
       std::cout << "\t\tExecution time: " << (t_end - t_start) / (double)niters
          << " seconds per FPROP" << std::endl;

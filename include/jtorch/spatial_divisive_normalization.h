@@ -30,6 +30,7 @@ namespace jtorch {
     virtual ~SpatialDivisiveNormalization();
 
     virtual TorchStageType type() const { return SPATIAL_DIVISIVE_NORMALIZATION_STAGE; }
+    virtual std::string name() const { return "SpatialDivisiveNormalization"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

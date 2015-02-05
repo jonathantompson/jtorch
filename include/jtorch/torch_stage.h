@@ -39,6 +39,7 @@ namespace jtorch {
     SELECT_TABLE_STAGE = 17,
     SPATIAL_UP_SAMPLING_NEAREST_STAGE = 18,
     C_ADD_TABLE_STAGE = 19,
+    SPATIAL_CONVOLUTION_MM_STAGE = 20,
   } TorchStageType;
 
   class TorchData;
@@ -50,6 +51,7 @@ namespace jtorch {
     virtual ~TorchStage();
 
     virtual TorchStageType type() const { return UNDEFINED_STAGE; }
+    virtual std::string name() const = 0;
     virtual void forwardProp(TorchData& input) = 0;  // Pure virtual
 
     // Top level read-write

@@ -26,6 +26,7 @@ namespace jtorch {
     virtual ~SpatialMaxPooling();
 
     virtual TorchStageType type() const { return SPATIAL_MAX_POOLING_STAGE; }
+    virtual std::string name() const { return "SpatialMaxPooling"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

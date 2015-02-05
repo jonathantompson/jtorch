@@ -23,6 +23,7 @@ namespace jtorch {
     virtual ~Tanh();
 
     virtual TorchStageType type() const { return TANH_STAGE; }
+    virtual std::string name() const { return "Tanh"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

@@ -1,7 +1,7 @@
 //
-//  spatial_convolution.h
+//  spatial_convolution_mm.h
 //
-//  Created by Jonathan Tompson on 5/15/13.
+//  Created by Jonathan Tompson on 2/4/15.
 //
 
 #pragma once
@@ -19,16 +19,16 @@ namespace jtorch {
 
   template <typename T> class Tensor;
   
-  class SpatialConvolution : public TorchStage {
+  class SpatialConvolutionMM : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialConvolution(const uint32_t feats_in, const uint32_t feats_out,
+    SpatialConvolutionMM(const uint32_t feats_in, const uint32_t feats_out,
       const uint32_t filt_height, const uint32_t filt_width, 
       const uint32_t padding = 0);
-    virtual ~SpatialConvolution();
+    virtual ~SpatialConvolutionMM();
 
-    virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_STAGE; }
-    virtual std::string name() const { return "SpatialConvolution"; }
+    virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_MM_STAGE; }
+    virtual std::string name() const { return "SpatialConvolutionMM"; }
     virtual void forwardProp(TorchData& input);
 
     void setWeights(const float* weights);
@@ -48,11 +48,14 @@ namespace jtorch {
     Tensor<float>* weights_;
     Tensor<float>* biases_;
 
+    Tensor<float>* columns_;  // This is finput in torch.  TODO: Share this!
+    Tensor<float>* ones_;  // This is fgradinput in torch
+
     void init(TorchData& input);
 
     // Non-copyable, non-assignable.
-    SpatialConvolution(SpatialConvolution&);
-    SpatialConvolution& operator=(const SpatialConvolution&);
+    SpatialConvolutionMM(SpatialConvolutionMM&);
+    SpatialConvolutionMM& operator=(const SpatialConvolutionMM&);
   };
   
 };  // namespace jtorch

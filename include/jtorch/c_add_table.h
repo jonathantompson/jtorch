@@ -21,6 +21,7 @@ namespace jtorch {
     virtual ~CAddTable();
 
     virtual TorchStageType type() const { return C_ADD_TABLE_STAGE; }
+    virtual std::string name() const { return "CAddTable"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

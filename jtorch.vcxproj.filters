@@ -92,6 +92,9 @@
     <ClInclude Include="include\jtorch\parallel_table.h">
       <Filter>Header Files\jtorch</Filter>
     </ClInclude>
+    <ClInclude Include="include\jtorch\spatial_convolution_mm.h">
+      <Filter>Header Files\jtorch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\jtorch\join_table.cpp">
@@ -163,6 +166,9 @@
     <ClCompile Include="src\jtorch\parallel_table.cpp">
       <Filter>Source Files\jtorch</Filter>
     </ClCompile>
+    <ClCompile Include="src\jtorch\spatial_convolution_mm.cpp">
+      <Filter>Source Files\jtorch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="kernels\tanh.cl">
@@ -209,6 +215,9 @@
       <Filter>kernels</Filter>
     </None>
     <None Include="kernels\fill.cl">
+      <Filter>kernels</Filter>
+    </None>
+    <None Include="kernels\spatial_convolution_mm.cl">
       <Filter>kernels</Filter>
     </None>
   </ItemGroup>

@@ -31,6 +31,7 @@ namespace jtorch {
     virtual ~SpatialLPPooling();
 
     virtual TorchStageType type() const { return SPATIAL_LP_POOLING_STAGE; }
+    virtual std::string name() const { return "SpatialLPPooling"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

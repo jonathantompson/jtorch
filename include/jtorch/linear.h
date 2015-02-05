@@ -24,6 +24,7 @@ namespace jtorch {
     virtual ~Linear();
 
     virtual TorchStageType type() const { return LINEAR_STAGE; }
+    virtual std::string name() const { return "Linear"; }
     virtual void forwardProp(TorchData& input);
 
     void setWeights(const float* weights);

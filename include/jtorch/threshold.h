@@ -23,6 +23,7 @@ namespace jtorch {
     virtual ~Threshold();
 
     virtual TorchStageType type() const { return THRESHOLD_STAGE; }
+    virtual std::string name() const { return "Threshold"; }
     virtual void forwardProp(TorchData& input);
 
     float threshold;  // Single threshold value

@@ -32,6 +32,7 @@ The library also contains a CPP framework for loading it and doing the forward p
 - Sequential
 - SpatialContrastiveNormalization
 - SpatialConvolution
+- SpatialConvolutionMM --> (using clBLAS)
 - SpatialConvolutionMap   --> (only on CPU)
 - SpatialDivisiveNormalization
 - SpatialLPPooling  --> (only on CPU)
@@ -48,17 +49,19 @@ The following stages have partial implementations:
 **Compilation**
 ---------------
 
-Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X.  The only dependancy is the jcl library.  See <http://github.com/jonathantompson/jcl> for more details.
+Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X.  The only dependencies are the jcl library (which should compile out of the box) and clBLAS.  See <http://github.com/jonathantompson/jcl> and <https://github.com/clMathLibraries/clBLAS> for more details (also for clBLAS I have a "Compiling_clBLAS.txt" helper if you get stuck).
 
 VS2012 and cmake expect a specific directory structure:
 
 - \\jcl\\
 - \\jtorch\\
+- \\clBLAS\\
 
-So jtorch and jcl must exist at the same directory level.
+So jtorch, clBLAS and jcl must exist at the same directory level.
 
 ### Windows:
 - **Follow all the compilation steps in <https://github.com/jonathantompson/jcl/blob/master/README.md>**
+- **Follow all the compilation steps in Compiling_clBLAS.txt**
 - **Compiling the library:**
     - open jtorch.sln
     - right click "jtorch_test" in the Solution Explorer -> "Set as StartUp Project"
@@ -66,9 +69,7 @@ So jtorch and jcl must exist at the same directory level.
     - The tests should run and at the end of each test there should be a "PASSED" printout (otherwise it will print FAILED).
 
 ### MAC OS X:
-- **Follow all the compilation steps in <https://github.com/jonathantompson/jcl/blob/master/README.md>**
-- Just run cmake and then build (all frameworks should be included).  
-- cl.hpp doesn't exist by default but there is a copy of it in the local directory opencl_cpp_header.
+- Before integration of clBLAS everything compiled and ran correctly. However, post clBLAS I have not tested it on Mac OS X or Linux.
 
 **Style**
 ---------

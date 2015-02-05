@@ -8,10 +8,21 @@
     <Filter Include="headers">
       <UniqueIdentifier>{8545287c-22ce-4fa2-b774-6988678dd486}</UniqueIdentifier>
     </Filter>
+    <Filter Include="headers\clk">
+      <UniqueIdentifier>{643ed2a3-b092-42b9-98ff-f58504fb4ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\clk">
+      <UniqueIdentifier>{f197a5ac-85e5-4d56-bda0-b517090e59c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main_clblas_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\clk\clk.h">
+      <Filter>headers\clk</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

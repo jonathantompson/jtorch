@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <stdio.h>
+#include "clk\clk.h"
 
 /* Include the clBLAS header. It includes the appropriate OpenCL headers */
 #include <clBLAS.h>
@@ -168,18 +169,34 @@ int main( void ) {
   err = clEnqueueWriteBuffer( queue, bufC, CL_TRUE, 0,
     M * N * sizeof( *C ), C, 0, NULL, NULL );
 
-  /* Call clBLAS extended function. Perform gemm for the lower right sub-matrices */
-  err = clblasSgemm( clblasRowMajor, clblasNoTrans, clblasNoTrans, 
-    M, N, K,
-    alpha, bufA, 0, lda,
-    bufB, 0, ldb, beta,
-    bufC, 0, ldc,
-    1, &queue, 0, NULL, &event );
-  CheckError(err);
+  const double t_test = 5.0;
+  std::cout << "Profiling clBLAS for " << t_test << " seconds" << std::endl;
+  clk::Clk clk;
+  const double t_start = clk.getTime();
+  double t_end = t_start;
+  uint64_t niters = 0;
 
-  /* Wait for calculations to be finished. */
-  err = clWaitForEvents( 1, &event );
-  CheckError(err);
+  while (t_end - t_start < t_test) {
+    /* Call clBLAS extended function. Perform gemm for the lower right sub-matrices */
+    err = clblasSgemm( clblasRowMajor, clblasNoTrans, clblasNoTrans, 
+      M, N, K,
+      alpha, bufA, 0, lda,
+      bufB, 0, ldb, beta,
+      bufC, 0, ldc,
+      1, &queue, 0, NULL, &event );
+    CheckError(err);
+
+    /* Wait for calculations to be finished. */
+    err = clWaitForEvents( 1, &event );
+    CheckError(err);
+    err = clFlush(queue);
+    CheckError(err);
+    niters++;
+    t_end = clk.getTime();
+  }
+
+  std::cout << "\t\tExecution time: " << (t_end - t_start) / (double)niters
+    << " seconds per sgemm call" << std::endl;
 
   /* Fetch results of calculations from GPU memory. */
   err = clEnqueueReadBuffer( queue, bufC, CL_TRUE, 0,

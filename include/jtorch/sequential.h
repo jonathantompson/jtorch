@@ -23,6 +23,7 @@ namespace jtorch {
     virtual ~Sequential();
 
     virtual TorchStageType type() const { return SEQUENTIAL_STAGE; }
+    virtual std::string name() const { return "Sequential"; }
     virtual void forwardProp(TorchData& input);
 
     void add(TorchStage* stage);

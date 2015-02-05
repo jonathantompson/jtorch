@@ -1,7 +1,9 @@
 #include <mutex>
 #include <iostream>
+#include <sstream>
 #include "jcl/jcl.h"
 #include "jtorch/jtorch.h"
+#include <clBLAS.h>
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -37,6 +39,14 @@ namespace jtorch {
       jtorch_path.at(jtorch_path.size()-1) != '/') {
       jtorch_path = jtorch_path + '/';
     }
+
+    cl_int err = clblasSetup();
+    if (err != CL_SUCCESS) {
+      std::stringstream ss;
+      ss << "ERROR - InitJTorchInternal: clblasSetup returned error: " <<
+        jcl::JCL::getErrorString(err);
+      throw std::runtime_error(ss.str());
+    }
   }
 
   void InitJTorch(const std::string& path_to_jtorch, const bool use_cpu) {
@@ -58,6 +68,7 @@ namespace jtorch {
 
   void ShutdownJTorch() {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
+    clblasTeardown();
     SAFE_DELETE(cl_context);
   }
 

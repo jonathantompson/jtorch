@@ -23,6 +23,7 @@ namespace jtorch {
     virtual ~ParallelTable();
 
     virtual TorchStageType type() const { return PARALLEL_TABLE_STAGE; }
+    virtual std::string name() const { return "ParallelTable"; }
     virtual void forwardProp(TorchData& input);
 
     void add(TorchStage* stage);

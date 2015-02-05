@@ -31,6 +31,7 @@ namespace jtorch {
     virtual ~SpatialContrastiveNormalization();
 
     virtual TorchStageType type() const { return SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE; }
+    virtual std::string name() const { return "SpatialContrastiveNormalization"; }
     virtual void forwardProp(TorchData& input);
 
     static TorchStage* loadFromFile(std::ifstream& file);

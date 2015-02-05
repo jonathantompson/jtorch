@@ -36,6 +36,7 @@ namespace jtorch {
     virtual ~SpatialConvolutionMap();
 
     virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_MAP_STAGE; }
+    virtual std::string name() const { return "SpatialConvolutionMap"; }
     virtual void forwardProp(TorchData& input);
 
     float** weights;
