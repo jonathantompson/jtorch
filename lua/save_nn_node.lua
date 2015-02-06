@@ -32,6 +32,7 @@ dofile(jtorch_root..'/lua/save_identity_node.lua')
 dofile(jtorch_root..'/lua/save_select_table_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_up_sampling_nearest_node.lua')
 dofile(jtorch_root..'/lua/save_c_add_table_node.lua')
+dofile(jtorch_root..'/lua/save_spatial_dropout.lua')
 
 function saveNNNode(node, ofile)
   -- Just send the node off to the correct routine depending on it's type
@@ -113,6 +114,9 @@ function saveNNNode(node, ofile)
           (class_str == "nn.SpatialConvolutionMMOut")) then
      ofile:writeInt(20)
      saveSpatialConvolutionMMNode(node, ofile)
+  elseif (class_str == 'nn.SpatialDropout') then
+     ofile:writeInt(21)
+     saveSpatialDropoutNode(node, ofile)
   else
      error('Node type ' .. class_str .. ' is not recognized.')
      return
