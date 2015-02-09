@@ -40,6 +40,7 @@ namespace jtorch {
     SPATIAL_UP_SAMPLING_NEAREST_STAGE = 18,
     C_ADD_TABLE_STAGE = 19,
     SPATIAL_CONVOLUTION_MM_STAGE = 20,
+    SPATIAL_DROPOUT = 21,
   } TorchStageType;
 
   class TorchData;

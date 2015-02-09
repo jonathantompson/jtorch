@@ -16,6 +16,7 @@
     <ClInclude Include="include\jtorch\select_table.h" />
     <ClInclude Include="include\jtorch\spatial_convolution.h" />
     <ClInclude Include="include\jtorch\spatial_convolution_mm.h" />
+    <ClInclude Include="include\jtorch\spatial_dropout.h" />
     <ClInclude Include="include\jtorch\spatial_up_sampling_nearest.h" />
     <ClInclude Include="include\jtorch\tensor.h" />
     <ClInclude Include="include\jtorch\join_table.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="src\jtorch\spatial_divisive_normalization.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\jtorch\spatial_dropout.cpp" />
     <ClCompile Include="src\jtorch\spatial_lp_pooling.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>

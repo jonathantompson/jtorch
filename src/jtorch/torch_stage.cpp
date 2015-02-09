@@ -23,6 +23,7 @@
 #include "jtorch/c_add_table.h"
 #include "jtorch/spatial_up_sampling_nearest.h"
 #include "jtorch/spatial_convolution_mm.h"
+#include "jtorch/spatial_dropout.h"
 
 #define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
 #define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
@@ -125,6 +126,9 @@ namespace jtorch {
       break;
     case SPATIAL_CONVOLUTION_MM_STAGE:
       node = SpatialConvolutionMM::loadFromFile(ifile);
+      break;
+    case SPATIAL_DROPOUT:
+      node = SpatialDropout::loadFromFile(ifile);
       break;
     default:
       throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
