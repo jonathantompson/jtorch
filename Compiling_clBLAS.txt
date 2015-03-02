@@ -5,7 +5,7 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
  2. Open cmake gui (You need 2.8 or greater)
  3. "Browse Source" --> C:/path/to/clBLAS/src
  4. "Browse Build" --> C:/path/to/clBLAS/build
- 6. Press "Configure"
+ 6. Press "Configure" (use Visual Studio 11 2012 Win64 compiler)
  7. Change CMAKE_BUILD_TYPE to RELEASE
  8. Press "Configure" again
  9. Press "Generate"
@@ -23,3 +23,6 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
 12. Right click clBLAS in the Solution Explorer, 
     -> change "Configuration Type" to "Static library"
     -> change "Target Extension" to "_d.lib"
+
+Alternatively, you can download the pre-compiled static libraries for windows (compiled using VS2012 Win 8.1 64bit) here:
+http://blackbox.cs.nyu.edu/clBLAS_win8.1_64bit.zip
