@@ -36,6 +36,10 @@ namespace jtorch {
     output = NULL;
   }
 
+  const uint32_t ParallelTable::size() const {
+    return network_->size();
+  }
+
   TorchStage* ParallelTable::loadFromFile(std::ifstream& file) {
     int n_nodes;
     file.read(reinterpret_cast<char*>(&n_nodes), sizeof(n_nodes));

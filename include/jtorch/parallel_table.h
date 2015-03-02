@@ -27,6 +27,7 @@ namespace jtorch {
     virtual void forwardProp(TorchData& input);
 
     void add(TorchStage* stage);
+    const uint32_t size() const;
 
     uint32_t numBanks() const;
 
