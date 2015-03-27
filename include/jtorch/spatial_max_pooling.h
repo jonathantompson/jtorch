@@ -31,6 +31,9 @@ namespace jtorch {
 
     static TorchStage* loadFromFile(std::ifstream& file);
 
+    inline uint32_t poolsize_u() const { return poolsize_u_; }
+    inline uint32_t poolsize_v() const { return poolsize_v_; }
+
   protected:
     uint32_t poolsize_v_;
     uint32_t poolsize_u_;
