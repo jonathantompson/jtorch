@@ -52,6 +52,11 @@ function saveNNNode(node, ofile)
   elseif (class_str == "nn.Threshold") then
      ofile:writeInt(4)
      saveThresholdNode(node, ofile)
+  elseif (class_str == 'cudnn.ReLU') then
+     ofile:writeInt(4)
+     node.threshold = 0  -- These don't exist for cudnn.ReLU
+     node.val = 0
+     saveThresholdNode(node, ofile)
   elseif (class_str == "nn.Linear") then
      ofile:writeInt(5)
      saveLinearNode(node, ofile)
