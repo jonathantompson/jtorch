@@ -52,7 +52,12 @@ function saveNNNode(node, ofile)
   elseif (class_str == "nn.Threshold") then
      ofile:writeInt(4)
      saveThresholdNode(node, ofile)
+  elseif (class_str == "nn.ReLU") then
+     -- Note: nn.ReLU gets saved with same index as nn.Threshold
+     ofile:writeInt(4)
+     saveThresholdNode(node, ofile)
   elseif (class_str == 'cudnn.ReLU') then
+     -- Note: cudnn.ReLU gets saved with same index as nn.Threshold
      ofile:writeInt(4)
      node.threshold = 0  -- These don't exist for cudnn.ReLU
      node.val = 0
