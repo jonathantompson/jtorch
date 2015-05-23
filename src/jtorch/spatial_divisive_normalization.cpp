@@ -42,12 +42,12 @@ namespace jtorch {
 
   SpatialDivisiveNormalization::~SpatialDivisiveNormalization() {
     cleanup();
+	SAFE_DELETE(kernel_);
+	SAFE_DELETE(kernel_norm_);
   }
 
   void SpatialDivisiveNormalization::cleanup() {
-    SAFE_DELETE(output);
-    SAFE_DELETE(kernel_);
-    SAFE_DELETE(kernel_norm_);
+    SAFE_DELETE(output);    
     SAFE_DELETE(std_coef_);
     SAFE_DELETE(std_pass1_);
     SAFE_DELETE(std_pass2_);

@@ -51,7 +51,6 @@ namespace jtorch {
 
   void SpatialSubtractiveNormalization::cleanup() {
     SAFE_DELETE(output);
-    SAFE_DELETE(kernel_);
     SAFE_DELETE(mean_coef_);
     SAFE_DELETE(mean_pass1_);
     SAFE_DELETE(mean_pass2_);
