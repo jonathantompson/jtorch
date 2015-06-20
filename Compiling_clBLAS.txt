@@ -11,6 +11,7 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
  9. Press "Generate"
 10. Open C:/path/to/clBLAS/src/library/blas/generic/common.c
     -> Comment out line 530: "    addBuildOpt(opts, BUILD_OPTS_MAXLEN, "-g");"
+    -> NOTE: This may have been fixed in a later release.  You might not need to do the above step.
 10. Open C:/path/to/clBLAS/build/clBLAS.sln
 11. Change from Debug to Release
 12. Right click clBLAS in the Solution Explorer, 
