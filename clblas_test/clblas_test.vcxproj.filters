@@ -19,10 +19,16 @@
     <ClCompile Include="src\main_clblas_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\debug_util_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\clk\clk.h">
       <Filter>headers\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\debug_util.h">
+      <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

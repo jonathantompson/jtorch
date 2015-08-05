@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include "clk\clk.h"
+#include "debug_util.h"
 
 /* Include the clBLAS header. It includes the appropriate OpenCL headers */
 #include <clBLAS.h>
@@ -113,6 +114,12 @@ cl_int CheckError(cl_int err) {
 }
 
 int main( void ) {
+#if defined(_DEBUG) || defined(DEBUG)
+  jcl::debug::EnableMemoryLeakChecks();
+  // jcl::debug::EnableAggressiveMemoryLeakChecks();
+  jcl::debug::SetBreakPointOnAlocation(374);
+#endif
+
   cl_int err;
 
   cl_platform_id platform = 0;

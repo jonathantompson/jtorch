@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 #if defined(_DEBUG) || defined(DEBUG)
   jcl::debug::EnableMemoryLeakChecks();
   // jcl::debug::EnableAggressiveMemoryLeakChecks();
-  // jcl::debug::SetBreakPointOnAlocation(1898);
+  jcl::debug::SetBreakPointOnAlocation(7145);
 #endif
 
   try {
@@ -474,7 +474,7 @@ int main(int argc, char *argv[]) {
     {
       const uint32_t fin = 128, fout = 512, kw = 11, kh = 11, pad = 5,
         imw = 90, imh = 60;
-      const double t_test = 5.0;
+      const double t_test = 1.0;
       double t_start, t_end;
       uint64_t niters;
       SpatialConvolution conv(fin, fout, kh, kw, pad);
@@ -527,5 +527,4 @@ int main(int argc, char *argv[]) {
   cout << endl;
   system("PAUSE");
 #endif
-
 }

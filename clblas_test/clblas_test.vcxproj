@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\debug_util_win32.cpp" />
     <ClCompile Include="src\main_clblas_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\clk\clk.h" />
+    <ClInclude Include="headers\debug_util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
