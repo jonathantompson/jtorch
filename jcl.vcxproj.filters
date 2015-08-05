@@ -132,7 +132,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
     <None Include="include\jcl\threading\callback_instances.py">
       <Filter>Header Files\jcl\threading</Filter>
     </None>

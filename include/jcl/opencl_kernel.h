@@ -38,7 +38,7 @@ namespace jcl {
 
   private:
     std::string kernel_name_;
-    OpenCLProgram* program_;  // Now owned here
+    OpenCLProgram* program_;  // Not owned here
     cl::Kernel kernel_;
 
     void compileKernel();

@@ -47,12 +47,12 @@ namespace data_str {
   private:
     uint32_t size_;
     uint32_t capacity_;  // will only grow or shrink by a factor of 2
-    T* pvec_;
+    std::unique_ptr<T[]> pvec_;
   };
 
   template <typename T>
   Vector<T>::Vector(const uint32_t capacity) {  // capacity = 0
-    pvec_ = nullptr;
+    pvec_.reset(nullptr);
     capacity_ = 0;
     size_ = 0;
     if (capacity != 0) {
@@ -62,46 +62,27 @@ namespace data_str {
 
   template <typename T>
   Vector<T>::~Vector() {
-    if (pvec_) { 
-      free(pvec_); 
-      pvec_ = nullptr; 
-    }
-    capacity_ = 0;
-    size_ = 0;
+    clear();
   };
 
   template <typename T>
   void Vector<T>::capacity(const uint32_t capacity) {
     if (capacity != capacity_ && capacity != 0) {
-      T* pvec_old = pvec_;
-
-      T dummy;
-      static_cast<void>(dummy);
-      void* temp = nullptr;
-      temp = malloc(capacity * sizeof(dummy));
-
-      assert(temp != nullptr);
+      std::unique_ptr<T[]> pvec_new(new T[capacity]);
 
       // Use placement new to call the constructors for the array
-      pvec_ = reinterpret_cast<T*>(temp);
+      T* pnew = pvec_new.get();
       for (uint32_t i = 0; i < capacity; i ++) {
-        pvec_[i] = *(new(pvec_ + i) T());  // Call placement new on each item
+        pnew[i] = *(new(pnew + i) T());  // Call placement new item
       }
 
-      if (pvec_old) {
-        if (capacity <= capacity_) {
-          for (uint32_t i = 0; i < capacity; i ++) {
-            pvec_[i] = pvec_old[i];
-          }
-        } else {
-          for (uint32_t i = 0; i < capacity_; i ++) {
-            pvec_[i] = pvec_old[i];
-          }
+      if (pvec_ != nullptr) {
+        for (uint32_t i = 0; i < std::min<uint32_t>(capacity, capacity_); i ++) {
+          pnew[i] = pvec_[i];
         }
-
-        free(pvec_old); 
-        pvec_old = nullptr;
       }
+
+      pvec_ = std::move(pvec_new);
 
       capacity_ = capacity;
       if (size_ > capacity_) {  // If we've truncated the array then resize_
@@ -115,10 +96,7 @@ namespace data_str {
   template <typename T>
   void Vector<T>::clear() {
     size_ = 0;
-    if (pvec_) { 
-      free(pvec_);    
-      pvec_ = nullptr; 
-    }
+    pvec_.reset(nullptr);
     capacity_ = 0;
   };
 

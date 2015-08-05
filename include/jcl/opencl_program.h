@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include "jcl/cl_include.h"
 
@@ -34,7 +35,7 @@ namespace jcl {
 
   private:
     std::string filename_;
-    char* code_;
+    std::unique_ptr<char[]> code_;
     cl::Program program_;
 
     void compileProgram(cl::Context& context,

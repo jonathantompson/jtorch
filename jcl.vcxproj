@@ -151,7 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="include\jcl\threading\callback_instances.py" />
-    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

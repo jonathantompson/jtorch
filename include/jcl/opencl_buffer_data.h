@@ -35,7 +35,7 @@ namespace jcl {
     cl::Buffer& buffer();
 
   private:
-    std::vector<cl::Buffer> buffer_;  // Wrap in vector so we can release on demand
+    std::vector<cl::Buffer> buffer_;
     int32_t reference_count_;
     static uint64_t nelems_allocated_;
     static std::mutex lock_;

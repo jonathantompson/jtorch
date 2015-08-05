@@ -3,10 +3,6 @@
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_FREE(x) if (x != nullptr) { free(x); x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using std::string;
 using std::runtime_error;
 
@@ -17,7 +13,7 @@ namespace jcl {
     const bool strict_float) {
     filename_ = filename;
     code_ = nullptr;
-    code_ = readFileToBuffer(filename);
+    code_.reset(readFileToBuffer(filename));
     compileProgram(context, devices, strict_float);
   }
   
@@ -27,18 +23,14 @@ namespace jcl {
     filename_ = kernel_name;
     code_ = nullptr;
     uint32_t str_len = (uint32_t)strlen(kernel_c_str);  // TODO: bounds check
-    char dummy_char;
-    static_cast<void>(dummy_char);
-    code_ = (char*)malloc((str_len + 1) * sizeof(dummy_char));
-    strcpy(code_, kernel_c_str);
+    code_.reset(new char[str_len + 1]);
+    strcpy(code_.get(), kernel_c_str);
     compileProgram(context, devices, strict_float);
   }
 
   OpenCLProgram::~OpenCLProgram() {
-    SAFE_FREE(code_);
   }
 
-  // Base code taken from: http://www.opengl.org/wiki/ (tutorial 2)
   char* OpenCLProgram::readFileToBuffer(const std::string& filename) {
     FILE *fptr;
     long length;
@@ -67,7 +59,7 @@ namespace jcl {
   void OpenCLProgram::compileProgram(cl::Context& context,
     std::vector<cl::Device>& devices, const bool strict_float) {
     try {
-      cl::Program::Sources source(1, std::make_pair(code_, strlen(code_)));
+      cl::Program::Sources source(1, std::make_pair(code_.get(), strlen(code_.get())));
       program_ = cl::Program(context, source);
     } catch (cl::Error err) {
       std::cout << "cl::Program() failed: "
