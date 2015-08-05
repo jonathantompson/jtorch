@@ -25,7 +25,8 @@
 
 namespace jcl { namespace threading { class ThreadPool; } }
 
-#define TO_TENSOR_PTR(x) ((x)->type() == jtorch::TorchDataType::TENSOR_DATA ? (jtorch::Tensor<float>*)(x) : nullptr)
+#define TO_TENSOR_PTR(x) ((x != nullptr && ((x)->type() == jtorch::TorchDataType::TENSOR_DATA)) ? \
+  (jtorch::Tensor<float>*)(x) : nullptr)
 
 namespace jtorch {
   

@@ -14,7 +14,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jtorch_test", "tests_jtorch
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clblas_test", "clblas_test\clblas_test.vcxproj", "{A664ED26-BC75-48BD-A189-F51F8714C806}"
 	ProjectSection(ProjectDependencies) = postProject
-		{287F2B7F-A92D-4144-B56D-B0A87E5883EE} = {287F2B7F-A92D-4144-B56D-B0A87E5883EE}
 		{7DBA1597-6CC7-45CC-AC82-7B7C69F569C2} = {7DBA1597-6CC7-45CC-AC82-7B7C69F569C2}
 	EndProjectSection
 EndProject

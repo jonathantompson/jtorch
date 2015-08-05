@@ -115,6 +115,11 @@ void testJTorchValue(std::shared_ptr<TorchData> t_data,
       std::cout << "Test PASSED: " << filename << std::endl;
     } else {
       std::cout << "Test FAILED!: " << filename << std::endl;
+#if defined(WIN32) || defined(_WIN32)
+      cout << endl;
+      system("PAUSE");
+#endif
+      exit(1);
     }
   }
 }
