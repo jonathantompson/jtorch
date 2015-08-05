@@ -8,9 +8,6 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::math;
 using namespace jcl::data_str;
@@ -20,74 +17,61 @@ namespace jtorch {
   // kernel1d default is either TorchStage::gaussian1D<float>(n) or just a
   // vector of 1 values.
   SpatialContrastiveNormalization::SpatialContrastiveNormalization(
-    const Tensor<float>* kernel, const float threshold) : TorchStage() {
-    const Tensor<float>* cur_kernel;
+    std::shared_ptr<Tensor<float>> kernel, float threshold) : TorchStage() {
     if (kernel) {
-      if (kernel->dim() > 2) {
-        throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
-          "Averaging kernel must be 1D or 2D!");
-      }
-      if (kernel->size()[0] % 2 == 0 || 
-        (kernel->dim() == 2 && kernel->size()[1] % 2 == 0)) {
-        throw std::runtime_error("SpatialSubtractiveNormalization() - ERROR: "
-          "Averaging kernel must have odd size!");
-      }
-      cur_kernel = kernel;
+      //Averaging kernel must be 1D or 2D.
+      assert(kernel->dim() <= 2);
+
+      // Averaging kernel must have odd size.
+      assert(kernel->size()[0] % 2 != 0 && 
+        !(kernel->dim() == 2 && kernel->size()[1] % 2 == 0));
     } else {
       uint32_t dim = 1;
       uint32_t size = 7;
-      Tensor<float>* kernel = new Tensor<float>(dim, &size);
-      Tensor<float>::fill(*kernel, 1);
-      cur_kernel = kernel;
+      kernel.reset(new Tensor<float>(dim, &size));
+      Tensor<float>::fill(*kernel.get(), 1);
     }
 
-    network_ = new Sequential();
-    network_->add(new SpatialSubtractiveNormalization(*cur_kernel));
-    network_->add(new SpatialDivisiveNormalization(*cur_kernel, threshold));
-
-    if (kernel == nullptr) {
-      // remove temporarily allocated kernel (since sub-modules will store
-      // their own copy).
-      delete cur_kernel;
-    }
+    network_.reset(new Sequential());
+    network_->add(std::unique_ptr<TorchStage>(
+      new SpatialSubtractiveNormalization(kernel)));
+    network_->add(std::unique_ptr<TorchStage>(
+      new SpatialDivisiveNormalization(kernel, threshold)));
   }
 
   SpatialContrastiveNormalization::~SpatialContrastiveNormalization() {
-    SAFE_DELETE(network_);
   }
 
-  void SpatialContrastiveNormalization::forwardProp(TorchData& input) {
+  void SpatialContrastiveNormalization::forwardProp(std::shared_ptr<TorchData> input) {
     network_->forwardProp(input);
     output = network_->output;
   }
 
-  TorchStage* SpatialContrastiveNormalization::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> SpatialContrastiveNormalization::loadFromFile(std::ifstream& file) {
     // This whole thing is a little wasteful.  I copy to GPU here, and then
     // I copy it back down in the constructor anyway...  But it's good enough
     // for now.
     int32_t kernel_size_2, kernel_size_1;  // kernel_size_1 is the inner dim
     file.read((char*)(&kernel_size_1), sizeof(kernel_size_1));
     file.read((char*)(&kernel_size_2), sizeof(kernel_size_2));
-    Tensor<float>* kernel;
+    std::shared_ptr<Tensor<float>> kernel = nullptr;
     if (kernel_size_2 > 1) {
       // The kernel is 2D
       uint32_t dim = 2;
       uint32_t size[2] = {kernel_size_1, kernel_size_2};
-      kernel = new Tensor<float>(dim, size);
+      kernel.reset(new Tensor<float>(dim, size));
     } else {
       uint32_t dim = 1;
       uint32_t size[1] = {kernel_size_1};
-      kernel = new Tensor<float>(dim, size);
+      kernel.reset(new Tensor<float>(dim, size));
     }
-    float* kernel_cpu = new float[kernel->nelems()];
-    file.read((char*)(kernel_cpu), kernel->nelems() * sizeof(*kernel_cpu));
-    kernel->setData(kernel_cpu);
+    std::unique_ptr<float[]> kernel_cpu(new float[kernel->nelems()]);
+    file.read((char*)(kernel_cpu.get()), kernel->nelems() * sizeof(kernel_cpu.get()[0]));
+    kernel->setData(kernel_cpu.get());
     float threshold;
     file.read((char*)(&threshold), sizeof(threshold));
-    TorchStage* ret = new SpatialContrastiveNormalization(kernel, threshold);
-    delete kernel;
-    delete[] kernel_cpu;
-    return ret;
+    return std::unique_ptr<TorchStage>(
+      new SpatialContrastiveNormalization(kernel, threshold));
   }
 
 }  // namespace jtorch

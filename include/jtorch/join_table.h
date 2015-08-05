@@ -22,18 +22,18 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     JoinTable(const uint32_t dimension);
-    virtual ~JoinTable();
+    ~JoinTable() override;
 
-    virtual TorchStageType type() const { return JOIN_TABLE_STAGE; }
-    virtual std::string name() const { return "JoinTable"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return JOIN_TABLE_STAGE; }
+    std::string name() const override { return "JoinTable"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
     inline uint32_t dimension() const { return dimension_; }
 
   protected:
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
     uint32_t dimension_;
 
     // Non-copyable, non-assignable.

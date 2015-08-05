@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
@@ -25,9 +26,6 @@
 #include "jtorch/spatial_convolution_mm.h"
 #include "jtorch/spatial_dropout.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 namespace jtorch {
 
   static std::mutex torch_init_lock_;
@@ -41,31 +39,31 @@ namespace jtorch {
     
   }
 
-  TorchStage* TorchStage::loadFromFile(const std::string& file) {
-    TorchStage* ret = nullptr;
+  std::unique_ptr<TorchStage> TorchStage::loadFromFile(const std::string& file) {
+    std::unique_ptr<TorchStage> ret;
     std::ifstream ifile(file.c_str(), std::ios::in|std::ios::binary);
     if (ifile.is_open()) {
       ifile.seekg(0, std::ios::beg);
       // Now recursively load the network
       std::cout << "Loading torch model..." << std::endl;
-      ret = TorchStage::loadFromFile(ifile);
+      ret = std::move(TorchStage::loadFromFile(ifile));
       ifile.close();
     } else {
-      std::stringstream ss;
-      ss << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
-      ss << " file " << file << std::endl;
-      throw std::runtime_error(ss.str());
+      std::cout << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
+      std::cout << " file " << file << std::endl;
+      assert(false);
     }
     return ret;
   }
 
-  TorchStage* TorchStage::loadFromFile(std::ifstream& ifile) { 
+  std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) { 
     // Read in the enum type:
+
     int type;
     ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
 
     // Now load in the module
-    TorchStage* node = nullptr;
+    std::unique_ptr<TorchStage> node;
     switch (type) {
     case SEQUENTIAL_STAGE: 
       node = Sequential::loadFromFile(ifile);
@@ -131,8 +129,9 @@ namespace jtorch {
       node = SpatialDropout::loadFromFile(ifile);
       break;
     default:
-      throw std::runtime_error("TorchStage::loadFromFile() - ERROR: "
-        "Node type not recognized!");
+      std::cout << "TorchStage::loadFromFile() - ERROR: "
+        "Node type not recognized!" << std::endl;
+      assert(false);
     }
 
 #if defined(DEBUG) || defined(_DEBUG)

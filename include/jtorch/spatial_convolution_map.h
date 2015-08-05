@@ -14,15 +14,15 @@
 
 #pragma once
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <vector>
 #include "jcl/math/int_types.h"
 #include "jcl/threading/callback.h"
 #include "jtorch/torch_stage.h"
 
 #define JTIL_SPATIAL_CONVOLUTION_MAP_NTHREADS 4
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
 namespace jcl { namespace threading { class ThreadPool; } }
 
 namespace jtorch {
@@ -33,23 +33,24 @@ namespace jtorch {
     SpatialConvolutionMap(const uint32_t feats_in, const uint32_t feats_out,
       const uint32_t fan_in, const uint32_t filt_height, 
       const uint32_t filt_width);
-    virtual ~SpatialConvolutionMap();
+    ~SpatialConvolutionMap() override;
 
-    virtual TorchStageType type() const { return SPATIAL_CONVOLUTION_MAP_STAGE; }
-    virtual std::string name() const { return "SpatialConvolutionMap"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SPATIAL_CONVOLUTION_MAP_STAGE; }
+    std::string name() const override { return "SpatialConvolutionMap"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    float** weights;
-    float* biases;
-    int16_t** conn_table;  // This is the same as conn_table_rev in Torch
-                           // For each output: [0] is input feature and [1]
-                           // is the weight matrix (filter) to use
-
-    static TorchStage* loadFromFile(std::ifstream& file);
+    std::vector<std::unique_ptr<float[]>> weights;
+    std::unique_ptr<float[]> biases;
+    // This is the same as conn_table_rev in Torch
+    // For each output: [0] is input feature and [1]
+    // is the weight matrix (filter) to use
+    std::vector<std::unique_ptr<int16_t[]>> conn_table;  
+                           
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
-    float* input_cpu_;
-    float* output_cpu_;
+    std::unique_ptr<float[]> input_cpu_;
+    std::unique_ptr<float[]> output_cpu_;
     uint32_t filt_width_;
     uint32_t filt_height_;
     uint32_t feats_in_;
@@ -57,19 +58,19 @@ namespace jtorch {
     uint32_t fan_in_;
 
     // Multithreading primatives and functions
-    jcl::threading::ThreadPool* tp_;
-    float* cur_input_;
+    std::unique_ptr<jcl::threading::ThreadPool> tp_;
+    float* cur_input_;  // Not owned here
     int32_t cur_input_width_;
     int32_t cur_input_height_;
-    float* cur_output_;
+    float* cur_output_;  // Not owned here
     int32_t threads_finished_;
     std::mutex thread_update_lock_;
     std::condition_variable not_finished_;
-    jcl::data_str::VectorManaged<jcl::threading::Callback<void>*>* thread_cbs_; 
+    std::vector<std::unique_ptr<jcl::threading::Callback<void>>> thread_cbs_; 
 
     void forwardPropThread(const uint32_t outf);
 
-    void init(TorchData& input, jcl::threading::ThreadPool& tp);
+    void init(std::shared_ptr<TorchData> input);
 
     // Non-copyable, non-assignable.
     SpatialConvolutionMap(SpatialConvolutionMap&);

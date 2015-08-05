@@ -21,27 +21,27 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     Linear(const uint32_t n_inputs, const uint32_t n_outputs);
-    virtual ~Linear();
+    ~Linear() override;
 
-    virtual TorchStageType type() const { return LINEAR_STAGE; }
-    virtual std::string name() const { return "Linear"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return LINEAR_STAGE; }
+    std::string name() const override { return "Linear"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
     void setWeights(const float* weights);
     void setBiases(const float* biases);
-    Tensor<float>* weights() { return weights_; }
-    Tensor<float>* biases() { return biases_; }
+    Tensor<float>* weights() { return weights_.get(); }
+    Tensor<float>* biases() { return biases_.get(); }
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
     uint32_t n_inputs_;
     uint32_t n_outputs_;
 
-    Tensor<float>* weights_;  // n_outputs (rows) * n_inputs (columns), stored row major
-    Tensor<float>* biases_;  // n_outputs
+    std::unique_ptr<Tensor<float>> weights_;  // n_outputs (rows) * n_inputs (columns), stored row major
+    std::unique_ptr<Tensor<float>> biases_;  // n_outputs
 
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
 
     // Non-copyable, non-assignable.
     Linear(Linear&);

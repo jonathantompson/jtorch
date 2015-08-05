@@ -20,19 +20,19 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     Threshold();
-    virtual ~Threshold();
+    ~Threshold() override;
 
-    virtual TorchStageType type() const { return THRESHOLD_STAGE; }
-    virtual std::string name() const { return "Threshold"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return THRESHOLD_STAGE; }
+    std::string name() const override { return "Threshold"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
     float threshold;  // Single threshold value
     float val;  // Single output value (when input < threshold)
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
 
     // Non-copyable, non-assignable.
     Threshold(Threshold&);

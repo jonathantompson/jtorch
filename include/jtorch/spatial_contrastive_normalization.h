@@ -26,18 +26,18 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     // Note if kernel is nullptr, then a rectangular filter kernel is used
-    SpatialContrastiveNormalization(const Tensor<float>* kernel = nullptr, 
-      const float threshold = 1e-4f);
-    virtual ~SpatialContrastiveNormalization();
+    SpatialContrastiveNormalization(std::shared_ptr<Tensor<float>> kernel = nullptr, 
+      float threshold = 1e-4f);
+    ~SpatialContrastiveNormalization() override;
 
-    virtual TorchStageType type() const { return SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE; }
-    virtual std::string name() const { return "SpatialContrastiveNormalization"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE; }
+    std::string name() const override { return "SpatialContrastiveNormalization"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
-    Sequential* network_;
+    std::unique_ptr<Sequential> network_;
 
     // Non-copyable, non-assignable.
     SpatialContrastiveNormalization(SpatialContrastiveNormalization&);

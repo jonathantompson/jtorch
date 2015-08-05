@@ -235,7 +235,7 @@ namespace jcl {
     default:
       std::cout << "Bad CLDevice" << std::endl;
       assert(false);
-      break;
+      return "Bad CLDevice";
     }
   }
 
@@ -252,7 +252,7 @@ namespace jcl {
     default:
       std::cout << "Bad CLVendor" << std::endl;
       assert(false);
-      break;
+      return "Bad CLVendor";
     }
   }
 

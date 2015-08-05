@@ -3,9 +3,6 @@
 #include "jcl/opencl_program.h"
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_FREE(x) if (x != nullptr) { free(x); x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using std::string;
 using std::runtime_error;

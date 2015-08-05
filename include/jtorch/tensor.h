@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
+#include <assert.h>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <sstream>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
@@ -32,9 +33,9 @@ namespace jtorch {
   class Tensor : public TorchData {
   public:
     Tensor(const uint32_t dim, const uint32_t* size);
-    virtual ~Tensor();
+    ~Tensor() override;
 
-    virtual TorchDataType type() const { return TENSOR_DATA; }
+    TorchDataType type() const override { return TENSOR_DATA; }
 
     // setData and getData are EXPENSIVE --> They require a CPU to GPU copy
     void setData(const T* data);
@@ -42,14 +43,14 @@ namespace jtorch {
 
     // View returns a new view on the same object.  The caller owns the new
     // memory (ie, it is transferred).
-    Tensor<T>* view(const uint32_t dim, const uint32_t* size);
+    std::shared_ptr<Tensor<T>> view(const uint32_t dim, const uint32_t* size);
 
     const uint32_t dim() const { return dim_; }
     const uint32_t* size() const { return size_; }
     const bool isSameSizeAs(const Tensor<T>& src) const;
 
     // Print --> EXPENSIVE
-    virtual void print();  // print to std::cout
+    void print() override;  // print to std::cout
 
     // Some simple tensor math operations
     static void copy(Tensor<T>& dst, const Tensor<T>& src);
@@ -148,20 +149,16 @@ namespace jtorch {
   }
 
   template <typename T>
-  Tensor<T>* Tensor<T>::view(const uint32_t dim, const uint32_t* size) {
-    if (dim == 0) {
-      throw std::runtime_error("ERROR - view() - zero dimension not allowed!"); 
-    }
+  std::shared_ptr<Tensor<T>> Tensor<T>::view(const uint32_t dim, const uint32_t* size) {
+    assert(dim != 0);
     int32_t view_nelem = 1;
     for (uint32_t i = 0; i < dim; i++) {
       view_nelem *= size[i];
     }
 
-    if (view_nelem != nelems()) {
-      throw std::runtime_error("ERROR - view() - Size mismatch!"); 
-    }
+    assert(view_nelem == nelems());  // Otherwise size mismatch
 
-    Tensor<T>* return_header = new Tensor<T>();
+    std::shared_ptr<Tensor<T>> return_header(new Tensor<T>());
     return_header->dim_ = dim;
     return_header->size_ = new uint32_t[dim];
     memcpy(return_header->size_, size, sizeof(return_header->size_[0]) * dim);
@@ -456,10 +453,10 @@ namespace jtorch {
       ifile.close();
       delete[] size;
     } else {
-      std::stringstream ss;
-      ss << "Tensor<T>::loadFromFile() - ERROR: Could not open file ";
-      ss << file << std::endl;
-      throw std::runtime_error(ss.str());
+      std::cout << "Tensor<T>::loadFromFile() - ERROR: Could not open file ";
+      std::cout << file << std::endl;
+      assert(false);
+      return nullptr;
     }
     return new_tensor;
   }
@@ -481,10 +478,9 @@ namespace jtorch {
       delete[] data;
       ofile.close();
     } else {
-      std::stringstream ss;
-      ss << "Tensor<T>::saveToFile() - ERROR: Could not open file ";
-      ss << file << std::endl;
-      throw std::runtime_error(ss.str());
+      std::cout << "Tensor<T>::saveToFile() - ERROR: Could not open file ";
+      std::cout << file << std::endl;
+      assert(false);
     }
   }
 

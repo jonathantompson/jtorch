@@ -406,7 +406,7 @@ int main(int argc, char *argv[]) {
       Table input;
       for (int32_t i = 0; i < table_size; i++) {
         input.add(Tensor<float>::gaussian(tensor_size));  // Transfers ownership
-        Tensor<float>::mul(*(Tensor<float>*)input(i), (float)(i+1));
+        Tensor<float>::mul(*TO_TENSOR_PTR(input(i)), (float)(i+1));
       }
 
       // Add the tensors to get the ground truth

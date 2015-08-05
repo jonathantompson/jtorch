@@ -21,23 +21,23 @@ namespace jtorch {
   class SpatialSubtractiveNormalization : public TorchStage {
   public:
     // Constructor / Destructor
-    SpatialSubtractiveNormalization(const Tensor<float>& kernel);
-    virtual ~SpatialSubtractiveNormalization();
+    SpatialSubtractiveNormalization(const std::shared_ptr<Tensor<float>> kernel);
+    ~SpatialSubtractiveNormalization() override;
 
-    virtual TorchStageType type() const { return SPATIAL_SUBTRACTIVE_NORMALIZATION_STAGE; }
-    virtual std::string name() const { return "SpatialSubtractiveNormalization"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SPATIAL_SUBTRACTIVE_NORMALIZATION_STAGE; }
+    std::string name() const override { return "SpatialSubtractiveNormalization"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
-    Tensor<float>* kernel_;
-    Tensor<float>* mean_coef_;
-    Tensor<float>* mean_;        // 2D
-    Tensor<float>* mean_pass1_;  // 3D - Horizontal pass
-    Tensor<float>* mean_pass2_;  // 3D - Vertical + normalization pass
+    std::unique_ptr<Tensor<float>> kernel_;
+    std::unique_ptr<Tensor<float>> mean_coef_;
+    std::unique_ptr<Tensor<float>> mean_;        // 2D
+    std::unique_ptr<Tensor<float>> mean_pass1_;  // 3D - Horizontal pass
+    std::unique_ptr<Tensor<float>> mean_pass2_;  // 3D - Vertical + normalization pass
 
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
     void cleanup();
 
     // Non-copyable, non-assignable.

@@ -7,9 +7,6 @@
 #include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::math;
 using namespace jcl::data_str;
@@ -21,55 +18,42 @@ namespace jtorch {
   }
 
   CAddTable::~CAddTable() {
-    delete output;
   }
 
 
-  TorchStage* CAddTable::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> CAddTable::loadFromFile(std::ifstream& file) {
     // Nothing to load from file
-    return new CAddTable();
+    return std::unique_ptr<TorchStage>(new CAddTable());
   }
 
-  void CAddTable::forwardProp(TorchData& input) {
-    if (input.type() != TorchDataType::TABLE_DATA) {
-      throw std::runtime_error("SelectTable::forwardProp() - "
-        "Table expected!");
-    }
+  void CAddTable::forwardProp(std::shared_ptr<TorchData> input) {
+    assert(input->type() == TorchDataType::TABLE_DATA);
 
-    Table& in = (Table&)input;
-
-    if (in.tableSize() == 0) {
-      throw std::runtime_error("SelectTable::forwardProp() - "
-        "Input table is empty!");
-    }
+    Table* in = reinterpret_cast<Table*>(input.get());
+    assert(in->tableSize() != 0);
 
     // Make sure all the elements are of type TENSOR
-    for (uint32_t i = 0; i < in.tableSize(); i++) {
-      if (in(i)->type() != TorchDataType::TENSOR_DATA) {
-        throw std::runtime_error("SelectTable::forwardProp() - "
-          "Table of Tensors expected!");
-      }
+    for (uint32_t i = 0; i < in->tableSize(); i++) {
+      // Table of Tensors expected.
+      assert((*in)(i)->type() == TorchDataType::TENSOR_DATA);
     }
 
-    for (uint32_t i = 1; i < in.tableSize(); i++) {
-      if (!TO_TENSOR_PTR(in(0))->isSameSizeAs(*TO_TENSOR_PTR(in(i)))) {
-        throw std::runtime_error("SelectTable::forwardProp() - "
-          "Table of equal size Tensors expected!");
-      }
+    for (uint32_t i = 1; i < in->tableSize(); i++) {
+      // Table of equal size tensors expected.
+      assert(TO_TENSOR_PTR((*in)(0).get())->isSameSizeAs(*TO_TENSOR_PTR((*in)(i).get())));
     }
 
     if (output == nullptr || 
-      !TO_TENSOR_PTR(in(0))->isSameSizeAs(*TO_TENSOR_PTR(output))) {
+      !TO_TENSOR_PTR((*in)(0).get())->isSameSizeAs(*TO_TENSOR_PTR(output.get()))) {
       // Reinitialize the output Tensor
-      SAFE_DELETE(output);
-      output = new Tensor<float>(TO_TENSOR_PTR(in(0))->dim(), 
-        TO_TENSOR_PTR(in(0))->size());
+      output.reset(new Tensor<float>(TO_TENSOR_PTR((*in)(0).get())->dim(), 
+        TO_TENSOR_PTR((*in)(0).get())->size()));
     }
 
     // TODO: We can probabily parallelize these calls accross multiple tensors
-    Tensor<float>::copy(*TO_TENSOR_PTR(output), *TO_TENSOR_PTR(in(0)));
-    for (uint32_t i = 1; i < in.tableSize(); i++) {
-      Tensor<float>::accumulate(*TO_TENSOR_PTR(output), *TO_TENSOR_PTR(in(i)));
+    Tensor<float>::copy(*TO_TENSOR_PTR(output.get()), *TO_TENSOR_PTR((*in)(0).get()));
+    for (uint32_t i = 1; i < in->tableSize(); i++) {
+      Tensor<float>::accumulate(*TO_TENSOR_PTR(output.get()), *TO_TENSOR_PTR((*in)(i).get()));
     }
 
   }

@@ -24,18 +24,18 @@ namespace jtorch {
     // Constructor / Destructor
     // For 1D tensor: set sz1 = -1, for 2D tensor: set sz2 = -1
     Reshape(const uint32_t dim, const uint32_t* size);
-    virtual ~Reshape();
+    ~Reshape() override;
 
-    virtual TorchStageType type() const { return RESHAPE_STAGE; }
-    virtual std::string name() const { return "Reshape"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return RESHAPE_STAGE; }
+    std::string name() const override { return "Reshape"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
     uint32_t odim_;
-    uint32_t* osize_;
-    void init(TorchData& input);
+    std::unique_ptr<uint32_t[]> osize_;
+    void init(std::shared_ptr<TorchData> input);
 
     uint32_t outNElem() const;
 

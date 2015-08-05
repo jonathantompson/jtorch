@@ -26,18 +26,18 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     SpatialDropout(const float p);
-    virtual ~SpatialDropout();
+    ~SpatialDropout() override;
 
-    virtual TorchStageType type() const { return SPATIAL_DROPOUT; }
-    virtual std::string name() const { return "SpatialDropout"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SPATIAL_DROPOUT; }
+    std::string name() const override { return "SpatialDropout"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
     float p_;
 
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
 
     // Non-copyable, non-assignable.
     SpatialDropout(SpatialDropout&);

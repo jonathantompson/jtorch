@@ -12,9 +12,12 @@
 
 #pragma once
 
+#include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <memory>
+
+#include "jtorch/torch_data.h"
 
 namespace jtorch {
 
@@ -42,8 +45,6 @@ namespace jtorch {
     SPATIAL_CONVOLUTION_MM_STAGE = 20,
     SPATIAL_DROPOUT = 21,
   } TorchStageType;
-
-  class TorchData;
   
   class TorchStage {
   public:
@@ -53,16 +54,16 @@ namespace jtorch {
 
     virtual TorchStageType type() const { return UNDEFINED_STAGE; }
     virtual std::string name() const = 0;
-    virtual void forwardProp(TorchData& input) = 0;  // Pure virtual
+    virtual void forwardProp(std::shared_ptr<TorchData> input) = 0;  // Pure virtual
 
     // Top level read-write
-    static TorchStage* loadFromFile(const std::string& file);
+    static std::unique_ptr<TorchStage> loadFromFile(const std::string& file);
 
     // Everyone must define an output structure
-    TorchData* output;
+    std::shared_ptr<TorchData> output;
 
   protected:
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
     // Non-copyable, non-assignable.
     TorchStage(TorchStage&);

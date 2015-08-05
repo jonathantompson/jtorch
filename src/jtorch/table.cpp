@@ -5,43 +5,38 @@
 #include "jtorch/table.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 namespace jtorch {
 
   Table::Table() {
-    data_ = new jcl::data_str::VectorManaged<TorchData*>();
   }
 
   Table::~Table() {
-    delete data_;
   }
 
-  TorchData* Table::operator()(const uint32_t i) {
-    return (*data_)[i];
+  std::shared_ptr<TorchData> Table::operator()(const uint32_t i) {
+    return data_[i];
   }
 
   void Table::print() {
-    for (uint32_t i = 0; i < data_->size(); i++) {
+    for (uint32_t i = 0; i < data_.size(); i++) {
       std::cout << "Table[" << i << "] = " << std::endl;
-      (*data_)[i]->print();
+      data_[i]->print();
     }
   };
 
-  void Table::add(TorchData* new_data) {
-    data_->pushBack(new_data);
+  void Table::add(std::shared_ptr<TorchData> new_data) {
+    data_.push_back(new_data);
   }
 
-  void Table::clearNoDelete() {
-    for (uint32_t i = 0; i < data_->size(); i++) {
-      (*data_)[i] = nullptr;
+  void Table::clear() {
+    for (uint32_t i = 0; i < data_.size(); i++) {
+      data_[i] = nullptr;
     }
-    data_->clear();
+    data_.resize(0);
   }
 
   uint32_t Table::tableSize() const {
-    return data_->size();
+    return (uint32_t)data_.size();
   }
 
 }  // namespace jtorch

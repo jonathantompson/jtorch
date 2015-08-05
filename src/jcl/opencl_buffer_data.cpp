@@ -3,10 +3,6 @@
 #include "jcl/opencl_context.h"
 #include "jcl/opencl_buffer_data.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_FREE(x) if (x != nullptr) { free(x); x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::data_str;
 using std::runtime_error;
 using std::cout;

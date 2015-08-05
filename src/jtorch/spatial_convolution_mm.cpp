@@ -8,9 +8,6 @@
 #include "clBLAS.h"
 #include "jcl/cl_include.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::math;
 using namespace jcl::data_str;
@@ -18,7 +15,7 @@ using namespace jcl;
 
 namespace jtorch {
 
-  // Function signatures from Torch (for easy code reuse
+  // Function signatures from Torch (for easy code reuse)
   void THCudaBlas_gemm(void* state, char transa, char transb, size_t m, size_t n, size_t k, float alpha, Tensor<float> *a, size_t lda, Tensor<float> *b, size_t ldb, float beta, Tensor<float> *c, size_t ldc);
   void im2col(const Tensor<float>* data_im, const int channels, const int height, const int width, const int ksize_h, const int ksize_w, const int pad_h, const int pad_w, const int stride_h, const int stride_w, Tensor<float>* data_col);
 
@@ -32,21 +29,16 @@ namespace jtorch {
     padding_ = padding;
 
     output = nullptr;
-    ones_ = nullptr;
-    columns_ = nullptr;
+    ones_.reset(nullptr);
+    columns_.reset(nullptr);
 
     uint32_t dim = 4;
     uint32_t size[4] = {filt_width_, filt_height_, feats_in_, feats_out_};
-    weights_ = new Tensor<float>(dim, size);
-    biases_ = new Tensor<float>(1, &feats_out_);
+    weights_.reset(new Tensor<float>(dim, size));
+    biases_.reset(new Tensor<float>(1, &feats_out_));
   }
 
   SpatialConvolutionMM::~SpatialConvolutionMM() {
-    SAFE_DELETE(output);
-    SAFE_DELETE(weights_);
-    SAFE_DELETE(biases_);
-    SAFE_DELETE(columns_);
-    SAFE_DELETE(ones_);
   }
 
   void SpatialConvolutionMM::setWeights(const float* weights) {
@@ -57,35 +49,27 @@ namespace jtorch {
     biases_->setData(biases);
   }
 
-  void SpatialConvolutionMM::init(TorchData& input)  {
-    if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::runtime_error("SpatialConvolutionMM::init() - "
-        "FloatTensor expected!");
-    }
-    Tensor<float>& in = (Tensor<float>&)input;
-    if (in.dim() != 3) {
-      throw std::runtime_error("SpatialConvolutionMM::init() - Input not 3D!");
-    }
-    if (in.size()[2] != feats_in_) {
-      throw std::runtime_error("SpatialConvolutionMM::init() - ERROR: "
-        "incorrect number of input features!");
-    }
+  void SpatialConvolutionMM::init(std::shared_ptr<TorchData> input)  {
+    assert(input->type() == TorchDataType::TENSOR_DATA);
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
+    assert(in->dim() == 3);
+    assert(in->size()[2] == feats_in_);
     if (output != nullptr) {  
-      uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
-      uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;
-      const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
+      uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padding_;
+      uint32_t oheight  = in->size()[1] - filt_height_ + 1 + 2 * padding_;
+      const uint32_t* out_size = TO_TENSOR_PTR(output.get())->size();
       if (out_size[0] != owidth || out_size[1] != oheight || 
         out_size[2] != feats_out_) {
         // Output size changed
-        SAFE_DELETE(output);
-        SAFE_DELETE(columns_);
-        SAFE_DELETE(ones_);
+        output = nullptr;
+        columns_ = nullptr;
+        ones_ = nullptr;
       }
     }
 
     if (output == nullptr) {
-      const uint32_t inputWidth = in.size()[0];
-      const uint32_t inputHeight = in.size()[1];
+      const uint32_t inputWidth = in->size()[0];
+      const uint32_t inputHeight = in->size()[1];
       const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padding_;
       const uint32_t outputHeight = inputHeight - filt_height_ + 1 + 2 * padding_;
 
@@ -94,13 +78,13 @@ namespace jtorch {
       out_dim[0] = outputWidth;
       out_dim[1] = outputHeight;
       out_dim[2] = feats_out_;
-      output = new Tensor<float>(3, out_dim);
+      output.reset(new Tensor<float>(3, out_dim));
 
       // Resize temporary columns
       uint32_t columns_dim[2];
       columns_dim[0] = outputHeight*outputWidth;
       columns_dim[1] = feats_in_ * filt_width_ * filt_height_;
-      columns_ = new Tensor<float>(2, columns_dim);
+      columns_.reset(new Tensor<float>(2, columns_dim));
 
       // Define a buffer of ones, for bias accumulation
       // Note: this buffer can be shared with other modules, it only ever gets increased,
@@ -108,15 +92,15 @@ namespace jtorch {
       uint32_t ones_dim[2];
       ones_dim[0] = outputWidth;
       ones_dim[1] = outputHeight;
-      ones_ = new Tensor<float>(2, ones_dim);
+      ones_.reset(new Tensor<float>(2, ones_dim));
     }
   }
 
-  void SpatialConvolutionMM::forwardProp(TorchData& input) { 
+  void SpatialConvolutionMM::forwardProp(std::shared_ptr<TorchData> input) { 
     init(input);
 
-    Tensor<float>* output_n = TO_TENSOR_PTR(output);
-    Tensor<float>* input_n = TO_TENSOR_PTR(&input);
+    Tensor<float>* output_n = TO_TENSOR_PTR(output.get());
+    Tensor<float>* input_n = TO_TENSOR_PTR(input.get());
     void* state = nullptr;
 
     const uint32_t inputWidth = input_n->size()[0];
@@ -144,8 +128,8 @@ namespace jtorch {
         't', 'n',
         n_, m_, k_,
         1,
-        ones_, k_,
-        biases_, k_,
+        ones_.get(), k_,
+        biases_.get(), k_,
         0,
         output_n, n_
     );
@@ -154,7 +138,7 @@ namespace jtorch {
     im2col(
         input_n,
         nInputPlane, inputHeight, inputWidth, kH, kW, padding, padding, dH, dW,
-        columns_
+        columns_.get()
     );
 
     // M,N,K are dims of matrix A and B
@@ -179,14 +163,14 @@ namespace jtorch {
         'n', 'n',
         n, m, k,
         1,
-        columns_, n,
-        weights_, k,
+        columns_.get(), n,
+        weights_.get(), k,
         1,
         output_n, n
     );
   }
 
-  TorchStage* SpatialConvolutionMM::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> SpatialConvolutionMM::loadFromFile(std::ifstream& file) {
     int32_t filt_width, filt_height, n_input_features, n_output_features,
       padding;
     file.read((char*)(&filt_width), sizeof(filt_width));
@@ -201,24 +185,23 @@ namespace jtorch {
       padding << ")" << std::endl;
 #endif
 
-    SpatialConvolutionMM* ret = new SpatialConvolutionMM(n_input_features,
-      n_output_features, filt_height, filt_width, padding);
+    std::unique_ptr<SpatialConvolutionMM> ret(
+      new SpatialConvolutionMM(n_input_features, n_output_features, filt_height, 
+                               filt_width, padding));
 
     int32_t filt_dim = filt_width * filt_height;
-    float* weights = new float[n_output_features * n_input_features * filt_dim];
+    std::unique_ptr<float[]> weights(new float[n_output_features * n_input_features * filt_dim]);
     for (int32_t i = 0; i < n_output_features * n_input_features; i++) {
       float* bank = &weights[i * filt_dim];
       file.read((char*)(bank), sizeof(bank[0]) * filt_dim);
     }
-    ret->setWeights(weights);
-    delete[] weights;
+    ret->setWeights(weights.get());
 
-    float* biases = new float[n_output_features];
-    file.read((char*)(biases), sizeof(biases[0]) * n_output_features);
-    ret->setBiases(biases);
-    delete[] biases;
+    std::unique_ptr<float[]> biases(new float[n_output_features]);
+    file.read((char*)(biases.get()), sizeof(biases[0]) * n_output_features);
+    ret->setBiases(biases.get());
 
-    return ret;
+    return std::unique_ptr<TorchStage>(std::move(ret));
   }
 
   void adjustLd(char transa, char transb, size_t m, size_t n, size_t k, 
@@ -257,7 +240,9 @@ namespace jtorch {
     else if (trans == 'n') return clblasNoTrans;  // Or CUBLAS_OP_N
     else if (trans == 'c') return clblasConjTrans;  // Or CUBLAS_OP_C
     else {
-      throw std::runtime_error("trans must be one of: t, n, c");
+      std::cout << "trans must be one of: t, n, c" << std::endl;
+      assert(false);
+      return clblasNoTrans;
     }
   }
 
@@ -354,9 +339,8 @@ namespace jtorch {
     // err = clWaitForEvents( 1, &event );
 
     if (err != CL_SUCCESS) {
-      std::stringstream ss;
-      ss << "Error clblasSgemm failed: " << getErrorString(err);
-      throw std::runtime_error(ss.str());
+      std::cout << "Error clblasSgemm failed: " << getErrorString(err);
+      assert(false);
     }
   }
 

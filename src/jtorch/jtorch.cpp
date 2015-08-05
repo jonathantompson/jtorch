@@ -1,16 +1,14 @@
-#include <mutex>
+#include <assert.h>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 #include "jcl/jcl.h"
 #include "jtorch/jtorch.h"
 #include <clBLAS.h>
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 namespace jtorch {
 
-  jcl::JCL* cl_context = nullptr;
+  std::unique_ptr<jcl::JCL> cl_context = nullptr;
   std::mutex cl_context_lock_;
   std::string jtorch_path;
 
@@ -21,17 +19,17 @@ namespace jtorch {
       std::cout << "\tWARNING: not using strict floats." << std::endl;
     }
     if (use_cpu) {
-      cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny),
-        strict_float;
+      cl_context.reset(new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny,
+        strict_float));
     } else {
       if (jcl::JCL::queryDeviceExists(jcl::CLDeviceGPU, jcl::CLVendorAny)) {
-        cl_context = new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny,
-          strict_float);
+        cl_context.reset(new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny,
+          strict_float));
       } else {
         std::cout << "\tWARNING: jtorch is using the CPU!" << std::endl;
         // Fall back to using the CPU (if a valid GPU context doesn't exist)
-        cl_context = new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny,
-          strict_float);
+        cl_context.reset(new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny,
+          strict_float));
       }
     }
     jtorch_path = path_to_jtorch;
@@ -42,19 +40,16 @@ namespace jtorch {
 
     cl_int err = clblasSetup();
     if (err != CL_SUCCESS) {
-      std::stringstream ss;
-      ss << "ERROR - InitJTorchInternal: clblasSetup returned error: " <<
+      std::cout << "ERROR - InitJTorchInternal: clblasSetup returned error: " <<
         jcl::JCL::getErrorString(err);
-      throw std::runtime_error(ss.str());
+      assert(false);
     }
   }
 
   void InitJTorch(const std::string& path_to_jtorch, const bool use_cpu) {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
-    if (cl_context != nullptr) {
-      throw std::runtime_error("jtorch::InitJTorch() - ERROR: Init called "
-        "twice!");
-    }
+    // Check we haven't already called init.
+    assert(cl_context == nullptr);
     InitJTorchInternal(path_to_jtorch, use_cpu);
   }
 
@@ -69,7 +64,7 @@ namespace jtorch {
   void ShutdownJTorch() {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
     clblasTeardown();
-    SAFE_DELETE(cl_context);
+    cl_context.reset(nullptr);
   }
 
   void Sync() {

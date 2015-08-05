@@ -9,9 +9,11 @@
 
 #pragma once
 
+#include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <memory>
+#include <vector>
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_data.h"
 
@@ -25,22 +27,20 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     Table();  // Create an empty table
-    virtual ~Table();
+    ~Table() override;
 
-    TorchData* operator()(const uint32_t i);
-    void add(TorchData* new_data);  // Transfers memory ownership
+    std::shared_ptr<TorchData> operator()(const uint32_t i);
+    void add(std::shared_ptr<TorchData> new_data);
 
-    // clearNoDelete - Clear the table but don't delete the memory.  This is a
-    // hacky function for use in the Parallel stage.
-    void clearNoDelete();  
+    void clear();  
 
-    virtual TorchDataType type() const { return TABLE_DATA; }
-    virtual void print();  // print to std::cout
+    TorchDataType type() const override { return TABLE_DATA; }
+    void print() override;  // print to std::cout
     
     uint32_t tableSize() const;
 
   protected:
-    jcl::data_str::VectorManaged<TorchData*>* data_;  // Internal data
+    std::vector<std::shared_ptr<TorchData>> data_;  // Internal data
 
     // Non-copyable, non-assignable.
     Table(Table&);

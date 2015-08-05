@@ -23,20 +23,20 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     SpatialUpSamplingNearest(const int32_t scale);
-    virtual ~SpatialUpSamplingNearest();
+    ~SpatialUpSamplingNearest() override;
 
-    virtual TorchStageType type() const { return SPATIAL_UP_SAMPLING_NEAREST_STAGE; }
-    virtual std::string name() const { return "SpatialUpSamplingNearest"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SPATIAL_UP_SAMPLING_NEAREST_STAGE; }
+    std::string name() const override { return "SpatialUpSamplingNearest"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
     uint32_t scale_;
     uint32_t out_dim_;
-    uint32_t* out_size_;
+    std::unique_ptr<uint32_t[]> out_size_;
 
-    void init(TorchData& input);
+    void init(std::shared_ptr<TorchData> input);
 
     // Non-copyable, non-assignable.
     SpatialUpSamplingNearest(SpatialUpSamplingNearest&);

@@ -6,9 +6,6 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::data_str;
 using namespace jcl;
@@ -23,79 +20,69 @@ namespace jtorch {
   }
 
   SpatialUpSamplingNearest::~SpatialUpSamplingNearest() {
-    SAFE_DELETE(output);
-    SAFE_DELETE_ARR(out_size_);
   }
 
-  void SpatialUpSamplingNearest::init(TorchData& input)  {
-    if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::runtime_error("SpatialConvolution::init() - "
-        "FloatTensor expected!");
-    }
+  void SpatialUpSamplingNearest::init(std::shared_ptr<TorchData> input)  {
+    assert(input->type() == TorchDataType::TENSOR_DATA);
 
-    Tensor<float>& in = (Tensor<float>&)input;
-    Tensor<float>* out = (Tensor<float>*)output;
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
+    Tensor<float>* out = TO_TENSOR_PTR(output.get());
 
-    if (in.dim() < 2) {
-      throw std::runtime_error("SpatialConvolution::init() - "
-        "Input must be 2D or larger!");
-    }
+    assert(in->dim() >= 2);
 
-    if (output != nullptr && in.dim() != out->dim()) {
-      SAFE_DELETE(output);
+    if (output != nullptr && in->dim() != out->dim()) {
+      output = nullptr;
     }
 
     // Check that the inner 2 dimensions differ by a single scale
     if (output != nullptr) {
-      if (in.size()[0] * scale_ != out->size()[0] || 
-          in.size()[1] * scale_ != out->size()[1]) {
-        SAFE_DELETE(output);
+      if (in->size()[0] * scale_ != out->size()[0] || 
+          in->size()[1] * scale_ != out->size()[1]) {
+        output = nullptr;
       }
     }
 
     // Check that the remaining dimensions are the same size
     if (output != nullptr) {
-      for (uint32_t i = 2; i < in.dim() && output != nullptr; i++) {
-        if (in.size()[i] != out->size()[i]) {
-          SAFE_DELETE(output);
+      for (uint32_t i = 2; i < in->dim() && output != nullptr; i++) {
+        if (in->size()[i] != out->size()[i]) {
+          output = nullptr;
         }
       }
     }
 
     if (output == nullptr) {
-      uint32_t* out_size = new uint32_t[in.dim()];
-      memcpy(out_size, in.size(), sizeof(out_size[0]) * in.dim());
+      std::unique_ptr<uint32_t[]> out_size(new uint32_t[in->dim()]);
+      memcpy(out_size.get(), in->size(), sizeof(out_size[0]) * in->dim());
       out_size[0] *= scale_;
       out_size[1] *= scale_;
 
-      output = new Tensor<float>(in.dim(), out_size);
-      
-      SAFE_DELETE_ARR(out_size);
+      output.reset(new Tensor<float>(in->dim(), out_size.get()));
     }
   }
 
-  void SpatialUpSamplingNearest::forwardProp(TorchData& input) { 
+  void SpatialUpSamplingNearest::forwardProp(std::shared_ptr<TorchData> input) { 
     init(input);
 
-    Tensor<float>& in = (Tensor<float>&)input;
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
     std::string kernel = jtorch::jtorch_path + "kernels/spatial_up_sampling_nearest.cl";
-    if (in.dim() == 2) {
+    if (in->dim() == 2) {
       cl_context->useKernel(kernel.c_str(), "SpatialUpSamplingNearest2D");
     } else {
       cl_context->useKernel(kernel.c_str(), "SpatialUpSamplingNearest");
     }
-    cl_context->setArg(0, ((Tensor<float>&)input).storage());
-    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(0, TO_TENSOR_PTR(input.get())->storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output.get())->storage());
     cl_context->setArg(2, (int)scale_);
-    cl_context->runKernel(jtorch::deviceid, TO_TENSOR_PTR(output)->dim(),
-      TO_TENSOR_PTR(output)->size(), false);
+    cl_context->runKernel(jtorch::deviceid, TO_TENSOR_PTR(output.get())->dim(),
+      TO_TENSOR_PTR(output.get())->size(), false);
   }
 
-  TorchStage* SpatialUpSamplingNearest::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> SpatialUpSamplingNearest::loadFromFile(std::ifstream& file) {
     int32_t scale;
     file.read((char*)(&scale), sizeof(scale));
 
-    return new SpatialUpSamplingNearest(scale);
+    return std::unique_ptr<TorchStage>(new SpatialUpSamplingNearest(scale));
   }
 
 }  // namespace jtorch

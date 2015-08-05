@@ -208,7 +208,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(OPENCL_INC_DIR);$(ProjectDir)include;$(ProjectDir)..\jcl\include;$(ProjectDir)..\clBLAS\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCL_INC_DIR);$(ProjectDir)include;$(ProjectDir)..\clBLAS\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -222,7 +222,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\clBLAS\build\staging\Debug;$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\clBLAS\build\staging\Debug;$(ProjectDir)build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>jcl_d.lib;clBLAS_d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
@@ -241,7 +241,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(OPENCL_INC_DIR);$(ProjectDir)include;$(ProjectDir)..\jcl\include;$(ProjectDir)..\clBLAS\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENCL_INC_DIR);$(ProjectDir)include;$(ProjectDir)..\clBLAS\src</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -258,7 +258,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\clBLAS\build\staging\Release;$(ProjectDir)..\jcl\build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\clBLAS\build\staging\Release;$(ProjectDir)build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>jcl.lib;clBLAS.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>

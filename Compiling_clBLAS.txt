@@ -1,6 +1,7 @@
 Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
 ----------------------------------------------------------------------
 
+ 0. Follow the OpenCL instructions in README.md
  1. git clone git@github.com:clMathLibraries/clBLAS.git
  2. Open cmake gui (You need 2.8 or greater)
  3. "Browse Source" --> C:/path/to/clBLAS/src
@@ -24,6 +25,3 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
 12. Right click clBLAS in the Solution Explorer, 
     -> change "Configuration Type" to "Static library"
     -> change "Target Extension" to "_d.lib"
-
-Alternatively, you can download the pre-compiled static libraries for windows (compiled using VS2012 Win 8.1 64bit) here:
-http://blackbox.cs.nyu.edu/clBLAS_win8.1_64bit.zip

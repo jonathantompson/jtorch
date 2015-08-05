@@ -19,13 +19,13 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     Identity();
-    virtual ~Identity();
+    ~Identity() override;
 
-    virtual TorchStageType type() const { return IDENTITY_STAGE; }
-    virtual std::string name() const { return "Identity"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return IDENTITY_STAGE; }
+    std::string name() const override { return "Identity"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
 

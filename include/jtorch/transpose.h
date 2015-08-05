@@ -19,13 +19,13 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     Transpose();
-    virtual ~Transpose();
+    ~Transpose() override;
 
-    virtual TorchStageType type() const { return TRANSPOSE_STAGE; }
-    virtual std::string name() const { return "Transpose"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return TRANSPOSE_STAGE; }
+    std::string name() const override { return "Transpose"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
 

@@ -6,9 +6,6 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::math;
 using namespace jcl::data_str;
@@ -29,14 +26,11 @@ namespace jtorch {
 
     uint32_t dim = 4;
     uint32_t size[4] = {filt_width_, filt_height_, feats_in_, feats_out_};
-    weights_ = new Tensor<float>(dim, size);
-    biases_ = new Tensor<float>(1, &feats_out_);
+    weights_.reset(new Tensor<float>(dim, size));
+    biases_.reset(new Tensor<float>(1, &feats_out_));
   }
 
   SpatialConvolution::~SpatialConvolution() {
-    SAFE_DELETE(output);
-    SAFE_DELETE(weights_);
-    SAFE_DELETE(biases_);
   }
 
   void SpatialConvolution::setWeights(const float* weights) {
@@ -47,53 +41,47 @@ namespace jtorch {
     biases_->setData(biases);
   }
 
-  void SpatialConvolution::init(TorchData& input)  {
-    if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::runtime_error("SpatialConvolution::init() - "
-        "FloatTensor expected!");
-    }
-    Tensor<float>& in = (Tensor<float>&)input;
-    if (in.dim() != 3) {
-      throw std::runtime_error("SpatialConvolution::init() - Input not 3D!");
-    }
-    if (in.size()[2] != feats_in_) {
-      throw std::runtime_error("SpatialConvolution::init() - ERROR: "
-        "incorrect number of input features!");
-    }
+  void SpatialConvolution::init(std::shared_ptr<TorchData> input)  {
+    assert(input->type() == TorchDataType::TENSOR_DATA);
+
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
+    assert(in->dim() == 3);
+    assert(in->size()[2] == feats_in_);
+
     if (output != nullptr) {
-      uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
-      uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;
-      const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
+      uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padding_;
+      uint32_t oheight  = in->size()[1] - filt_height_ + 1 + 2 * padding_;
+      const uint32_t* out_size = TO_TENSOR_PTR(output.get())->size();
       if (out_size[0] != owidth || out_size[1] != oheight || 
         out_size[2] != feats_out_) {
-        SAFE_DELETE(output);
+        output = nullptr;
       }
     }
     if (output == nullptr) {
       uint32_t out_dim[3];
-      out_dim[0] = in.size()[0] - filt_width_ + 1 + 2 * padding_;
-      out_dim[1] = in.size()[1] - filt_height_ + 1 + 2 * padding_;
+      out_dim[0] = in->size()[0] - filt_width_ + 1 + 2 * padding_;
+      out_dim[1] = in->size()[1] - filt_height_ + 1 + 2 * padding_;
       out_dim[2] = feats_out_;
-      output = new Tensor<float>(3, out_dim);
+      output.reset(new Tensor<float>(3, out_dim));
     }
   }
 
-  void SpatialConvolution::forwardProp(TorchData& input) { 
+  void SpatialConvolution::forwardProp(std::shared_ptr<TorchData> input) { 
     init(input);
-    Tensor<float>& in = (Tensor<float>&)input;
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
     std::string kernel = jtorch::jtorch_path + "kernels/spatial_convolution.cl";
     if (padding_ > 0) {
       cl_context->useKernel(kernel.c_str(), "SpatialConvolutionPadding");
     } else {
       cl_context->useKernel(kernel.c_str(), "SpatialConvolution");
     }
-    cl_context->setArg(0, ((Tensor<float>&)input).storage());
-    cl_context->setArg(1, TO_TENSOR_PTR(output)->storage());
+    cl_context->setArg(0, in->storage());
+    cl_context->setArg(1, TO_TENSOR_PTR(output.get())->storage());
     cl_context->setArg(2, weights_->storage());
     cl_context->setArg(3, biases_->storage());
-    cl_context->setArg(4, (int)in.size()[2]);
-    cl_context->setArg(5, (int)in.size()[1]);
-    cl_context->setArg(6, (int)in.size()[0]);
+    cl_context->setArg(4, (int)in->size()[2]);
+    cl_context->setArg(5, (int)in->size()[1]);
+    cl_context->setArg(6, (int)in->size()[0]);
     cl_context->setArg(7, (int)filt_height_);
     cl_context->setArg(8, (int)filt_width_);
     if (padding_ > 0) {
@@ -101,10 +89,10 @@ namespace jtorch {
     }
     uint32_t dim = 3;
     cl_context->runKernel(jtorch::deviceid, dim, 
-      TO_TENSOR_PTR(output)->size(), false);
+      TO_TENSOR_PTR(output.get())->size(), false);
   }
 
-  TorchStage* SpatialConvolution::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> SpatialConvolution::loadFromFile(std::ifstream& file) {
     int32_t filt_width, filt_height, n_input_features, n_output_features,
       padding;
     file.read((char*)(&filt_width), sizeof(filt_width));
@@ -119,24 +107,23 @@ namespace jtorch {
       padding << ")" << std::endl;
 #endif
 
-    SpatialConvolution* ret = new SpatialConvolution(n_input_features,
-      n_output_features, filt_height, filt_width, padding);
+    std::unique_ptr<SpatialConvolution> ret(new SpatialConvolution(n_input_features,
+      n_output_features, filt_height, filt_width, padding));
 
     int32_t filt_dim = filt_width * filt_height;
-    float* weights = new float[n_output_features * n_input_features * filt_dim];
+    std::unique_ptr<float[]> weights(
+      new float[n_output_features * n_input_features * filt_dim]);
     for (int32_t i = 0; i < n_output_features * n_input_features; i++) {
       float* bank = &weights[i * filt_dim];
       file.read((char*)(bank), sizeof(bank[0]) * filt_dim);
     }
-    ret->setWeights(weights);
-    delete[] weights;
+    ret->setWeights(weights.get());
 
-    float* biases = new float[n_output_features];
-    file.read((char*)(biases), sizeof(biases[0]) * n_output_features);
-    ret->setBiases(biases);
-    delete[] biases;
+    std::unique_ptr<float[]> biases(new float[n_output_features]);
+    file.read((char*)(biases.get()), sizeof(biases[0]) * n_output_features);
+    ret->setBiases(biases.get());
 
-    return ret;
+    return std::unique_ptr<TorchStage>(std::move(ret));
   }
 
 }  // namespace jtorch

@@ -73,7 +73,8 @@ So jtorch and clBLAS must exist at the same directory level.
     - Create windows environment variables (right click My Computer -> Properties -> Advanced System Settings -> Environment Variables -> System Variables -> New): 
         - Name = `OPENCL_INC_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include
         - Name = `OPENCL_LIB_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64
-    - Now download the hpp header from http://www.khronos.org/registry/cl/api/1.1/cl.hpp and put it in C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\CL
+    - Now download the hpp header from http://www.khronos.org/registry/cl/api/1.2/cl.hpp and put it in C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\CL
+	- You may need to follow the instructions here: https://github.com/clMathLibraries/clBLAS/issues/117 (you need all the headers)
 - **Compiling the library:**
     - open jtorch.sln
     - right click "test_jcl" in the Solution Explorer -> "Set as StartUp Project"

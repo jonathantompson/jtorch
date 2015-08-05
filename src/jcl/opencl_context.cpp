@@ -238,17 +238,16 @@ namespace jcl {
       std::cout << "Platform query failed: "
                 << GetCLErrorString(err) << std::endl;
       assert(false);
+      return false;
     }
   }
 
   void OpenCLContext::CheckError(const cl_int err_code) {
-#if defined(DEBUG) || defined(_DEBUG)
     if (err_code != CL_SUCCESS) {
       std::cout << "OpenCLContext::CheckError() - ERROR: "
                 << GetCLErrorString(err_code) << std::endl;
       assert(false);
     }
-#endif
   }
 
   void OpenCLContext::getPlatformDeviceIDsOfType(cl::Platform& platform, 
@@ -291,6 +290,7 @@ namespace jcl {
       std::cout << "allocateBuffer error: " 
                 << GetCLErrorString(err) << std::endl;
       assert(false);
+      return (JCLBuffer)std::numeric_limits<uint32_t>::max();
     }
   }
 

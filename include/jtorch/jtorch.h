@@ -32,7 +32,7 @@ namespace jtorch {
   void Sync();  // NOT Thread safe
 
   // Some constants and globals for the jtorch instance
-  extern jcl::JCL* cl_context;
+  extern std::unique_ptr<jcl::JCL> cl_context;
   extern std::string jtorch_path;
   const uint32_t deviceid = 0;
 

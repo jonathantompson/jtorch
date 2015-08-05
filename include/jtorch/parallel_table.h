@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <vector>
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
@@ -20,23 +21,23 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     ParallelTable();
-    virtual ~ParallelTable();
+    ~ParallelTable() override;
 
-    virtual TorchStageType type() const { return PARALLEL_TABLE_STAGE; }
-    virtual std::string name() const { return "ParallelTable"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return PARALLEL_TABLE_STAGE; }
+    std::string name() const override { return "ParallelTable"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    void add(TorchStage* stage);
+    void add(std::unique_ptr<TorchStage> stage);  // Memory is transferred
     const uint32_t size() const;
 
     uint32_t numBanks() const;
 
     TorchStage* get(const uint32_t i);
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
-    jcl::data_str::VectorManaged<TorchStage*>* network_;
+    std::vector<std::unique_ptr<TorchStage>> network_;
 
     void initOutput();
 

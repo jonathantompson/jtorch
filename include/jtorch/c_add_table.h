@@ -18,13 +18,13 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     CAddTable();
-    virtual ~CAddTable();
+    ~CAddTable() override;
 
-    virtual TorchStageType type() const { return C_ADD_TABLE_STAGE; }
-    virtual std::string name() const { return "CAddTable"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return C_ADD_TABLE_STAGE; }
+    std::string name() const override { return "CAddTable"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
 

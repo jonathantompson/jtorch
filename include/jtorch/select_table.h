@@ -18,13 +18,13 @@ namespace jtorch {
   public:
     // Constructor / Destructor
     SelectTable(int32_t index);
-    virtual ~SelectTable();
+    ~SelectTable() override;
 
-    virtual TorchStageType type() const { return SELECT_TABLE_STAGE; }
-    virtual std::string name() const { return "SelectTable"; }
-    virtual void forwardProp(TorchData& input);
+    TorchStageType type() const override { return SELECT_TABLE_STAGE; }
+    std::string name() const override { return "SelectTable"; }
+    void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static TorchStage* loadFromFile(std::ifstream& file);
+    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   protected:
     uint32_t index_;

@@ -6,9 +6,6 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
-#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
-
 using namespace jcl::threading;
 using namespace jcl::math;
 using namespace jcl::data_str;
@@ -22,36 +19,33 @@ namespace jtorch {
   }
 
   SpatialDropout::~SpatialDropout() {
-    SAFE_DELETE(output);
   }
 
-  void SpatialDropout::init(TorchData& input)  {
-    if (input.type() != TorchDataType::TENSOR_DATA) {
-      throw std::runtime_error("SpatialDropout::init() - "
-        "FloatTensor expected!");
-    }
-    Tensor<float>& in = (Tensor<float>&)input;
+  void SpatialDropout::init(std::shared_ptr<TorchData> input)  {
+    assert(input->type() == TorchDataType::TENSOR_DATA);
+
+    Tensor<float>* in = TO_TENSOR_PTR(input.get());
     if (output != nullptr) {
-      if (!TO_TENSOR_PTR(output)->isSameSizeAs((Tensor<float>&)input)) {
-        SAFE_DELETE(output);
+      if (!TO_TENSOR_PTR(output.get())->isSameSizeAs(*TO_TENSOR_PTR(input.get()))) {
+        output = nullptr;
       }
     }
     if (output == nullptr) {
-      output = Tensor<float>::clone((Tensor<float>&)input);
+      output.reset(Tensor<float>::clone(*TO_TENSOR_PTR(input.get())));
     }
   }
 
-  void SpatialDropout::forwardProp(TorchData& input) { 
+  void SpatialDropout::forwardProp(std::shared_ptr<TorchData> input) { 
     init(input);
 
-    Tensor<float>::copy(*TO_TENSOR_PTR(output), (Tensor<float>&)input);
-    Tensor<float>::mul(*TO_TENSOR_PTR(output), p_);
+    Tensor<float>::copy(*TO_TENSOR_PTR(output.get()), *TO_TENSOR_PTR(input.get()));
+    Tensor<float>::mul(*TO_TENSOR_PTR(output.get()), p_);
   }
 
-  TorchStage* SpatialDropout::loadFromFile(std::ifstream& file) {
+  std::unique_ptr<TorchStage> SpatialDropout::loadFromFile(std::ifstream& file) {
     float p;
     file.read((char*)(&p), sizeof(p));
-    return new SpatialDropout(p);
+    return std::unique_ptr<TorchStage>(new SpatialDropout(p));
   }
 
 }  // namespace jtorch
