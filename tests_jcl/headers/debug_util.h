@@ -7,9 +7,6 @@
 //  
 //  NOTE: This header should be included last
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

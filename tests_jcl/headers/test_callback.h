@@ -11,14 +11,10 @@
 #include "test_unit/test_unit.h"
 #include "test_unit/test_util.h"
 
-using jcl::threading::Callback;
-using jcl::threading::MakeCallableOnce;
-using jcl::threading::MakeCallableMany;
-using tests::Counter;
-
 TEST(Once, Simple) {
-  Counter c;
-  Callback<void>* cb = MakeCallableOnce(&Counter::inc, &c);
+  tests::Counter c;
+  jcl::threading::Callback<void>* cb = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::inc, &c);
   EXPECT_TRUE(cb->once());
   (*cb)();
   EXPECT_EQ(c.count(), 1);
@@ -26,46 +22,54 @@ TEST(Once, Simple) {
 
 TEST(Once, Binding) {
   // early
-  Counter c;
-  Callback<void>* cb1 = MakeCallableOnce(&Counter::incBy, &c, 2);
+  tests::Counter c;
+  jcl::threading::Callback<void>* cb1 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::incBy, &c, 2);
   EXPECT_TRUE(cb1->once());
   (*cb1)();
   EXPECT_EQ(c.count(), 2);
 
   // late
   c.reset();
-  Callback<void, int>* cb2 = MakeCallableOnce(&Counter::incBy, &c);
+  jcl::threading::Callback<void, int>* cb2 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::incBy, &c);
   EXPECT_TRUE(cb2->once());
   (*cb2)(3);
   EXPECT_EQ(c.count(), 3);
 }
 
 TEST(Once, Currying) {
-  Counter c;
-  Callback<void, int>* cb1 = MakeCallableOnce(&Counter::incBy, &c);
-  Callback<void>* cb2 =
-    MakeCallableOnce(&Callback<void, int>::operator(), cb1, 4);
+  tests::Counter c;
+  jcl::threading::Callback<void, int>* cb1 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::incBy, &c);
+  jcl::threading::Callback<void>* cb2 =
+    jcl::threading::MakeCallableOnce(&jcl::threading::Callback<void, int>::operator(), 
+                                     cb1, 4);
   (*cb2)();
   EXPECT_EQ(c.count(), 4);
 }
 
 TEST(Once, ReturnType) {
-  Counter c;
+  tests::Counter c;
   c.set(7);
-  Callback<bool, int, int>* cb1 = MakeCallableOnce(&Counter::between, &c);
+  jcl::threading::Callback<bool, int, int>* cb1 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::between, &c);
   EXPECT_TRUE((*cb1)(5, 10));
 
-  Callback<bool, int>* cb2 = MakeCallableOnce(&Counter::between, &c, 5);
+  jcl::threading::Callback<bool, int>* cb2 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::between, &c, 5);
   EXPECT_TRUE(cb2->once());
   EXPECT_TRUE((*cb2)(10));
 
-  Callback<bool>* cb3 = MakeCallableOnce(&Counter::between, &c, 5, 10);
+  jcl::threading::Callback<bool>* cb3 = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::between, &c, 5, 10);
   EXPECT_TRUE((*cb3)());
 }
 
 TEST(Many, Simple) {
-  Counter c;
-  Callback<void>* cb = MakeCallableMany(&Counter::inc, &c);
+  tests::Counter c;
+  jcl::threading::Callback<void>* cb = 
+    jcl::threading::MakeCallableMany(&tests::Counter::inc, &c);
   EXPECT_FALSE(cb->once());
   (*cb)();
   (*cb)();

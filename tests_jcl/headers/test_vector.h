@@ -7,13 +7,9 @@
 #include "jcl/data_str/vector.h"
 #include "test_unit/test_unit.h"
 
-#define TEST_VECTOR_START_SIZE 101  // A "bigish" prime
-#define TEST_VECTOR_NUM_VALUES 2048
-
-using jcl::data_str::Vector;
-
 TEST(Vector, CreationAndInsertion) {
-  Vector<int>* vec1 = new Vector<int>(2);  // capacity = 2
+  jcl::data_str::Vector<int>* vec1 = 
+    new jcl::data_str::Vector<int>(2);  // capacity = 2
   EXPECT_EQ(vec1->size(), 0);
   vec1->pushBack(1);
   vec1->pushBack(2);
@@ -26,7 +22,8 @@ TEST(Vector, CreationAndInsertion) {
   EXPECT_EQ(vec1->size(), 2);
   vec1->pushBack(3);
   vec1->pushBack(4);
-  Vector<int>* vec2 = new Vector<int>(2);
+  jcl::data_str::Vector<int>* vec2 = 
+    new jcl::data_str::Vector<int>(2);
   *vec2 = *vec1;  // should force a resize of vec2's capacity to 4
   EXPECT_EQ(vec2->size(), 4);
   EXPECT_EQ(vec2->capacity(), 4);
@@ -59,7 +56,8 @@ TEST(Vector, CreationAndInsertion) {
 
 TEST(VectorPointer, CreationAndInsertion) {
   int* cur_item;
-  Vector<int*>* vec1 = new Vector<int*>(2);  // capacity = 2
+  jcl::data_str::Vector<int*>* vec1 = 
+    new jcl::data_str::Vector<int*>(2);  // capacity = 2
   EXPECT_EQ(vec1->size(), 0);
   cur_item = new int[1]; 
   *cur_item = 1;
@@ -83,7 +81,8 @@ TEST(VectorPointer, CreationAndInsertion) {
   cur_item = new int[1]; 
   *cur_item = 4;
   vec1->pushBack(cur_item);
-  Vector<int*> * vec2 = new Vector<int*>(2);
+  jcl::data_str::Vector<int*> * vec2 = 
+    new jcl::data_str::Vector<int*>(2);
   cur_item = new int[1]; 
   *cur_item = 3;
   vec2->pushBack(cur_item);

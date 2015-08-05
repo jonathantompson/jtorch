@@ -7,10 +7,9 @@
 #include "jcl/data_str/vector_managed.h"
 #include "test_unit/test_unit.h"
 
-using jcl::data_str::VectorManaged;
-
 TEST(VectorManaged, CreationAndInsertion) {
-  VectorManaged<int>* vec1 = new VectorManaged<int>(2);  // capacity = 2
+  jcl::data_str::VectorManaged<int>* vec1 = 
+    new jcl::data_str::VectorManaged<int>(2);  // capacity = 2
   EXPECT_EQ(vec1->size(), 0);
   vec1->pushBack(1);
   vec1->pushBack(2);
@@ -23,7 +22,8 @@ TEST(VectorManaged, CreationAndInsertion) {
   EXPECT_EQ(vec1->size(), 2);
   vec1->pushBack(3);
   vec1->pushBack(4);
-  VectorManaged<int>* vec2 = new VectorManaged<int>(2);
+  jcl::data_str::VectorManaged<int>* vec2 = 
+    new jcl::data_str::VectorManaged<int>(2);
   *vec2 = *vec1;  // should force a resize of vec2's capacity to 4
   EXPECT_EQ(vec2->size(), 4);
   EXPECT_EQ(vec2->capacity(), 4);
@@ -56,7 +56,8 @@ TEST(VectorManaged, CreationAndInsertion) {
 
 TEST(VectorManagedPointer, CreationAndInsertion) {
   int* cur_item;
-  VectorManaged<int*>* vec1 = new VectorManaged<int*>(2);  // capacity = 2
+  jcl::data_str::VectorManaged<int*>* vec1 = 
+    new jcl::data_str::VectorManaged<int*>(2);  // capacity = 2
   EXPECT_EQ(vec1->size(), 0);
   cur_item = new int[1]; 
   *cur_item = 1;
@@ -79,7 +80,8 @@ TEST(VectorManagedPointer, CreationAndInsertion) {
   cur_item = new int[1]; 
   *cur_item = 4;
   vec1->pushBack(cur_item);
-  VectorManaged<int*> * vec2 = new VectorManaged<int*>(2);
+  jcl::data_str::VectorManaged<int*> * vec2 = 
+    new jcl::data_str::VectorManaged<int*>(2);
   cur_item = new int[1]; 
   *cur_item = 3;
   vec2->pushBack(cur_item);

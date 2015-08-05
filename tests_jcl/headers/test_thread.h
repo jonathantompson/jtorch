@@ -14,18 +14,6 @@
 #include "jcl/threading/thread.h"
 #include "jcl/threading/callback.h"
 
-#define NUM_EXECUTE_THREADS 101  // A non-trivial number of threads
-#define COUNT_STRIDE 11
-
-using std::thread;
-using tests::Counter;
-using tests::CounterThreadSafe;
-using jcl::threading::Callback;
-using jcl::threading::MakeCallableOnce;
-using jcl::threading::MakeCallableMany;
-using jcl::threading::MakeThread;
-using jcl::threading::GetThreadID;
-
 int count = 0;
 void DumbCounter() {
   count += 314159;
@@ -41,14 +29,15 @@ TEST(Cpp11, ThreadCreation) {
 
 TEST(Creation, MakeAndExecuteOnce) {
   // Use a counter to provide the task.
-  Counter c;
+  tests::Counter c;
 
   // Create the callback associated with one counter increment
-  Callback<void>* threadBody = MakeCallableOnce(&Counter::inc, &c);
+  jcl::threading::Callback<void>* threadBody = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::inc, &c);
 
   // Run the callback on a new thread
-  thread th = MakeThread(threadBody);
-  EXPECT_NEQ(GetThreadID(&th), 0);
+  std::thread th = jcl::threading::MakeThread(threadBody);
+  EXPECT_NEQ(jcl::threading::GetThreadID(&th), 0);
 
   // Wait for it to execute and finish
   th.join();
@@ -58,40 +47,45 @@ TEST(Creation, MakeAndExecuteOnce) {
 }
 
 TEST(Creation, MakeAndExecuteOnceWithParams) {
+  static const int kCountStride = 11;
+
   // Use a counter to provide the task.
-  Counter c;
+  tests::Counter c;
 
   // Create the callback associated with one counter increment
-  Callback<void>* threadBody = MakeCallableOnce(&Counter::incBy, &c,
-                                                COUNT_STRIDE);
+  jcl::threading::Callback<void>* threadBody = 
+    jcl::threading::MakeCallableOnce(&tests::Counter::incBy, &c, 
+                                     kCountStride);
 
   // Run the callback on a new thread
-  thread th = MakeThread(threadBody);
-  EXPECT_NEQ(GetThreadID(&th), 0);
+  std::thread th = jcl::threading::MakeThread(threadBody);
+  EXPECT_NEQ(jcl::threading::GetThreadID(&th), 0);
 
   // Wait for it to execute and finish
   th.join();
 
   // Check that the counter incremented
-  EXPECT_EQ(COUNT_STRIDE, c.count());
+  EXPECT_EQ(kCountStride, c.count());
 }
 
 
 TEST(Creation, MakeAndExecuteMany) {
-  CounterThreadSafe c;
-  std::thread tid[NUM_EXECUTE_THREADS];
+  static const uint32_t kNumExecuteThreads = 101;
+  tests::CounterThreadSafe c;
+  std::thread tid[kNumExecuteThreads];
 
   // Create the callback associated with a counter increment
-  Callback<void>* threadBody = MakeCallableMany(&CounterThreadSafe::inc, &c);
+  jcl::threading::Callback<void>* threadBody = 
+    jcl::threading::MakeCallableMany(&tests::CounterThreadSafe::inc, &c);
 
   // Run the callback on many threads
-  for (int i = 0; i < NUM_EXECUTE_THREADS; i ++) {
+  for (int i = 0; i < kNumExecuteThreads; i ++) {
     tid[i] = MakeThread(threadBody);
-    EXPECT_NEQ(GetThreadID(&tid[i]), 0);
+    EXPECT_NEQ(jcl::threading::GetThreadID(&tid[i]), 0);
   }
 
   // Wait for them to execute
-  for (int i = 0; i < NUM_EXECUTE_THREADS; i ++) {
+  for (int i = 0; i < kNumExecuteThreads; i ++) {
     tid[i].join();
   }
 
@@ -99,5 +93,5 @@ TEST(Creation, MakeAndExecuteMany) {
   delete threadBody;
 
   // Check that the counter incremented
-  EXPECT_EQ(NUM_EXECUTE_THREADS, c.count());
+  EXPECT_EQ(kNumExecuteThreads, c.count());
 }

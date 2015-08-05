@@ -17,7 +17,7 @@
 #include "clk/clk.h"
 
 // convolution_kernel.cl
-const char* conv_kernel_c_str =
+static const char* conv_kernel_c_str =
 "__kernel void Convolve(const __global float * pInput, "
 "  __constant float * pFilter, __global  float * pOutput, const int nInWidth, "
 "  const int nFilterWidth) {"
@@ -41,10 +41,6 @@ const char* conv_kernel_c_str =
 "  pOutput[idxOut] = sum;"
 "}";
 
-using namespace jcl::math;
-using namespace clk;
-using namespace jcl;
-
 TEST(OpenCLTests, TestConvolution) {
   // Allocate a Random input image and a random kernel
   const int32_t src_width = 139;
@@ -55,15 +51,15 @@ TEST(OpenCLTests, TestConvolution) {
   const int32_t dst_height = src_height - kernel_size + 1;  // 64
   const uint32_t num_repeats = 100;
 
-  float* input = new float[src_width * src_height];
-  float* kernel = new float[kernel_size * kernel_size];
-  float* output = new float[dst_width * dst_height];
-  float* outputcl = new float[dst_width * dst_height];
+  std::unique_ptr<float[]> input(new float[src_width * src_height]);
+  std::unique_ptr<float[]> kernel(new float[kernel_size * kernel_size]);
+  std::unique_ptr<float[]> output(new float[dst_width * dst_height]);
+  std::unique_ptr<float[]> outputcl(new float[dst_width * dst_height]);
 
   RandEngine eng;
   NORM_DIST<float> norm_dist;
   eng.seed();
-  Clk clk;
+  clk::Clk clk;
 
   for (uint32_t uv = 0; uv < src_width * src_height; uv++) {
     input[uv] = norm_dist(eng);
@@ -79,32 +75,33 @@ TEST(OpenCLTests, TestConvolution) {
   }
 
   // Call the CPU version
-  Convolve(input, kernel, output, src_width, src_height, dst_width, 
-    dst_height, kernel_size, n_threads);
+  jcl::math::Convolve(input.get(), kernel.get(), output.get(), src_width, 
+    src_height, dst_width, dst_height, kernel_size, n_threads);
   std::cout << std::endl;
 
   // Create an OpenCL context on each of the devices
-  CLDevice dev[2] = {CLDeviceCPU, CLDeviceGPU};
+  jcl::CLDevice dev[2] = {jcl::CLDeviceCPU, jcl::CLDeviceGPU};
   for (uint32_t d = 0; d < 2; d++) {
-    if (!JCL::queryDeviceExists(dev[d], CLVendorAny)) {
+    if (!jcl::JCL::queryDeviceExists(dev[d], jcl::CLVendorAny)) {
       std::cout << "\tOpenCL Device '" << d << "' does not exist. ";
       std::cout << "\tSkipping test" << std::endl;
       continue;
     }
-    JCL* context = new JCL(dev[d], CLVendorAny);
+    std::unique_ptr<jcl::JCL> context(new jcl::JCL(dev[d], 
+      jcl::CLVendorAny));
     const uint32_t dev_id = 0;
     std::cout << "\tUsing OpenCL Device: " << context->getDeviceName(dev_id);
     std::cout << std::endl;
 
     // Initialize Buffers
-    JCLBuffer input_buffer = context->allocateBuffer(CLBufferTypeRead, 
+    jcl::JCLBuffer input_buffer = context->allocateBuffer(jcl::CLBufferTypeRead, 
       src_width * src_height);
-    JCLBuffer kernel_buffer = context->allocateBuffer(CLBufferTypeRead, 
+    jcl::JCLBuffer kernel_buffer = context->allocateBuffer(jcl::CLBufferTypeRead, 
       kernel_size * kernel_size);
-    JCLBuffer output_buffer = context->allocateBuffer(CLBufferTypeWrite, 
+    jcl::JCLBuffer output_buffer = context->allocateBuffer(jcl::CLBufferTypeWrite, 
       dst_width * dst_height);
-    context->writeToBuffer(input, dev_id, input_buffer, true);
-    context->writeToBuffer(kernel, dev_id, kernel_buffer, true);
+    context->writeToBuffer(input.get(), dev_id, input_buffer, true);
+    context->writeToBuffer(kernel.get(), dev_id, kernel_buffer, true);
 
     context->useKernelCStr(conv_kernel_c_str, "Convolve");
     context->setArg(0, input_buffer);
@@ -131,10 +128,7 @@ TEST(OpenCLTests, TestConvolution) {
     // Let OpenCL choose the local worksize
     // context->runKernel2D(dev_id, global_worksize, true);
       
-    context->readFromBuffer(outputcl, dev_id, output_buffer, true);
-
-    // Clean up the context
-    delete context;
+    context->readFromBuffer(outputcl.get(), dev_id, output_buffer, true);
 
     // Check that the results are the same:
     for (uint32_t i = 0; i < dst_width * dst_height; i++) {
@@ -146,12 +140,6 @@ TEST(OpenCLTests, TestConvolution) {
       }
     }
   }
-  
-  // Clean up
-  delete[] input;
-  delete[] kernel;
-  delete[] output;
-  delete[] outputcl;
 }
 
 TEST(OpenCLTests, ProfileConvolution) {
@@ -164,14 +152,14 @@ TEST(OpenCLTests, ProfileConvolution) {
   const int32_t dst_height = src_height - kernel_size + 1;  // 64
   const uint32_t num_repeats = 1000;
 
-  float* input = new float[src_width * src_height];
-  float* kernel = new float[kernel_size * kernel_size];
-  float* output = new float[dst_width * dst_height];
+  std::unique_ptr<float[]> input(new float[src_width * src_height]);
+  std::unique_ptr<float[]> kernel(new float[kernel_size * kernel_size]);
+  std::unique_ptr<float[]> output(new float[dst_width * dst_height]);
 
   RandEngine eng;
   NORM_DIST<float> norm_dist;
   eng.seed();
-  Clk clk;
+  clk::Clk clk;
 
   for (uint32_t uv = 0; uv < src_width * src_height; uv++) {
     input[uv] = norm_dist(eng);
@@ -190,8 +178,9 @@ TEST(OpenCLTests, ProfileConvolution) {
   double cpu_t_accum = 0;
   for (uint32_t i = 0; i < num_repeats; i++) {
     double t0 = clk.getTime();
-    Convolve(input, kernel, output, src_width, src_height, dst_width, 
-      dst_height, kernel_size, n_threads);
+    jcl::math::Convolve(input.get(), kernel.get(), output.get(), 
+      src_width, src_height, dst_width, dst_height, kernel_size, 
+      n_threads);
     double t1 = clk.getTime();
     cpu_t_accum += (t1 - t0);
 
@@ -204,28 +193,28 @@ TEST(OpenCLTests, ProfileConvolution) {
   std::cout << std::endl << "\tCPU time = " << cpu_t_accum << std::endl;
 
   // Create an OpenCL context on the GPU if possible, otherwise the CPU
-  JCL* context = nullptr; 
+  std::unique_ptr<jcl::JCL> context; 
   bool gpu = false;
-  if (JCL::queryDeviceExists(CLDeviceGPU, CLVendorAny)) {
-    context = new JCL(CLDeviceGPU, CLVendorAny);
+  if (jcl::JCL::queryDeviceExists(jcl::CLDeviceGPU, jcl::CLVendorAny)) {
+    context.reset(new jcl::JCL(jcl::CLDeviceGPU, jcl::CLVendorAny));
     gpu = true;
-  } else if (JCL::queryDeviceExists(CLDeviceCPU, CLVendorAny)) {
-    context = new JCL(CLDeviceCPU, CLVendorAny);
+  } else if (jcl::JCL::queryDeviceExists(jcl::CLDeviceCPU, jcl::CLVendorAny)) {
+    context.reset(new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny));
   }
   if ( context != nullptr ) {
     const uint32_t dev_id = 0;
     std::cout << "\tUsing OpenCL Device: " << context->getDeviceName(dev_id);
     std::cout << std::endl;
   
-    float* outputcl = new float[dst_width * dst_height];
-    JCLBuffer input_buffer = context->allocateBuffer(CLBufferTypeRead, 
+    std::unique_ptr<float[]> outputcl(new float[dst_width * dst_height]);
+    jcl::JCLBuffer input_buffer = context->allocateBuffer(jcl::CLBufferTypeRead, 
       src_width * src_height);
-    JCLBuffer kernel_buffer = context->allocateBuffer(CLBufferTypeRead, 
+    jcl::JCLBuffer kernel_buffer = context->allocateBuffer(jcl::CLBufferTypeRead, 
       kernel_size * kernel_size);
-    JCLBuffer output_buffer = context->allocateBuffer(CLBufferTypeWrite, 
+    jcl::JCLBuffer output_buffer = context->allocateBuffer(jcl::CLBufferTypeWrite, 
       dst_width * dst_height);
-    context->writeToBuffer(input, dev_id, input_buffer, true);
-    context->writeToBuffer(kernel, dev_id, kernel_buffer, true);
+    context->writeToBuffer(input.get(), dev_id, input_buffer, true);
+    context->writeToBuffer(kernel.get(), dev_id, kernel_buffer, true);
   
     context->useKernelCStr(conv_kernel_c_str, "Convolve");
     context->setArg(0, input_buffer);
@@ -260,7 +249,7 @@ TEST(OpenCLTests, ProfileConvolution) {
     for (uint32_t i = 0; i < num_repeats; i++) {
       context->runKernel(dev_id, dim, global_worksize, local_worksize, false);
     }
-    context->readFromBuffer(outputcl, dev_id, output_buffer, false);
+    context->readFromBuffer(outputcl.get(), dev_id, output_buffer, false);
     context->sync(dev_id);
     double t1 = clk.getTime();
     std::cout << "\tGPU time (manual sizes) = " << (t1 - t0) << std::endl;
@@ -269,17 +258,9 @@ TEST(OpenCLTests, ProfileConvolution) {
     for (uint32_t i = 0; i < num_repeats; i++) {
       context->runKernel(dev_id, dim, global_worksize, false);
     }
-    context->readFromBuffer(outputcl, dev_id, output_buffer, false);
+    context->readFromBuffer(outputcl.get(), dev_id, output_buffer, false);
     context->sync(dev_id);
     t1 = clk.getTime();
     std::cout << "\tGPU time (opencl sizes) = " << (t1 - t0) << std::endl;
-      
-    delete context;
-    delete outputcl;
   }
-
-  // Clean up
-  delete input;
-  delete kernel;
-  delete output;
 }

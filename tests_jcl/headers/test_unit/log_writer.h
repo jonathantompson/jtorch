@@ -5,9 +5,6 @@
 //
 //  Used to be multi-threaded, but pthreads stripped out
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
