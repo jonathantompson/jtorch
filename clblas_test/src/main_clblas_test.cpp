@@ -11,40 +11,40 @@
 * simplicity purpose.
 */
 
-#define M  4
-#define N  3
-#define K  5
+const int kM = 4;
+const int kN = 3;
+const int kK = 5;
 
 static const cl_float alpha = 10;
 
-static const cl_float A[M*K] = {
+static const cl_float A[kM * kK] = {
   11, 12, 13, 14, 15,
   21, 22, 23, 24, 25,
   31, 32, 33, 34, 35,
   41, 42, 43, 44, 45,
 };
-static const size_t lda = K;        /* i.e. lda = K */
+static const size_t lda = kK;        /* i.e. lda = K */
 
-static const cl_float B[K*N] = {
+static const cl_float B[kK * kN] = {
   11, 12, 13,
   21, 22, 23,
   31, 32, 33,
   41, 42, 43,
   51, 52, 53,
 };
-static const size_t ldb = N;        /* i.e. ldb = N */
+static const size_t ldb = kN;        /* i.e. ldb = N */
 
 static const cl_float beta = 20;
 
-static cl_float C[M*N] = {
+static cl_float C[kM * kN] = {
   11, 12, 13,
   21, 22, 23,
   31, 32, 33,
   41, 42, 43, 
 };
-static const size_t ldc = N;        /* i.e. ldc = N */
+static const size_t ldc = kN;        /* i.e. ldc = N */
 
-static cl_float result[M*N];
+static cl_float result[kM * kN];
 
 const char * getErrorString(cl_int err) {
   switch (err) {
@@ -152,22 +152,22 @@ int main( void ) {
   CheckError(err);
 
   /* Prepare OpenCL memory objects and place matrices inside them. */
-  bufA = clCreateBuffer( ctx, CL_MEM_READ_ONLY, M * K * sizeof(*A),
+  bufA = clCreateBuffer( ctx, CL_MEM_READ_ONLY, kM * kK * sizeof(*A),
     nullptr, &err );
   CheckError(err);
-  bufB = clCreateBuffer( ctx, CL_MEM_READ_ONLY, K * N * sizeof(*B),
+  bufB = clCreateBuffer( ctx, CL_MEM_READ_ONLY, kK * kN * sizeof(*B),
     nullptr, &err );
   CheckError(err);
-  bufC = clCreateBuffer( ctx, CL_MEM_READ_WRITE, M * N * sizeof(*C),
+  bufC = clCreateBuffer( ctx, CL_MEM_READ_WRITE, kM * kN * sizeof(*C),
     nullptr, &err );
   CheckError(err);
 
   err = clEnqueueWriteBuffer( queue, bufA, CL_TRUE, 0,
-    M * K * sizeof( *A ), A, 0, nullptr, nullptr );
+    kM * kK * sizeof( *A ), A, 0, nullptr, nullptr );
   err = clEnqueueWriteBuffer( queue, bufB, CL_TRUE, 0,
-    K * N * sizeof( *B ), B, 0, nullptr, nullptr );
+    kK * kN * sizeof( *B ), B, 0, nullptr, nullptr );
   err = clEnqueueWriteBuffer( queue, bufC, CL_TRUE, 0,
-    M * N * sizeof( *C ), C, 0, nullptr, nullptr );
+    kM * kN * sizeof( *C ), C, 0, nullptr, nullptr );
 
   const double t_test = 5.0;
   std::cout << "Profiling clBLAS for " << t_test << " seconds" << std::endl;
@@ -179,7 +179,7 @@ int main( void ) {
   while (t_end - t_start < t_test) {
     /* Call clBLAS extended function. Perform gemm for the lower right sub-matrices */
     err = clblasSgemm( clblasRowMajor, clblasNoTrans, clblasNoTrans, 
-      M, N, K,
+      kM, kN, kK,
       alpha, bufA, 0, lda,
       bufB, 0, ldb, beta,
       bufC, 0, ldc,
@@ -200,7 +200,7 @@ int main( void ) {
 
   /* Fetch results of calculations from GPU memory. */
   err = clEnqueueReadBuffer( queue, bufC, CL_TRUE, 0,
-    M * N * sizeof(*result),
+    kM * kN * sizeof(*result),
     result, 0, nullptr, nullptr );
   CheckError(err);
 

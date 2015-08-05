@@ -69,25 +69,27 @@ const uint32_t lin_size_out = 20;
 float lweights[lin_size_in * lin_size_out];
 float lbiases[lin_size_out];
 
-void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename,
-  float precision = JTORCH_FLOAT_PRECISION) {
-  float* correct_data = new float[data->nelems()];
-  float* model_data = new float[data->nelems()];
-  memset(model_data, 0, sizeof(model_data[0]) * data->nelems());
-  memset(correct_data, 0, sizeof(correct_data[0]) * data->nelems());
+void testJTorchValue(std::shared_ptr<TorchData> t_data, 
+  const std::string& filename, float precision = JTORCH_FLOAT_PRECISION) {
+  Tensor<float>* data = TO_TENSOR_PTR(t_data.get());
+  std::unique_ptr<float[]> correct_data(new float[data->nelems()]);
+  std::unique_ptr<float[]> model_data(new float[data->nelems()]);
+  memset(model_data.get(), 0, sizeof(model_data[0]) * data->nelems());
+  memset(correct_data.get(), 0, sizeof(correct_data[0]) * data->nelems());
 
-  jtorch::Tensor<float>* correct_data_tensor = Tensor<float>::loadFromFile(filename);
+  std::shared_ptr<jtorch::Tensor<float>> correct_data_tensor(
+    Tensor<float>::loadFromFile(filename));
 
   if (!correct_data_tensor->isSameSizeAs(*data)) {
     std::cout << "Test FAILED (size mismatch)!: " << filename << std::endl;
   } else {
-    correct_data_tensor->getData(correct_data);
-    data->getData(model_data);
+    correct_data_tensor->getData(correct_data.get());
+    data->getData(model_data.get());
     bool data_correct = true;
     for (uint32_t i = 0; i < data->nelems() && data_correct; i++) {
       float delta = fabsf(model_data[i] - correct_data[i]) ;
       if (delta > precision && (delta /
-        std::max<float>(fabsf(correct_data[i]), LOOSE_EPSILON)) > precision) {
+        std::max<float>(fabsf(correct_data[i]), kLooseEpsilon)) > precision) {
         data_correct = false;
         for (uint32_t repeat = 0; repeat < 5; repeat++) {
           for (uint32_t cnt = 0; cnt < 60; cnt++) {
@@ -97,8 +99,10 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename,
         }
         std::cout << "index " << i << " incorrect!: " << std::endl;
         std::cout << std::fixed << std::setprecision(15); 
-        std::cout << "model_data[" << i << "] = " << model_data[i] << std::endl;
-        std::cout << "correct_data[" << i << "] = " << correct_data[i] << std::endl;
+        std::cout << "model_data[" << i << "] = " 
+                  << model_data[i] << std::endl;
+        std::cout << "correct_data[" << i << "] = " 
+                  << correct_data[i] << std::endl;
         for (uint32_t repeat = 0; repeat < 5; repeat++) {
           for (uint32_t cnt = 0; cnt < 60; cnt++) {
             std::cout << "*";
@@ -113,9 +117,6 @@ void testJTorchValue(jtorch::Tensor<float>* data, const std::string& filename,
       std::cout << "Test FAILED!: " << filename << std::endl;
     }
   }
-  delete correct_data_tensor;
-  delete[] model_data;
-  delete[] correct_data;
 }
 
 void assertTrue(bool value, const std::string& module_name) {
@@ -140,9 +141,9 @@ int main(int argc, char *argv[]) {
     jtorch::InitJTorch("../", use_cpu);
 
     const uint32_t isize[3] = {width, height, num_feats_in};
-    Tensor<float> data_in(3, isize);
+    std::shared_ptr<Tensor<float>> data_in(new Tensor<float>(3, isize));
     const uint32_t osize[3] = {width, height, num_feats_in};
-    Tensor<float> data_out(3, osize);
+    std::shared_ptr<Tensor<float>> data_out(new Tensor<float>(3, osize));
 
     for (uint32_t f = 0; f < num_feats_in; f++) {
       float val = (f+1) - (float)(width * height) / 16.0f;
@@ -153,8 +154,8 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-    data_in.setData(din);
-    testJTorchValue(&data_in, "./test_data/data_in.bin");
+    data_in->setData(din);
+    testJTorchValue(data_in, "./test_data/data_in.bin");
 
     // Test Tanh, Threshold and SpatialConvolutionMap in a Sequential container
     // (this means we can also test Sequential at the same time)
@@ -162,26 +163,24 @@ int main(int argc, char *argv[]) {
     {
       // ***********************************************
       // Test Tanh
-      stages.add(new Tanh());
+      stages.add(std::unique_ptr<TorchStage>(new Tanh()));
       stages.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(stages.output), 
-        "./test_data/tanh_result.bin");
+      testJTorchValue(stages.output, "./test_data/tanh_result.bin");
     
       // ***********************************************
       // Test Threshold
       const float threshold = 0.5f;
       const float val = 0.1f;
-      stages.add(new jtorch::Threshold());
+      stages.add(std::unique_ptr<TorchStage>(new jtorch::Threshold()));
       ((jtorch::Threshold*)stages.get(1))->threshold = threshold;
       ((jtorch::Threshold*)stages.get(1))->val = val;
       stages.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(stages.output), 
-        "./test_data/threshold.bin");
+      testJTorchValue(stages.output, "./test_data/threshold.bin");
     
       // ***********************************************
       // Test SpatialConvolutionMap --> THIS STAGE IS STILL ON THE CPU!!
-      stages.add(new SpatialConvolutionMap(num_feats_in, num_feats_out, fan_in,
-        filt_height, filt_width));
+      stages.add(std::unique_ptr<TorchStage>(new SpatialConvolutionMap(
+        num_feats_in, num_feats_out, fan_in, filt_height, filt_width)));
       for (int32_t i = 0; i < static_cast<int32_t>(num_feats_out); i++) {
         ((SpatialConvolutionMap*)stages.get(2))->biases[i] = (float)(i+1) / 
           (float)num_feats_out - 0.5f;
@@ -209,7 +208,7 @@ int main(int argc, char *argv[]) {
         }
       }
       stages.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(stages.output), 
+      testJTorchValue(stages.output, 
         "./test_data/spatial_convolution_map.bin");
     }
 
@@ -240,17 +239,16 @@ int main(int argc, char *argv[]) {
       conv.setWeights(cweights);
       conv.setBiases(cbiases);
       // TODO: This shouldn't use the output from the previous test
-      conv.forwardProp(*stages.get(1)->output);
-      testJTorchValue(TO_TENSOR_PTR(conv.output), 
-        "./test_data/spatial_convolution.bin");
+      conv.forwardProp(stages.get(1)->output);
+      testJTorchValue(conv.output, "./test_data/spatial_convolution.bin");
 
       const uint32_t padding = 6;
       SpatialConvolutionMM convmm(num_feats_in, num_feats_out, filt_height, 
         filt_width, padding);
       Tensor<float>::copy(*convmm.weights(), *conv.weights());
       Tensor<float>::copy(*convmm.biases(), *conv.biases());
-      convmm.forwardProp(*stages.get(1)->output);
-      testJTorchValue(TO_TENSOR_PTR(convmm.output), 
+      convmm.forwardProp(stages.get(1)->output);
+      testJTorchValue(convmm.output, 
         "./test_data/spatial_convolution_mm_padding.bin");
     }
     
@@ -260,9 +258,10 @@ int main(int argc, char *argv[]) {
       const float pnorm = 2;
       const int32_t pool_u = 2;
       const int32_t pool_v = 2;
-      stages.add(new SpatialLPPooling(pnorm, pool_v, pool_u));
+      stages.add(std::unique_ptr<TorchStage>(
+        new SpatialLPPooling(pnorm, pool_v, pool_u)));
       stages.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(stages.output), 
+      testJTorchValue(stages.output, 
         "./test_data/spatial_lp_pooling.bin");
     }
 
@@ -273,7 +272,7 @@ int main(int argc, char *argv[]) {
       const uint32_t pool_v = 2;
       SpatialMaxPooling max_pool_stage(pool_v, pool_u);
       max_pool_stage.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(max_pool_stage.output), 
+      testJTorchValue(max_pool_stage.output, 
         "./test_data/spatial_max_pooling.bin");
     }
   
@@ -281,72 +280,64 @@ int main(int argc, char *argv[]) {
     // Test SpatialSubtractiveNormalization
     {
       uint32_t gauss_size = 7;
-      Tensor<float>* kernel_1d = Tensor<float>::gaussian1D(gauss_size);
-      Tensor<float>* kernel_2d = Tensor<float>::gaussian(gauss_size);
+      std::shared_ptr<Tensor<float>> kernel_1d(Tensor<float>::gaussian1D(gauss_size));
+      std::shared_ptr<Tensor<float>> kernel_2d(Tensor<float>::gaussian(gauss_size));
       const float precision = JTORCH_FLOAT_PRECISION * 10;
 
-      SpatialSubtractiveNormalization sub_norm_stage(*kernel_1d);
+      SpatialSubtractiveNormalization sub_norm_stage(kernel_1d);
       sub_norm_stage.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(sub_norm_stage.output), 
+      testJTorchValue(sub_norm_stage.output, 
         "./test_data/spatial_subtractive_normalization.bin", precision);
 
-      SpatialSubtractiveNormalization sub_norm_stage_2d(*kernel_2d);
+      SpatialSubtractiveNormalization sub_norm_stage_2d(kernel_2d);
       sub_norm_stage_2d.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(sub_norm_stage_2d.output), 
+      testJTorchValue(sub_norm_stage_2d.output, 
         "./test_data/spatial_subtractive_normalization_2d.bin", precision);
-
-      delete kernel_1d;
-      delete kernel_2d;
     }
 
     // ***********************************************
     // Test SpatialDivisiveNormalization
     {
       uint32_t gauss_size = 7;
-      Tensor<float>* kernel_1d = Tensor<float>::gaussian1D(gauss_size);
-      Tensor<float>* kernel_2d = Tensor<float>::gaussian(gauss_size);
+      std::shared_ptr<Tensor<float>> kernel_1d(Tensor<float>::gaussian1D(gauss_size));
+      std::shared_ptr<Tensor<float>> kernel_2d(Tensor<float>::gaussian(gauss_size));
       const float precision = JTORCH_FLOAT_PRECISION * 10;
 
-      SpatialDivisiveNormalization div_norm_stage(*kernel_1d);
+      SpatialDivisiveNormalization div_norm_stage(kernel_1d);
       div_norm_stage.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(div_norm_stage.output), 
+      testJTorchValue(div_norm_stage.output, 
         "./test_data/spatial_divisive_normalization.bin", precision);
 
-      SpatialDivisiveNormalization div_norm_stage_2d(*kernel_2d);
+      SpatialDivisiveNormalization div_norm_stage_2d(kernel_2d);
       div_norm_stage_2d.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(div_norm_stage_2d.output), 
+      testJTorchValue(div_norm_stage_2d.output, 
         "./test_data/spatial_divisive_normalization_2d.bin", precision);
-
-      delete kernel_1d;
-      delete kernel_2d;
     }
 
     // ***********************************************
     // Test SpatialContrastiveNormalization
     {
-      Tensor<float>* lena = Tensor<float>::loadFromFile("./test_data/lena_image.bin");
+      std::shared_ptr<Tensor<float>> lena(
+        Tensor<float>::loadFromFile("./test_data/lena_image.bin"));
 
       const uint32_t kernel_size = 7;
-      Tensor<float>* kernel2 = new Tensor<float>(1, &kernel_size);
+      std::shared_ptr<Tensor<float>> kernel2(new Tensor<float>(1, &kernel_size));
       Tensor<float>::fill(*kernel2, 1);
       SpatialContrastiveNormalization cont_norm_stage(kernel2);
-      cont_norm_stage.forwardProp(*lena);
+      cont_norm_stage.forwardProp(lena);
       const float precision = JTORCH_FLOAT_PRECISION * 10;
-      testJTorchValue(TO_TENSOR_PTR(cont_norm_stage.output), 
+      testJTorchValue(cont_norm_stage.output, 
         "./test_data/spatial_contrastive_normalization.bin", precision);
-
-      delete lena;
-      delete kernel2;
     }
 
     // ***********************************************
     // Test Linear
     {
       Sequential lin_stage;
-      lin_stage.add(new Reshape(1, &lin_size_in));
+      lin_stage.add(std::unique_ptr<TorchStage>(new Reshape(1, &lin_size_in)));
 
-      Linear* lin = new Linear(lin_size_in, lin_size_out);
-      lin_stage.add(lin);
+      std::unique_ptr<Linear> lin(new Linear(lin_size_in, lin_size_out));
+      
       // Weight matrix is M (rows = outputs) x N (columns = inputs)
       // It is stored column major with the M dimension stored contiguously
       for (int32_t n = 0; n < lin_size_in; n++) {
@@ -362,8 +353,9 @@ int main(int argc, char *argv[]) {
       }
       lin->setBiases(lbiases);
       lin->setWeights(lweights);
+      lin_stage.add(std::move(lin));
       lin_stage.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(lin_stage.output), 
+      testJTorchValue(lin_stage.output, 
         "./test_data/linear.bin");
     }
 
@@ -372,27 +364,30 @@ int main(int argc, char *argv[]) {
     {
       Identity eye;
       const int32_t rand_size = 5;
-      Tensor<float>* rand = Tensor<float>::gaussian(rand_size);
-      eye.forwardProp(*rand);
+      std::shared_ptr<Tensor<float>> rand(Tensor<float>::gaussian(rand_size));
+      eye.forwardProp(rand);
       assertTrue(eye.output == rand, "Identity");
-      delete rand;
     }
 
     // ***********************************************
     // Test SelectTable
     {
       const int32_t table_size = 5;
-      Table input;
+      std::shared_ptr<TorchData> input(new Table());
+      Table* table_input = (Table*)input.get();
       for (int32_t i = 0; i < table_size; i++) {
-        input.add(Tensor<float>::gaussian1D(i+1));  // Transfers ownership
+        table_input->add(
+          std::shared_ptr<Tensor<float>>(Tensor<float>::gaussian1D(i+1)));
       }
 
       bool test_passed = true;
       for (int32_t i = 0; i < table_size; i++) {
         SelectTable* module = new SelectTable(i);
         module->forwardProp(input);
-        test_passed = test_passed && module->output == input(i);
-        test_passed = test_passed && TO_TENSOR_PTR(module->output)->nelems() == i+1;
+        test_passed = test_passed && 
+          module->output.get() == (*table_input)(i).get();
+        test_passed = test_passed && 
+          TO_TENSOR_PTR(module->output.get())->nelems() == i+1;
         delete module;
       }
       assertTrue(test_passed, "SelectTable");
@@ -403,27 +398,29 @@ int main(int argc, char *argv[]) {
     {
       const int32_t table_size = 5;
       const int32_t tensor_size = 5;
-      Table input;
+      std::shared_ptr<TorchData> input(new Table());
+      Table* table_input = (Table*)input.get();
       for (int32_t i = 0; i < table_size; i++) {
-        input.add(Tensor<float>::gaussian(tensor_size));  // Transfers ownership
-        Tensor<float>::mul(*TO_TENSOR_PTR(input(i)), (float)(i+1));
+        table_input->add(
+          std::shared_ptr<Tensor<float>>(Tensor<float>::gaussian(tensor_size)));
+        Tensor<float>::mul(*TO_TENSOR_PTR((*table_input)(i).get()), (float)(i+1));
       }
 
       // Add the tensors to get the ground truth
-      float* gt = new float[tensor_size * tensor_size];
-      float* temp = new float[tensor_size * tensor_size];
-      memset(gt, 0, sizeof(gt[0]) * tensor_size * tensor_size);
+      std::unique_ptr<float[]> gt(new float[tensor_size * tensor_size]);
+      std::unique_ptr<float[]> temp(new float[tensor_size * tensor_size]);
+      memset(gt.get(), 0, sizeof(gt[0]) * tensor_size * tensor_size);
       for (int32_t i = 0; i < table_size; i++) {
         assert(input(i)->dataSize() == tensor_size * tensor_size);
-        TO_TENSOR_PTR(input(i))->getData(temp);
+        TO_TENSOR_PTR((*table_input)(i).get())->getData(temp.get());
         for (uint32_t i = 0; i < tensor_size * tensor_size; i++) {
           gt[i] += temp[i];
         }
       }
 
-      CAddTable* module = new CAddTable();
+      std::unique_ptr<CAddTable> module(new CAddTable());
       module->forwardProp(input);
-      TO_TENSOR_PTR(module->output)->getData(temp);
+      TO_TENSOR_PTR(module->output.get())->getData(temp.get());
 
       bool test_passed = true;
       for (int32_t i = 0; i < tensor_size * tensor_size; i++) {
@@ -431,10 +428,6 @@ int main(int argc, char *argv[]) {
           (fabsf(temp[i] - gt[i]) < JTORCH_FLOAT_PRECISION);
       }
       assertTrue(test_passed, "CAddTable");
-
-      delete module;
-      delete[] gt;
-      delete[] temp;
     }
 
     // ***********************************************
@@ -443,67 +436,32 @@ int main(int argc, char *argv[]) {
       int32_t scale = 4;
       SpatialUpSamplingNearest module(scale);
       module.forwardProp(data_in);
-      testJTorchValue(TO_TENSOR_PTR(module.output), 
+      testJTorchValue(module.output, 
         "./test_data/spatial_up_sampling_nearest.bin");
     }
 
     // ***********************************************
     // Test Loading and running a model
     {
-      TorchStage* model = TorchStage::loadFromFile("./test_data/testmodel.bin");
+      std::unique_ptr<TorchStage> model = 
+        TorchStage::loadFromFile("./test_data/testmodel.bin");
 
       model->forwardProp(data_in);
 
       // Some debugging if things go wrong:
-      if (model->type() != SEQUENTIAL_STAGE) {
-        throw std::runtime_error("main() - ERROR: Expecting Sequential!");
-      }
+      assert(model->type() == SEQUENTIAL_STAGE);
       const TorchStageType stages[] = {SPATIAL_CONVOLUTION_STAGE, TANH_STAGE,
         THRESHOLD_STAGE, SPATIAL_MAX_POOLING_STAGE, SPATIAL_CONVOLUTION_STAGE,
         RESHAPE_STAGE, LINEAR_STAGE};
 
-      if (((Sequential*)model)->size() != sizeof(stages) / sizeof(stages[0])) {
-        throw std::runtime_error("main() - ERROR: Badly formatted model!");
-      }
+      assert(((Sequential*)model.get())->size() == sizeof(stages) / sizeof(stages[0]));
 
       for (uint32_t i = 0; i < sizeof(stages) / sizeof(stages[0]); i++) {
-        TorchStage* stage = ((Sequential*)model)->get(i);
-        if (stage->type() != stages[i]) {
-          throw std::runtime_error("main() - ERROR: Badly formatted model!");
-        }
+        TorchStage* stage = ((Sequential*)model.get())->get(i);
+        assert(stage->type() == stages[i]);
       }
 
-      testJTorchValue(TO_TENSOR_PTR(model->output),
-        "./test_data/test_model_result.bin");
-
-      delete model;
-    }
-
-    // ***********************************************
-    // Test Loading and running a big model (ie our body tracking model)
-    if (jcl::file_io::fileExists("./test_data/big_model.bin")) {
-      TorchStage* model = TorchStage::loadFromFile("./test_data/big_model.bin");
-
-      // The input is a nested table of tensors (one for each resolution bank)
-      Table* input = new Table();
-      const uint32_t num_banks = 3;
-      for (uint32_t i = 1; i <= num_banks; i++) {
-        std::stringstream ss;
-        ss << "./test_data/big_model_input_bank" << i << ".bin";
-        Table* cur_table = new Table();
-        cur_table->add(Tensor<float>::loadFromFile(ss.str()));
-        cur_table->add(nullptr);
-        input->add(cur_table);
-      }
-
-      model->forwardProp(*input);
-
-      const float precision = JTORCH_FLOAT_PRECISION * 100;
-      testJTorchValue(TO_TENSOR_PTR(model->output),
-        "./test_data/big_model_output.bin", precision);
-
-      delete model;
-      delete input;
+      testJTorchValue(model->output, "./test_data/test_model_result.bin");
     }
 
     // ***********************************************
@@ -517,7 +475,7 @@ int main(int argc, char *argv[]) {
       SpatialConvolution conv(fin, fout, kh, kw, pad);
       SpatialConvolutionMM conv_mm(fin, fout, kh, kw, pad);
       uint32_t size[3] = {imw, imh, fin};
-      Tensor<float>* input = new Tensor<float>(3, size);
+      std::shared_ptr<Tensor<float>> input(new Tensor<float>(3, size));
       clk::Clk clk;
 
       Tensor<float>::fill(*conv.weights(), 1);
@@ -530,7 +488,7 @@ int main(int argc, char *argv[]) {
       t_end = t_start;
       niters = 0;
       while (t_end - t_start < t_test) {
-        conv_mm.forwardProp(*input);
+        conv_mm.forwardProp(input);
         niters++;
         jtorch::Sync();
         t_end = clk.getTime();
@@ -544,15 +502,13 @@ int main(int argc, char *argv[]) {
       t_end = t_start;
       niters = 0;
       while (t_end - t_start < t_test) {
-        conv.forwardProp(*input);
+        conv.forwardProp(input);
         niters++;
         jtorch::Sync();
         t_end = clk.getTime();
       }
       std::cout << "\t\tExecution time: " << (t_end - t_start) / (double)niters
          << " seconds per FPROP" << std::endl;
-
-      delete input;
     }
 
   } catch (std::runtime_error e) {
