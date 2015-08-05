@@ -55,7 +55,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OPENCL_INC_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <ProgramDataBaseFileName>$(TargetDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -88,7 +88,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(OPENCL_INC_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996; 4290</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;BREAK_ON_EXCEPTION_INT;FREEIMAGE_LIB;GLEW_STATIC;UNICODE;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <ProgramDataBaseFileName>$(TargetDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -116,7 +116,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\jcl\alignment\data_align.h" />
     <ClInclude Include="include\jcl\cl_include.h" />
     <ClInclude Include="include\jcl\data_str\hash_funcs.h" />
     <ClInclude Include="include\jcl\data_str\hash_map_managed.h" />
@@ -132,7 +131,6 @@
     <ClInclude Include="include\jcl\opencl_kernel.h" />
     <ClInclude Include="include\jcl\opencl_program.h" />
     <ClInclude Include="include\jcl\string_util\macros.h" />
-    <ClInclude Include="include\jcl\string_util\md5_jcl.h" />
     <ClInclude Include="include\jcl\threading\callback.h" />
     <ClInclude Include="include\jcl\threading\callback_instances.h" />
     <ClInclude Include="include\jcl\threading\callback_queue.h" />
@@ -148,10 +146,6 @@
     <ClCompile Include="src\jcl\opencl_context.cpp" />
     <ClCompile Include="src\jcl\opencl_kernel.cpp" />
     <ClCompile Include="src\jcl\opencl_program.cpp" />
-    <ClCompile Include="src\jcl\string_util\md5c_jcl.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
-    </ClCompile>
     <ClCompile Include="src\jcl\threading\thread.cpp" />
     <ClCompile Include="src\jcl\threading\thread_pool.cpp" />
   </ItemGroup>

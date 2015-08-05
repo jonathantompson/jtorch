@@ -7,8 +7,8 @@
 #include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -18,7 +18,7 @@ namespace jtorch {
 
   JoinTable::JoinTable(const uint32_t dimension) {
     dimension_ = dimension;
-    output = NULL;
+    output = nullptr;
   }
 
   JoinTable::~JoinTable() {
@@ -70,7 +70,7 @@ namespace jtorch {
               "Size mismatch!");
           }
         }
-        if (output != NULL && TO_TENSOR_PTR(output)->size()[d] != 
+        if (output != nullptr && TO_TENSOR_PTR(output)->size()[d] != 
           TO_TENSOR_PTR(in(0))->size()[d]) {
             SAFE_DELETE(output);
         }
@@ -82,12 +82,12 @@ namespace jtorch {
       nelems_jdim += TO_TENSOR_PTR(in(j))->size()[jdim];
     }
 
-    if (output != NULL &&
+    if (output != nullptr &&
       TO_TENSOR_PTR(output)->size()[jdim] != nelems_jdim) {
       SAFE_DELETE(output);
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       uint32_t* size = new uint32_t[dim];
       memcpy(size, TO_TENSOR_PTR(in(0))->size(), sizeof(size[0]) * dim);
       size[dimension_] = nelems_jdim;

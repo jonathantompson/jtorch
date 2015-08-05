@@ -10,15 +10,11 @@
 //        transferred.  That is, the vector is not responsible for handling
 //        cleanup when Vector<type*> is used.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
-#include <stdio.h>  // For printf()
+#include <assert.h>
 #include "jcl/math/int_types.h"  // for uint
-#include "jcl/alignment/data_align.h"
 
 namespace jcl {
 namespace data_str {
@@ -56,7 +52,7 @@ namespace data_str {
 
   template <typename T>
   Vector<T>::Vector(const uint32_t capacity) {  // capacity = 0
-    pvec_ = NULL;
+    pvec_ = nullptr;
     capacity_ = 0;
     size_ = 0;
     if (capacity != 0) {
@@ -67,12 +63,8 @@ namespace data_str {
   template <typename T>
   Vector<T>::~Vector() {
     if (pvec_) { 
-#ifdef _WIN32
-      _aligned_free(pvec_); 
-#else
       free(pvec_); 
-#endif
-      pvec_ = NULL; 
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
     size_ = 0;
@@ -83,20 +75,12 @@ namespace data_str {
     if (capacity != capacity_ && capacity != 0) {
       T* pvec_old = pvec_;
 
-#ifdef _WIN32 
       T dummy;
-      static_cast<void>(dummy);  // Get rid of unreference local variable warn
-      void* temp = NULL;
-      temp = _aligned_malloc(capacity * sizeof(dummy), ALIGNMENT);
-#else
-      T dummy;
-      void* temp = NULL;
+      static_cast<void>(dummy);
+      void* temp = nullptr;
       temp = malloc(capacity * sizeof(dummy));
-#endif
 
-      if (temp == NULL) { 
-        throw std::runtime_error("Vector<T>::capacity: Malloc Failed.");
-      }
+      assert(temp != nullptr);
 
       // Use placement new to call the constructors for the array
       pvec_ = reinterpret_cast<T*>(temp);
@@ -115,12 +99,8 @@ namespace data_str {
           }
         }
 
-#ifdef _WIN32
-        _aligned_free(pvec_old); 
-#else
         free(pvec_old); 
-#endif
-        pvec_old = NULL;
+        pvec_old = nullptr;
       }
 
       capacity_ = capacity;
@@ -136,12 +116,8 @@ namespace data_str {
   void Vector<T>::clear() {
     size_ = 0;
     if (pvec_) { 
-#ifdef _WIN32
-      _aligned_free(pvec_); 
-#else
-      free(pvec_);
-#endif      
-      pvec_ = NULL; 
+      free(pvec_);    
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
   };
@@ -158,21 +134,15 @@ namespace data_str {
   
   template <typename T>
   void Vector<T>::popBack(T& elem) {
-    if (size_ > 0) {
-      elem = pvec_[size_-1];
-      size_ -= 1;  // just reduce the size_ by 1
-    } else {
-      throw std::runtime_error("Vector<T>::popBack: Out of bounds");
-    }
+    assert(size_ > 0);
+    elem = pvec_[size_-1];
+    size_ -= 1;  // just reduce the size_ by 1
   };
 
   template <typename T>
   void Vector<T>::popBack() {
-    if (size_ > 0) {
-      size_ -= 1;  // just reduce the size_ by 1
-    } else {
-      throw std::runtime_error("Vector<T>::popBack: Out of bounds");
-    }
+    assert(size_ > 0);
+    size_ -= 1;  // just reduce the size_ by 1
   };
 
   template <typename T>
@@ -188,60 +158,38 @@ namespace data_str {
 
   template <typename T>
   T* Vector<T>::at(const uint32_t index ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return &pvec_[index];
   };
 
   template <typename T>
   const T* Vector<T>::at(const uint32_t index ) const {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return &pvec_[index];
   };
 
   template <typename T>
   T Vector<T>::operator[](const uint32_t index) const { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   T& Vector<T>::operator[](const uint32_t index) { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   void Vector<T>::set(const uint32_t index, const T& val ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     pvec_[index] = val;
   };
 
   template <typename T>
   void Vector<T>::resize(const uint32_t size) { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if ( size > capacity_) { 
-      throw std::runtime_error("Vector<T>::resize: Out of bounds");
-    } else { 
-#endif
-      size_ = size; 
-#if defined(_DEBUG) || defined(DEBUG)
-    } 
-#endif
+    assert(size <= capacity_);
+    size_ = size; 
   };   
 
   template <typename T>
@@ -276,11 +224,7 @@ namespace data_str {
 
   template <typename T>
   void Vector<T>::deleteAtAndShift(const uint32_t index) {
-#ifdef _DEBUG
-    if (index > (size_-1)) {
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-    }
-#endif
+    assert(index < size_);
     for (uint32_t i = index; i < size_-1; i++) {
       pvec_[i] = pvec_[i+1];
     }

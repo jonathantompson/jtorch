@@ -25,8 +25,8 @@
 #include "jtorch/spatial_convolution_mm.h"
 #include "jtorch/spatial_dropout.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 namespace jtorch {
 
@@ -34,7 +34,7 @@ namespace jtorch {
   static bool torch_init_;
 
   TorchStage::TorchStage() {
-    output = NULL; 
+    output = nullptr; 
   }
 
   TorchStage::~TorchStage() {
@@ -42,7 +42,7 @@ namespace jtorch {
   }
 
   TorchStage* TorchStage::loadFromFile(const std::string& file) {
-    TorchStage* ret = NULL;
+    TorchStage* ret = nullptr;
     std::ifstream ifile(file.c_str(), std::ios::in|std::ios::binary);
     if (ifile.is_open()) {
       ifile.seekg(0, std::ios::beg);
@@ -65,7 +65,7 @@ namespace jtorch {
     ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
 
     // Now load in the module
-    TorchStage* node = NULL;
+    TorchStage* node = nullptr;
     switch (type) {
     case SEQUENTIAL_STAGE: 
       node = Sequential::loadFromFile(ifile);

@@ -27,14 +27,8 @@
     <Filter Include="Source Files\jcl\math">
       <UniqueIdentifier>{fd4bcea3-319b-43db-8bb4-ac31ec7c1a46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\jcl\alignment">
-      <UniqueIdentifier>{d60ec02a-7f7e-423b-bfea-d75f668ba71e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\jcl\data_str">
       <UniqueIdentifier>{ff179a39-8fc0-4465-809a-8a85717c0611}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\jcl\string_util">
-      <UniqueIdentifier>{9a53f332-2a6c-4da2-8dcb-7cc2b6dba6e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\jcl\threading">
       <UniqueIdentifier>{d6b5ab1d-723d-4621-b45a-04d8e7344129}</UniqueIdentifier>
@@ -86,14 +80,8 @@
     <ClInclude Include="include\jcl\math\math_base.h">
       <Filter>Header Files\jcl\math</Filter>
     </ClInclude>
-    <ClInclude Include="include\jcl\alignment\data_align.h">
-      <Filter>Header Files\jcl\alignment</Filter>
-    </ClInclude>
     <ClInclude Include="include\jcl\math\math_types.h">
       <Filter>Header Files\jcl\math</Filter>
-    </ClInclude>
-    <ClInclude Include="include\jcl\string_util\md5_jcl.h">
-      <Filter>Header Files\jcl\string_util</Filter>
     </ClInclude>
     <ClInclude Include="include\jcl\threading\callback_instances.h">
       <Filter>Header Files\jcl\threading</Filter>
@@ -135,9 +123,6 @@
     </ClCompile>
     <ClCompile Include="src\jcl\data_str\hash_funcs.cpp">
       <Filter>Source Files\jcl\data_str</Filter>
-    </ClCompile>
-    <ClCompile Include="src\jcl\string_util\md5c_jcl.c">
-      <Filter>Source Files\jcl\string_util</Filter>
     </ClCompile>
     <ClCompile Include="src\jcl\threading\thread_pool.cpp">
       <Filter>Source Files\jcl\threading</Filter>

@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -24,10 +24,10 @@ namespace jtorch {
     feats_out_ = feats_out;
     fan_in_ = fan_in;
 
-    output = NULL;
-    thread_cbs_ = NULL;
-    output_cpu_ = NULL;
-    input_cpu_ = NULL;
+    output = nullptr;
+    thread_cbs_ = nullptr;
+    output_cpu_ = nullptr;
+    input_cpu_ = nullptr;
 
     weights = new float*[feats_out_ * fan_in_];
     for (uint32_t i = 0; i < feats_out_ * fan_in_; i++) {
@@ -77,7 +77,7 @@ namespace jtorch {
       throw std::runtime_error("SpatialConvolutionMap::init() - ERROR: "
         "incorrect number of input features!");
     }
-    if (output != NULL) {
+    if (output != nullptr) {
       uint32_t owidth = in.size()[0] - filt_width_ + 1;
       uint32_t oheight = in.size()[1] - filt_height_ + 1;
       const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
@@ -90,7 +90,7 @@ namespace jtorch {
         SAFE_DELETE(thread_cbs_);
       }
     }
-    if (output == NULL) {
+    if (output == nullptr) {
       uint32_t out_dim[3];
       out_dim[0] = in.size()[0] - filt_width_ + 1;
       out_dim[1] = in.size()[1] - filt_height_ + 1;
@@ -99,7 +99,7 @@ namespace jtorch {
       input_cpu_ = new float[in.nelems()];
       output_cpu_ = new float[TO_TENSOR_PTR(output)->nelems()];
     }
-    if (thread_cbs_ == NULL) {
+    if (thread_cbs_ == nullptr) {
       uint32_t n_feats = feats_out_;
       uint32_t n_threads = n_feats;
       thread_cbs_ = new VectorManaged<Callback<void>*>(n_threads);

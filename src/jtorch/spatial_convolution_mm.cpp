@@ -8,8 +8,8 @@
 #include "clBLAS.h"
 #include "jcl/cl_include.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -31,9 +31,9 @@ namespace jtorch {
     feats_out_ = feats_out;
     padding_ = padding;
 
-    output = NULL;
-    ones_ = NULL;
-    columns_ = NULL;
+    output = nullptr;
+    ones_ = nullptr;
+    columns_ = nullptr;
 
     uint32_t dim = 4;
     uint32_t size[4] = {filt_width_, filt_height_, feats_in_, feats_out_};
@@ -70,7 +70,7 @@ namespace jtorch {
       throw std::runtime_error("SpatialConvolutionMM::init() - ERROR: "
         "incorrect number of input features!");
     }
-    if (output != NULL) {  
+    if (output != nullptr) {  
       uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
       uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;
       const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
@@ -83,7 +83,7 @@ namespace jtorch {
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       const uint32_t inputWidth = in.size()[0];
       const uint32_t inputHeight = in.size()[1];
       const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padding_;
@@ -117,7 +117,7 @@ namespace jtorch {
 
     Tensor<float>* output_n = TO_TENSOR_PTR(output);
     Tensor<float>* input_n = TO_TENSOR_PTR(&input);
-    void* state = NULL;
+    void* state = nullptr;
 
     const uint32_t inputWidth = input_n->size()[0];
     const uint32_t inputHeight = input_n->size()[1];
@@ -329,7 +329,7 @@ namespace jtorch {
 
     clblasOrder order = clblasColumnMajor;  // Not sure what this is
     cl_command_queue queue = (cl_command_queue)cl_context->queue(jtorch::deviceid);
-    cl_event event = NULL;
+    cl_event event = nullptr;
     cl_int err = clblasSgemm(
       order, 
       opa, 
@@ -348,7 +348,7 @@ namespace jtorch {
       (cl_mem)cl_context->getCLMem(c->storage()), 
       0,  // (offC)
       ldc,
-      1, &queue, 0, NULL, &event);
+      1, &queue, 0, nullptr, &event);
 
     // Non-blocking: Don't wait for events
     // err = clWaitForEvents( 1, &event );

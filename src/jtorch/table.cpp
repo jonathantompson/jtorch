@@ -5,8 +5,8 @@
 #include "jtorch/table.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 namespace jtorch {
 
@@ -35,7 +35,7 @@ namespace jtorch {
 
   void Table::clearNoDelete() {
     for (uint32_t i = 0; i < data_->size(); i++) {
-      (*data_)[i] = NULL;
+      (*data_)[i] = nullptr;
     }
     data_->clear();
   }

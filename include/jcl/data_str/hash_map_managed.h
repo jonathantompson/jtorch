@@ -17,21 +17,17 @@
 //        IS TRANSFERRED.  The HashMap will call the destructor for that
 //        memory when clear is called or the HashMap destructor is called.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
+#include <assert.h>
+
 #include <cstring>  // For gcc builds, get rid of fpermissive compile error
-#include <stdio.h>  // For printf()
+#include <memory>
+
+#include "jcl/data_str/pair.h"
 #include "jcl/math/int_types.h"  // for uint
 #include "jcl/math/math_base.h"  // for NextPrime
-#include "jcl/data_str/pair.h"
-
-#ifndef NULL
-#define NULL 0
-#endif
 
 namespace jcl {
 namespace data_str {
@@ -50,23 +46,19 @@ namespace data_str {
     bool insert(const TKey& key, const TValue& value);
     bool insertPrehash(const uint32_t prehash, const TKey& key, 
       const TValue& value);
-    // REMOVAL MIGHT BE BROKEN AND NEEDS TO BE CHECKED!!!
-    // DO I NEED TO MARK FORMALLY OCCUPIED?  PUT TOGETHER A TEST CASE FOR THIS.
-    //bool remove(const TKey& key);
-    //bool removePrehash(const uint32_t prehash, const TKey& key);
     bool lookup(const TKey& key, TValue& value) const;
     bool lookupPrehash(const uint32_t prehash, const TKey& key, TValue& value)
       const;
     void clear();  // O(m) - m is the number of buckets (potentially slow)
 
-    inline const Pair<TKey, TValue>* table() { return table_; }
-    inline const bool* bucket_full() { return bucket_full_; }
+    inline const Pair<TKey, TValue>* table() { return table_.get(); }
+    inline const bool* bucket_full() { return bucket_full_.get(); }
 
   protected:
     uint32_t size_;
     uint32_t count_;
-    Pair<TKey, TValue>* table_;
-    bool* bucket_full_;  // Array of booleans telling us if an item exists there
+    std::unique_ptr<Pair<TKey, TValue>[]> table_;
+    std::unique_ptr<bool[]> bucket_full_;  // Array telling us if an item exists 
     float load_factor_;
     static const float max_load_;
 
@@ -96,23 +88,20 @@ namespace data_str {
     load_factor_ = 0;
     count_ = 0;
     size_ = size;
-    if (size_ < 1) {
-      throw std::runtime_error(L"HashMapManaged<TKey, TValue>"
-        L"::HashMapManaged: size < 1");
-    }
-    table_ = new Pair<TKey, TValue>[size_];
-    bucket_full_ = new bool[size_];
-    memset(bucket_full_, false, size_*sizeof(bucket_full_[0]));
+    assert(size > 0);
+    table_.reset(new Pair<TKey, TValue>[size_]);
+    bucket_full_.reset(new bool[size_]);
+    memset(bucket_full_.get(), false, size_*sizeof(bucket_full_[0]));
   };
 
   template <class TKey, class TValue>
   void HashMapManaged<TKey, TValue>::rehash() {
-    // printf("HashMap rehash\n");
     uint32_t new_size = size_*2;
     new_size = static_cast<uint32_t>(math::NextPrime(new_size));
-    Pair<TKey, TValue>* new_table = new Pair<TKey, TValue>[new_size];
-    bool* new_bucket_full = new bool[new_size];
-    memset(new_bucket_full, false, new_size*sizeof(new_bucket_full[0]));
+    std::unique_ptr<Pair<TKey, TValue>[]> new_table(
+      new Pair<TKey, TValue>[new_size]);
+    std::unique_ptr<bool[]> new_bucket_full(new bool[new_size]);
+    memset(new_bucket_full.get(), false, new_size*sizeof(new_bucket_full[0]));
     // manually insert all the old key/value pairs into the hash table
     for (uint32_t j = 0; j < size_; j ++) {
       if (bucket_full_[j]) {
@@ -130,29 +119,23 @@ namespace data_str {
             value_inserted = true;
             break;
           }
-        }  // end for (uint32_t i = 0; i < size_; i ++)
-        if (!value_inserted) {
-          printf("HashMapManaged<TKey, TValue>::rehash - Couldn't insert a ");
-          printf("value!  This shouldn't happen.  Check hash table logic.\n");
-          throw std::runtime_error("HashMap::rehash: insert failed");
         }
+        
+        // If the following assert fails then we couldn't insert a value!  
+        // This shouldn't happen if the hash table logic above is correct.
+        assert(value_inserted);
       }  // end if (bucket_full_[i])
     }
     size_ = new_size;
-    delete[] table_;
-    delete[] bucket_full_;
-    table_ = new_table;
-    bucket_full_ = new_bucket_full;
+    table_.reset(nullptr);
+    bucket_full_.reset(nullptr);
+    table_ = std::move(new_table);
+    bucket_full_ = std::move(new_bucket_full);
   };
 
   template <class TKey, class TValue>
   HashMapManaged<TKey, TValue>::~HashMapManaged() {
-    if (table_) {
-      delete[] table_;
-    }
-    if (bucket_full_) {
-      delete[] bucket_full_;
-    }
+    // std::unique_ptr will clean up the class
   };
 
   template <class TKey, class TValue>
@@ -160,8 +143,8 @@ namespace data_str {
     if (table_) {
       // Nothing to do for non-pointer class
     }
-    if (bucket_full_) {
-      memset(bucket_full_, false, size_*sizeof(bucket_full_[0]));
+    if (bucket_full_.get()) {
+      memset(bucket_full_.get(), false, size_*sizeof(bucket_full_[0]));
     }
     load_factor_ = 0;
     count_ = 0;
@@ -200,32 +183,6 @@ namespace data_str {
     }
     return false;
   };
-
-  //template <class TKey, class TValue>
-  //bool HashMapManaged<TKey, TValue>::remove(const TKey& key) {
-  //  uint32_t hash = hash_func_(size_, key);
-  //  return removePrehash(hash, key);
-  //};
-
-  //template <class TKey, class TValue>
-  //bool HashMapManaged<TKey, TValue>::removePrehash(const uint32_t prehash, 
-  //  const TKey& key) {
-  //  for (uint32_t i = 0; i < size_; i ++) {
-  //    uint32_t hash = linearProbeFunc(prehash, i, size_);
-  //    if (!bucket_full_[hash]) {
-  //      return false;
-  //    } else {
-  //      if (table_[hash].first == key) {
-  //        bucket_full_[hash] = false;
-  //        count_--;
-  //        load_factor_ = static_cast<float>(count_) / 
-  //          static_cast<float>(size_);
-  //        return true;
-  //      }
-  //    }
-  //  }
-  //  return false;
-  //};
 
   template <class TKey, class TValue>
   bool HashMapManaged<TKey, TValue>::lookup(const TKey& key, TValue& value) 
@@ -273,23 +230,19 @@ namespace data_str {
     bool insert(const TKey& key, TValue* value);
     bool insertPrehash(const uint32_t prehash, const TKey& key, 
       TValue* value);
-    // REMOVAL MIGHT BE BROKEN AND NEEDS TO BE CHECKED!!!
-    // DO I NEED TO MARK FORMALLY OCCUPIED?  PUT TOGETHER A TEST CASE FOR THIS.
-    //bool remove(const TKey& key);
-    //bool removePrehash(const uint32_t prehash, const TKey& key);
     bool lookup(const TKey& key, TValue*& value) const;
     bool lookupPrehash(const uint32_t prehash, const TKey& key, TValue*& value)
       const;
     void clear();  // O(m) - m is the number of buckets (potentially slow)
 
-    inline const Pair<TKey, TValue*>* table() { return table_; }
-    inline const bool* bucket_full() { return bucket_full_; }
+    inline const Pair<TKey, TValue*>* table() { return table_.get(); }
+    inline const bool* bucket_full() { return bucket_full_.get(); }
 
   private:
     uint32_t size_;
     uint32_t count_;
-    Pair<TKey, TValue*>* table_;
-    bool* bucket_full_;  // Array of booleans telling us if an item exists
+    std::unique_ptr<Pair<TKey, TValue*>[]> table_;
+    std::unique_ptr<bool[]> bucket_full_;  // Array telling us if item exists
     float load_factor_;
     static const float max_load_;
 
@@ -319,29 +272,26 @@ namespace data_str {
     load_factor_ = 0;
     count_ = 0;
     size_ = size;
-    if (size_ < 1) {
-      throw std::runtime_error("HashMapManaged<TKey, TValue*>"
-        "::HashMapManaged: size < 1");
-    }
-    table_ = new Pair<TKey, TValue*>[size_];
+    assert(size_ > 0);
+    table_.reset(new Pair<TKey, TValue*>[size_]);
     for (uint32_t i = 0; i < size_; i ++) {
-      table_[i].second = NULL;
+      table_[i].second = nullptr;
     }
-    bucket_full_ = new bool[size_];
-    memset(bucket_full_, false, size_*sizeof(bucket_full_[0]));
+    bucket_full_.reset(new bool[size_]);
+    memset(bucket_full_.get(), false, size_*sizeof(bucket_full_[0]));
   };
 
   template <class TKey, class TValue>
   void HashMapManaged<TKey, TValue*>::rehash() {
-    // printf("HashMapManaged rehash\n");
     uint32_t new_size = size_*2;
     new_size = static_cast<uint32_t>(math::NextPrime(new_size));
-    Pair<TKey, TValue*>* new_table = new Pair<TKey, TValue*>[new_size];
+    std::unique_ptr<Pair<TKey, TValue*>[]> new_table(
+      new Pair<TKey, TValue*>[new_size]);
     for (uint32_t i = 0; i < new_size; i ++) {
-      new_table[i].second = NULL;
+      new_table[i].second = nullptr;
     }
-    bool* new_bucket_full = new bool[new_size];
-    memset(new_bucket_full, false, new_size*sizeof(new_bucket_full[0]));
+    std::unique_ptr<bool[]> new_bucket_full(new bool[new_size]);
+    memset(new_bucket_full.get(), false, new_size*sizeof(new_bucket_full[0]));
     // manually insert all the old key/value pairs into the hash table
     for (uint32_t j = 0; j < size_; j ++) {
       if (bucket_full_[j]) {
@@ -359,19 +309,18 @@ namespace data_str {
             value_inserted = true;
             break;
           }
-        }  // end for (uint32_t i = 0; i < size_; i ++)
-        if (!value_inserted) {
-          printf("HashMapManaged<TKey, TValue*>::rehash - Couldn't insert!  ");
-          printf("This shouldn't happen.  Check hash table logic.\n");
-          throw std::runtime_error("HashMapManaged::rehash: insert failed");
         }
+
+        // If the following assert fails then we couldn't insert a value!  
+        // This shouldn't happen if the hash table logic above is correct.
+        assert(value_inserted);
       }  // end if (bucket_full_[i])
     }
     size_ = new_size;
-    delete[] table_;
-    delete[] bucket_full_;
-    table_ = new_table;
-    bucket_full_ = new_bucket_full;
+    table_.reset(nullptr);
+    bucket_full_.reset(nullptr);
+    table_ = std::move(new_table);
+    bucket_full_ = std::move(new_bucket_full);
   };
 
   template <class TKey, class TValue>
@@ -379,18 +328,12 @@ namespace data_str {
     if (table_ && bucket_full_) {
       for (uint32_t i = 0; i < size_; i ++) {
         if (bucket_full_[i]) {
-          if (table_[i].second != NULL) {
+          if (table_[i].second != nullptr) {
             delete table_[i].second;
-            table_[i].second = NULL;
+            table_[i].second = nullptr;
           }
         }
       }
-    }
-    if (table_) {
-      delete[] table_;
-    }
-    if (bucket_full_) {
-      delete[] bucket_full_;
     }
   };
 
@@ -399,15 +342,15 @@ namespace data_str {
     if (table_ && bucket_full_) {
       for (uint32_t i = 0; i < size_; i ++) {
         if (bucket_full_[i]) {
-          if (table_[i].second != NULL) {
+          if (table_[i].second != nullptr) {
             delete table_[i].second;
-            table_[i].second = NULL;
+            table_[i].second = nullptr;
           }
         }
       }
     }
-    if (bucket_full_) {
-      memset(bucket_full_, false, size_*sizeof(bucket_full_[0]));
+    if (bucket_full_.get()) {
+      memset(bucket_full_.get(), false, size_*sizeof(bucket_full_[0]));
     }
     load_factor_ = 0;
     count_ = 0;
@@ -446,36 +389,6 @@ namespace data_str {
     }
     return false;
   };
-
-  //template <class TKey, class TValue>
-  //bool HashMapManaged<TKey, TValue*>::remove(const TKey& key) {
-  //  uint32_t hash = hash_func_(size_, key);
-  //  return removePrehash(hash, key);
-  //};
-
-  //template <class TKey, class TValue>
-  //bool HashMapManaged<TKey, TValue*>::removePrehash(const uint32_t prehash, 
-  //  const TKey& key) {
-  //  for (uint32_t i = 0; i < size_; i ++) {
-  //    uint32_t hash = linearProbeFunc(prehash, i, size_);
-  //    if (!bucket_full_[hash]) {
-  //      return false;
-  //    } else {
-  //      if (table_[hash].first == key) {
-  //        bucket_full_[hash] = false;
-  //        count_--;
-  //        if (table_[hash].second != NULL) {
-  //          delete table_[hash].second;
-  //          table_[hash].second = NULL;
-  //        }
-  //        load_factor_ = static_cast<float>(count_) / 
-  //          static_cast<float>(size_);
-  //        return true;
-  //      }
-  //    }
-  //  }
-  //  return false;
-  //};
 
   template <class TKey, class TValue>
   bool HashMapManaged<TKey, TValue*>::lookup(const TKey& key, TValue*& value) 

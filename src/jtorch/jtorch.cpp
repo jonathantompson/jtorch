@@ -5,12 +5,12 @@
 #include "jtorch/jtorch.h"
 #include <clBLAS.h>
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 namespace jtorch {
 
-  jcl::JCL* cl_context = NULL;
+  jcl::JCL* cl_context = nullptr;
   std::mutex cl_context_lock_;
   std::string jtorch_path;
 
@@ -51,7 +51,7 @@ namespace jtorch {
 
   void InitJTorch(const std::string& path_to_jtorch, const bool use_cpu) {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
-    if (cl_context != NULL) {
+    if (cl_context != nullptr) {
       throw std::runtime_error("jtorch::InitJTorch() - ERROR: Init called "
         "twice!");
     }
@@ -60,7 +60,7 @@ namespace jtorch {
 
   void InitJTorchSafe(const std::string& path_to_jtorch, const bool use_cpu) {
     std::lock_guard<std::mutex> lck(cl_context_lock_);
-    if (cl_context != NULL) {
+    if (cl_context != nullptr) {
       return;
     }
     InitJTorchInternal(path_to_jtorch, use_cpu);

@@ -8,11 +8,17 @@
 #include "test_unit/test_unit.h"
 #include "test_unit/test_util.h"
 
+// Test basic data structures and utilites.
 #include "test_callback.h"
 #include "test_callback_queue.h"
+#include "test_hash_map_managed.h"
+#include "test_pair.h"
 #include "test_thread.h"
 #include "test_thread_pool.h"
+#include "test_vector.h"
+#include "test_vector_managed.h"
 
+// Test a OpenCL kernel on CPU and GPU.
 #include "test_convolution.h"
 
 #include "debug_util.h"  // Must come last in .cpp with main

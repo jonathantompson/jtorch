@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -29,13 +29,13 @@ namespace jtorch {
     }
 
     kernel_ = Tensor<float>::clone(kernel);
-    kernel_norm_ = NULL;   // Normalization is input size dependant
+    kernel_norm_ = nullptr;   // Normalization is input size dependant
 
-    output = NULL;
-    std_coef_ = NULL;
-    std_pass1_ = NULL;
-    std_pass2_ = NULL;
-    std_ = NULL;
+    output = nullptr;
+    std_coef_ = nullptr;
+    std_pass1_ = nullptr;
+    std_pass2_ = nullptr;
+    std_ = nullptr;
 
     threshold_ = threshold;
   }
@@ -66,14 +66,14 @@ namespace jtorch {
         "3D input is expected!");
     }
 
-    if (output != NULL) {
+    if (output != nullptr) {
       if (!in.isSameSizeAs(*(Tensor<float>*)output)) {
         // Input dimension has changed!
         cleanup();
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       output = new Tensor<float>(in.dim(), in.size());
       std_pass1_ = new Tensor<float>(in.dim(), in.size());
       std_pass2_ = new Tensor<float>(in.dim(), in.size());
@@ -81,7 +81,7 @@ namespace jtorch {
       //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
       //  TO_TENSOR_PTR(output)->dim(), local_worgroup_size_3d);
     }
-    if (kernel_norm_ == NULL) {
+    if (kernel_norm_ == nullptr) {
       bool onedim_kernel = kernel_->dim() == 1;
       const float n_feats = (float)in.size()[2];
 
@@ -91,7 +91,7 @@ namespace jtorch {
       float div_val = onedim_kernel ? (sum * sqrtf(n_feats)) : (sum * n_feats);
       Tensor<float>::div(*kernel_norm_, div_val);
     }
-    if (std_coef_ == NULL) {
+    if (std_coef_ == nullptr) {
       uint32_t std_coeff_size[2];
       std_coeff_size[0] = TO_TENSOR_PTR(output)->size()[0];
       std_coeff_size[1] = TO_TENSOR_PTR(output)->size()[1];
@@ -159,7 +159,7 @@ namespace jtorch {
       delete[] std_coef_cpu;
       delete[] kernel_norm_cpu;
     }
-    if (std_ == NULL) {
+    if (std_ == nullptr) {
       uint32_t std_coeff_size[2];
       std_coeff_size[0] = TO_TENSOR_PTR(output)->size()[0];
       std_coeff_size[1] = TO_TENSOR_PTR(output)->size()[1];

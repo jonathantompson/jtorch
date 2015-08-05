@@ -3,9 +3,6 @@
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
-
 using std::runtime_error;
 using std::string;
 using std::cout;
@@ -17,7 +14,7 @@ namespace jcl {
 
   JCL::JCL(const CLDevice device, const CLVendor vendor, 
     const bool strict_float) {
-    context_ = NULL;
+    context_ = nullptr;
     device_ = device;
     vendor_ = vendor;
     strict_float_ = strict_float;
@@ -27,7 +24,7 @@ namespace jcl {
     // Aquire lock to prevent multiple initilizations:
     std::lock_guard<std::mutex> lock(context_lock_);
 
-    context_ = new OpenCLContext();
+    context_ .reset(new OpenCLContext());
     context_->createContext(device, vendor);
     context_->InitDevices(device);
     context_->createCommandQueues();  // For each device
@@ -35,7 +32,6 @@ namespace jcl {
 
   JCL::~JCL() {
     std::cout << "\tShutting down OpenCL Context..." << std::endl;
-    SAFE_DELETE(context_);
   }
   
   bool JCL::queryDeviceExists(const CLDevice device, const CLVendor vendor) {
@@ -237,7 +233,9 @@ namespace jcl {
     case CLDeviceAccelerator:
       return "CLDeviceDefault";
     default:
-      throw std::runtime_error("Bad CLDevice");
+      std::cout << "Bad CLDevice" << std::endl;
+      assert(false);
+      break;
     }
   }
 
@@ -252,7 +250,9 @@ namespace jcl {
     case CLDeviceIntel:
       return "CLDeviceIntel";
     default:
-      throw std::runtime_error("Bad CLVendor");
+      std::cout << "Bad CLVendor" << std::endl;
+      assert(false);
+      break;
     }
   }
 

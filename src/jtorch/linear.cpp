@@ -6,8 +6,8 @@
 #include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -96,8 +96,8 @@ namespace jtorch {
     cl_context->setArg(1, in.storage());
     cl_context->setArg(2, TO_TENSOR_PTR(output)->storage());
     float dummy; static_cast<void>(dummy);
-    // setArg with NULL --> Local memory allocation (per local workgroup)
-    cl_context->setArg(3, sizeof(dummy) * local_size[0] * local_size[1], NULL);
+    // setArg with nullptr --> Local memory allocation (per local workgroup)
+    cl_context->setArg(3, sizeof(dummy) * local_size[0] * local_size[1], nullptr);
     cl_context->setArg(4, (int)n_outputs_);
     cl_context->setArg(5, (int)n_inputs_);
     uint32_t dim = 2;

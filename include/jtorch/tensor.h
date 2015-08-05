@@ -24,7 +24,7 @@
 
 namespace jcl { namespace threading { class ThreadPool; } }
 
-#define TO_TENSOR_PTR(x) ((x)->type() == jtorch::TorchDataType::TENSOR_DATA ? (jtorch::Tensor<float>*)(x) : NULL)
+#define TO_TENSOR_PTR(x) ((x)->type() == jtorch::TorchDataType::TENSOR_DATA ? (jtorch::Tensor<float>*)(x) : nullptr)
 
 namespace jtorch {
   
@@ -103,7 +103,7 @@ namespace jtorch {
     // Default constructor returns an empty header.  Used internally (ie 
     // private).
     dim_ = 0;
-    size_ = NULL;
+    size_ = nullptr;
     storage_ = (jcl::JCLBuffer)-1;
   }
 
@@ -190,7 +190,7 @@ namespace jtorch {
     for (uint32_t i = 0; i < nelems(); i++) {
       max_val = std::max<T>(max_val, d[i]);
     }
-    T scale = (T)pow(10.0, floor(log10((double)max_val + EPSILON)));
+    T scale = (T)pow(10.0, floor(log10((double)max_val + kEpsilon)));
 
 #if defined(WIN32) || defined(_WIN32)
       std::cout.setf(0, std::ios::showpos);
@@ -201,7 +201,7 @@ namespace jtorch {
     if (dim_ == 1) {
       // Print a 1D tensor
       std::cout << "  tensor[*] =" << std::endl;
-      if (fabsf((float)scale - 1.0f) > EPSILON) {
+      if (fabsf((float)scale - 1.0f) > kEpsilon) {
         std::cout << " " << scale << " * " << std::endl;
       }
       std::cout.setf(std::ios::showpos);
@@ -217,7 +217,7 @@ namespace jtorch {
     } else if (dim_ == 2) {
       // Print a 2D tensor
       std::cout << "  tensor[*,*] =" << std::endl;
-      if (fabsf((float)scale - 1.0f) > EPSILON) {
+      if (fabsf((float)scale - 1.0f) > kEpsilon) {
         std::cout << " " << scale << " * " << std::endl;
       }
       std::cout.setf(std::ios::showpos);
@@ -255,7 +255,7 @@ namespace jtorch {
 
         std::cout << "*,*] =";
         std::cout << std::endl;
-        if (fabsf((float)scale - 1.0f) > EPSILON) {
+        if (fabsf((float)scale - 1.0f) > kEpsilon) {
           std::cout << " " << scale << " * " << std::endl;
         }
 
@@ -434,7 +434,7 @@ namespace jtorch {
 
   template <typename T>
   Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
-    Tensor<T>* new_tensor = NULL;
+    Tensor<T>* new_tensor = nullptr;
     std::ifstream ifile(file.c_str(), std::ios::in|std::ios::binary);
     if (ifile.is_open()) {
       ifile.seekg(0, std::ios::beg);

@@ -16,7 +16,7 @@ namespace threading {
     // Spawn worker threads
     stop_called_ = false;
     stop_finished_ = false;
-    thread_to_join_in_destructor_ = NULL;
+    thread_to_join_in_destructor_ = nullptr;
     num_workers_ = num_workers;
     worker_ids_ = new std::thread[num_workers_];
     stopCB_many_ = MakeCallableMany(&ThreadPool::stop, this);
@@ -29,7 +29,7 @@ namespace threading {
       Callback<void>* worker_callback_ =
       MakeCallableOnce(&ThreadPool::workerMain, this, i);
       worker_ids_[i] = MakeThread(worker_callback_);
-      idle_worker_tasks_[i] = NULL;
+      idle_worker_tasks_[i] = nullptr;
     }
     queue_lock_.unlock();
   }
@@ -146,7 +146,7 @@ namespace threading {
           // addTask wont update unless the worker thread is on the wait queue
           // (which it cannot be at this point).
           (*idle_worker_tasks_[thread_index])();
-          idle_worker_tasks_[thread_index] = NULL;
+          idle_worker_tasks_[thread_index] = nullptr;
           unique_lock.lock();
         }
       } else {

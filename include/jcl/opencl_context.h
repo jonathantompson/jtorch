@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <memory>
 #include "jcl/cl_include.h"
 #include "jcl/jcl.h"
 #include "jcl/opencl_kernel.h"
@@ -33,9 +34,9 @@ namespace jcl {
     cl::Context context;
     std::vector<cl::Device> devices;
     std::vector<cl::CommandQueue> queues;
-    jcl::data_str::HashMapManaged<std::string, OpenCLProgram*>* programs;  // Stored by filename
-    jcl::data_str::HashMapManaged<std::string, OpenCLKernel*>* kernels;  // Stored by (filename + kernel)
-    jcl::data_str::VectorManaged<OpenCLBufferData*>* buffers;
+    std::unique_ptr<jcl::data_str::HashMapManaged<std::string, OpenCLProgram*>> programs;  // Stored by filename
+    std::unique_ptr<jcl::data_str::HashMapManaged<std::string, OpenCLKernel*>> kernels;  // Stored by (filename + kernel)
+    std::unique_ptr<jcl::data_str::VectorManaged<OpenCLBufferData*>> buffers;
 
     static void CheckError(const cl_int err_code);
     static std::string GetCLErrorString(const cl::Error& err);
@@ -94,8 +95,8 @@ namespace jcl {
     uint32_t queryMaxWorkgroupSizeForCurKernel(const uint32_t device_index);
 
   private:
-    OpenCLProgram* cur_program_;
-    OpenCLKernel* cur_kernel_;
+    OpenCLProgram* cur_program_;  // Not owned here
+    OpenCLKernel* cur_kernel_;  // Now owned here
     jcl::data_str::Vector<int> devices_max_workgroup_size_;
     jcl::data_str::VectorManaged<uint32_t*> devices_max_workitem_size_;
 
@@ -114,10 +115,7 @@ namespace jcl {
 
   template <typename T>
   void OpenCLContext::setArg(const uint32_t index, const T& val) {
-    if (!cur_kernel_) {
-      throw std::runtime_error("OpenCLContext::setArg() - ERROR: You must "
-        "call OpenCL::useKernel() first!");
-    }
+    assert(cur_kernel_ != nullptr);  // You must call OpenCL::useKernel() first
     cur_kernel_->setArg(index, val);
   }
 
@@ -125,26 +123,19 @@ namespace jcl {
   void OpenCLContext::writeToBuffer(const T* data, 
     const uint32_t device_index, const JCLBuffer buffer, 
     const bool blocking) {
-#if defined(DEBUG) || defined(_DEBUG)
-    if (device_index >= devices.size()) {
-      throw std::runtime_error("runKernelxD() - ERROR: Invalid "
-        "device_index");
-    }
-    if ((uint32_t)buffer >= buffers->size()) {
-      throw std::runtime_error("runKernelxD() - ERROR: Invalid "
-        "buffer");
-    }
-#endif
+    assert(device_index < devices.size());
+    assert(static_cast<uint32_t>(buffer) < buffers->size());
     OpenCLBufferData* buf = (*buffers)[(uint32_t)buffer];
     cl::Event cur_event;
     try {
       queues[device_index].enqueueWriteBuffer(buf->buffer(), 
         blocking ? CL_TRUE : CL_FALSE, 0, 
         buf->nelems * sizeof(data[0]), data, 
-        NULL, &cur_event);
+        nullptr, &cur_event);
     } catch (cl::Error err) {
-      throw std::runtime_error(std::string("enqueueWriteBuffer failed: ") +
-        GetCLErrorString(err));
+      std::cout << "enqueueWriteBuffer failed: " 
+                << GetCLErrorString(err) << std::endl;
+      assert(false);
     }
     if (blocking) {
       cur_event.wait();
@@ -155,26 +146,19 @@ namespace jcl {
   void OpenCLContext::readFromBuffer(T* data, 
     const uint32_t device_index, const JCLBuffer buffer, 
     const bool blocking) {
-#if defined(DEBUG) || defined(_DEBUG)
-    if (device_index >= devices.size()) {
-      throw std::runtime_error("runKernelxD() - ERROR: Invalid "
-        "device_index");
-    }
-    if ((uint32_t)buffer >= buffers->size()) {
-      throw std::runtime_error("runKernelxD() - ERROR: Invalid "
-        "buffer");
-    }
-#endif
+    assert(device_index < devices.size());
+    assert(static_cast<uint32_t>(buffer) < buffers->size());
     OpenCLBufferData* buf = (*buffers)[(uint32_t)buffer];
     cl::Event cur_event;
     try {
       queues[device_index].enqueueReadBuffer(buf->buffer(), 
         blocking ? CL_TRUE : CL_FALSE, 0, 
         buf->nelems * sizeof(data[0]), data, 
-        NULL, &cur_event);
+        nullptr, &cur_event);
     } catch (cl::Error err) {
-      throw std::runtime_error(std::string("enqueueReadBuffer failed: ") +
-        GetCLErrorString(err));
+      std::cout << "enqueueReadBuffer failed: " 
+                << GetCLErrorString(err) << std::endl;
+      assert(false);
     }
     if (blocking) {
       cur_event.wait();

@@ -5,9 +5,6 @@
 //
 //  A simple wrapper around std::thread for spawning threads from a Callback<>
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <assert.h>
+#include <memory>
 #include <sstream>
 #include <string>
 #include "jcl/cl_include.h"
@@ -22,7 +24,8 @@ namespace jcl {
 
   struct OpenCLKernel {
   public:
-    OpenCLKernel(const std::string& kernel_name, OpenCLProgram* program);
+    OpenCLKernel(const std::string& kernel_name, 
+      OpenCLProgram* program);
     ~OpenCLKernel();
     
     template <typename T>
@@ -35,7 +38,7 @@ namespace jcl {
 
   private:
     std::string kernel_name_;
-    OpenCLProgram* program_;
+    OpenCLProgram* program_;  // Now owned here
     cl::Kernel kernel_;
 
     void compileKernel();
@@ -52,12 +55,12 @@ namespace jcl {
     } catch (cl::Error err) {
       // This would be nice but on gcc OpenCLContext is undefined and
       // we cannot just include it since it adds circular dependancies.
-      // throw std::wruntime_error(std::string("kernel_.setArg() failed: ") +
+      // throw std::runtime_error(std::string("kernel_.setArg() failed: ") +
       //   OpenCLContext::GetCLErrorString(err));
       // Instead let the user figure it out!
-      std::stringstream ss;
-      ss << "kernel_.setArg() failed: opencl error enum: " << err.err();
-      throw std::runtime_error(ss.str());
+      std::cout << "kernel_.setArg() failed: opencl error enum: " 
+                << err.err() << std::endl;
+      assert(false);
     }
   }
 

@@ -116,24 +116,24 @@ int main( void ) {
   cl_int err;
 
   cl_platform_id platform = 0;
-  cl_device_id device = NULL;
+  cl_device_id device = nullptr;
   cl_context_properties props[3] = { CL_CONTEXT_PLATFORM, 0, 0 };
   cl_context ctx = 0;
   cl_command_queue queue = 0;
   cl_mem bufA, bufB, bufC;
-  cl_event event = NULL;
+  cl_event event = nullptr;
   int ret = 0;
 
   /* Setup OpenCL environment. */
   cl_uint num_platforms;
-  err = clGetPlatformIDs( 1, NULL, &num_platforms );
+  err = clGetPlatformIDs( 1, nullptr, &num_platforms );
   cl_platform_id* platforms = new cl_platform_id[num_platforms];
   CheckError(err);
-  err = clGetPlatformIDs( num_platforms, platforms, NULL );
+  err = clGetPlatformIDs( num_platforms, platforms, nullptr );
   CheckError(err);
-  for (cl_uint i = 0; i < num_platforms && device == NULL; i++) {
-    err = clGetDeviceIDs( platforms[i], CL_DEVICE_TYPE_GPU, 1, &device, NULL );
-    if (err == CL_SUCCESS && device != NULL) {
+  for (cl_uint i = 0; i < num_platforms && device == nullptr; i++) {
+    err = clGetDeviceIDs( platforms[i], CL_DEVICE_TYPE_GPU, 1, &device, nullptr );
+    if (err == CL_SUCCESS && device != nullptr) {
       platform = platforms[i];
       break;
     }
@@ -142,7 +142,7 @@ int main( void ) {
 
   props[1] = (cl_context_properties)platform;
   delete[] platforms;
-  ctx = clCreateContext( props, 1, &device, NULL, NULL, &err );
+  ctx = clCreateContext( props, 1, &device, nullptr, nullptr, &err );
   CheckError(err);
   queue = clCreateCommandQueue( ctx, device, 0, &err );
   CheckError(err);
@@ -153,21 +153,21 @@ int main( void ) {
 
   /* Prepare OpenCL memory objects and place matrices inside them. */
   bufA = clCreateBuffer( ctx, CL_MEM_READ_ONLY, M * K * sizeof(*A),
-    NULL, &err );
+    nullptr, &err );
   CheckError(err);
   bufB = clCreateBuffer( ctx, CL_MEM_READ_ONLY, K * N * sizeof(*B),
-    NULL, &err );
+    nullptr, &err );
   CheckError(err);
   bufC = clCreateBuffer( ctx, CL_MEM_READ_WRITE, M * N * sizeof(*C),
-    NULL, &err );
+    nullptr, &err );
   CheckError(err);
 
   err = clEnqueueWriteBuffer( queue, bufA, CL_TRUE, 0,
-    M * K * sizeof( *A ), A, 0, NULL, NULL );
+    M * K * sizeof( *A ), A, 0, nullptr, nullptr );
   err = clEnqueueWriteBuffer( queue, bufB, CL_TRUE, 0,
-    K * N * sizeof( *B ), B, 0, NULL, NULL );
+    K * N * sizeof( *B ), B, 0, nullptr, nullptr );
   err = clEnqueueWriteBuffer( queue, bufC, CL_TRUE, 0,
-    M * N * sizeof( *C ), C, 0, NULL, NULL );
+    M * N * sizeof( *C ), C, 0, nullptr, nullptr );
 
   const double t_test = 5.0;
   std::cout << "Profiling clBLAS for " << t_test << " seconds" << std::endl;
@@ -183,7 +183,7 @@ int main( void ) {
       alpha, bufA, 0, lda,
       bufB, 0, ldb, beta,
       bufC, 0, ldc,
-      1, &queue, 0, NULL, &event );
+      1, &queue, 0, nullptr, &event );
     CheckError(err);
 
     /* Wait for calculations to be finished. */
@@ -201,7 +201,7 @@ int main( void ) {
   /* Fetch results of calculations from GPU memory. */
   err = clEnqueueReadBuffer( queue, bufC, CL_TRUE, 0,
     M * N * sizeof(*result),
-    result, 0, NULL, NULL );
+    result, 0, nullptr, nullptr );
   CheckError(err);
 
   /* Release OpenCL memory objects. */

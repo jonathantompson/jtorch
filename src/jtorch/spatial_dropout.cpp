@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -17,7 +17,7 @@ using namespace jcl;
 namespace jtorch {
 
   SpatialDropout::SpatialDropout(const float p) : TorchStage() {
-    output = NULL;
+    output = nullptr;
     p_ = p;
   }
 
@@ -31,12 +31,12 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
-    if (output != NULL) {
+    if (output != nullptr) {
       if (!TO_TENSOR_PTR(output)->isSameSizeAs((Tensor<float>&)input)) {
         SAFE_DELETE(output);
       }
     }
-    if (output == NULL) {
+    if (output == nullptr) {
       output = Tensor<float>::clone((Tensor<float>&)input);
     }
   }

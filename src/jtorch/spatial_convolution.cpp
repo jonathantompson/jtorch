@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -25,7 +25,7 @@ namespace jtorch {
     feats_out_ = feats_out;
     padding_ = padding;
 
-    output = NULL;
+    output = nullptr;
 
     uint32_t dim = 4;
     uint32_t size[4] = {filt_width_, filt_height_, feats_in_, feats_out_};
@@ -60,7 +60,7 @@ namespace jtorch {
       throw std::runtime_error("SpatialConvolution::init() - ERROR: "
         "incorrect number of input features!");
     }
-    if (output != NULL) {
+    if (output != nullptr) {
       uint32_t owidth = in.size()[0] - filt_width_ + 1 + 2 * padding_;
       uint32_t oheight  = in.size()[1] - filt_height_ + 1 + 2 * padding_;
       const uint32_t* out_size = TO_TENSOR_PTR(output)->size();
@@ -69,7 +69,7 @@ namespace jtorch {
         SAFE_DELETE(output);
       }
     }
-    if (output == NULL) {
+    if (output == nullptr) {
       uint32_t out_dim[3];
       out_dim[0] = in.size()[0] - filt_width_ + 1 + 2 * padding_;
       out_dim[1] = in.size()[1] - filt_height_ + 1 + 2 * padding_;

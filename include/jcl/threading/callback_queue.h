@@ -6,12 +6,10 @@
 //  This is a NON-THREADSAFE templatized queue of pointers used for storing the
 //  pending callbacks for execution in the class ThreadPool
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
+#include <assert.h>
 #include <iostream>  // For std::cout
 #include <string>
 #include "jcl/threading/callback_queue_item.h"
@@ -57,8 +55,8 @@ namespace threading {
   
   template <typename T>
   CallbackQueue<T>::CallbackQueue() {
-    head_ = NULL;
-    tail_ = NULL;
+    head_ = nullptr;
+    tail_ = nullptr;
     num_elements_ = 0;
   }
   
@@ -70,12 +68,12 @@ namespace threading {
   template <typename T>
   void CallbackQueue<T>::clear() {
     CallbackQueueItem<T>* old_head;
-    while (head_ != NULL) {
+    while (head_ != nullptr) {
       old_head = head_;
       head_ = head_->next;
       delete old_head;
     }
-    tail_ = NULL;
+    tail_ = nullptr;
     num_elements_ = 0;
   }
   
@@ -87,9 +85,9 @@ namespace threading {
   template <typename T>
   void CallbackQueue<T>::enqueue(const T& newItem) {
     CallbackQueueItem<T>* p_cur_item = new CallbackQueueItem<T>(newItem);
-    if (head_ == NULL)
+    if (head_ == nullptr)
       head_ = p_cur_item;
-    if (tail_ != NULL)
+    if (tail_ != nullptr)
       tail_->next = p_cur_item;
     tail_ = p_cur_item;
     num_elements_++;
@@ -97,15 +95,12 @@ namespace threading {
   
   template <typename T>
   T CallbackQueue<T>::dequeue() {
-    if (head_ == NULL) {  // queue is empty
-      throw std::runtime_error(std::string("CallbackQueue<T>::dequeue() - ") + 
-        std::string("ERROR: Trying to dequeue from an empty queue!"));
-    }
+    assert(head_ != nullptr);  //  Trying to dequeue from an empty queue
     T ret_val = head_->data;
     if (head_ == tail_) {  // one element left in the queue
       delete head_;
-      head_ = NULL;
-      tail_ = NULL;
+      head_ = nullptr;
+      tail_ = nullptr;
     } else {  // more than one element left in the queue
       CallbackQueueItem<T>* old_head = head_;
       head_ = head_->next;
@@ -117,23 +112,20 @@ namespace threading {
   
   template <typename T>
   T CallbackQueue<T>::peak() {
-    if (head_ == NULL) {  // queue is empty
-      throw std::runtime_error(std::string("CallbackQueue<T>::peak() - ") + 
-        std::string("ERROR: Trying to peak from an empty queue!"));      
-    }
+    assert(head_ != nullptr);  //  Trying to peak from an empty queue
     return head_->data;
   }
   
   template <typename T>
   bool CallbackQueue<T>::empty() const {
-    return head_ == NULL;
+    return head_ == nullptr;
   }
   
   template <typename T>
   void CallbackQueue<T>::printQueue() const {
     CallbackQueueItem<T>* p_cur_item = head_;
     std::cout << "Queue contents: ";
-    while (p_cur_item != NULL) {
+    while (p_cur_item != nullptr) {
       std::cout << p_cur_item->data << " ";
       p_cur_item = p_cur_item->next;
     }

@@ -3,9 +3,9 @@
 #include "jcl/opencl_program.h"
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_FREE(x) if (x != NULL) { free(x); x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_FREE(x) if (x != nullptr) { free(x); x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using std::string;
 using std::runtime_error;
@@ -15,7 +15,7 @@ namespace jcl {
   OpenCLKernel::OpenCLKernel(const std::string& kernel_name, 
     OpenCLProgram* program) {
     kernel_name_ = kernel_name;
-    program_ = program;
+    program_ = program;  // Ownership is NOT transferred
     compileKernel();
   }
 
@@ -27,8 +27,9 @@ namespace jcl {
     try {
       kernel_ = cl::Kernel(program_->program(), kernel_name_.c_str());
     } catch (cl::Error err) {
-      throw runtime_error(string("cl::Kernel() failed: ") + 
-        OpenCLContext::GetCLErrorString(err));
+      std::cout << "cl::Kernel() failed: " 
+                << OpenCLContext::GetCLErrorString(err) << std::endl;
+      assert(false);
     }
   }
 
@@ -37,8 +38,9 @@ namespace jcl {
     try {
       kernel_.setArg(index, size, data);
     } catch (cl::Error err) {
-      throw runtime_error(std::string("kernel_.setArgNull() failed: ") + 
-        OpenCLContext::GetCLErrorString(err));
+      std::cout << "kernel_.setArgNull() failed: " 
+                << OpenCLContext::GetCLErrorString(err) << std::endl;
+      assert(false);
     }
   }
 

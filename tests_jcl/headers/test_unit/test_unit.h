@@ -79,10 +79,10 @@ TestRegistry::TestRegistry() {
   args_.addParam("listcases", "false", "list the test cases for this test");
 }
 
-TestRegistry* TestRegistry::instance_ = NULL;
+TestRegistry* TestRegistry::instance_ = nullptr;
 
 TestRegistry* TestRegistry::getInstance() {
-  if (instance_ == NULL) instance_ = new TestRegistry;
+  if (instance_ == nullptr) instance_ = new TestRegistry;
   return instance_;
 }
 
@@ -149,7 +149,7 @@ int TestRegistry::runAndResetWithArgs(int argc, char* argv[]) {
   bool exit = false;
   TESTS_exit_on_fatal = false;
 
-  if (argv != NULL && !args_.parseArgv(argc, argv)) {
+  if (argv != nullptr && !args_.parseArgv(argc, argv)) {
     args_.printUsage();
     errors += 1 /* one error, parsing */;
     exit = true;
@@ -177,7 +177,7 @@ int TestRegistry::runAndResetWithArgs(int argc, char* argv[]) {
   }
   tests_.clear();
   TestRegistry* me = instance_;
-  instance_ = NULL;
+  instance_ = nullptr;
   delete me;
 
   return errors;
@@ -269,7 +269,7 @@ private: \
   \
   void TEST_CLASS_NAME(test_group, test_name)::clear() { \
   TestCase* me = me_; \
-  me_ = NULL; \
+  me_ = nullptr; \
   delete me; \
 } \
   \

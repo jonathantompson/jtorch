@@ -10,9 +10,6 @@
 //  these callback wrappers allows us to call a thread on a class's non-static
 //  member function.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

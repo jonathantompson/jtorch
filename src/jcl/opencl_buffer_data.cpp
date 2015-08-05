@@ -2,9 +2,10 @@
 #include <iostream>
 #include "jcl/opencl_context.h"
 #include "jcl/opencl_buffer_data.h"
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_FREE(x) if (x != NULL) { free(x); x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_FREE(x) if (x != nullptr) { free(x); x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::data_str;
 using std::runtime_error;
@@ -46,14 +47,13 @@ namespace jcl {
       flags |= CL_MEM_READ_WRITE;
       break;
     default:
-      throw runtime_error("OpenCLBufferData::OpenCLBufferData() - "
-        "ERROR: Memory type not supported!");
+      std::cout << "OpenCLBufferData::OpenCLBufferData() - "
+        "ERROR: Memory type not supported!" << std::endl;
+      assert(false);
     }
 
-    if (nelems == 0) {
-      throw runtime_error("OpenCLBufferData::OpenCLBufferData() - "
-        "ERROR: Zero size buffer cannot be allocated!!");
-    }
+    // Zero size buffer cannot be allocated!
+    assert(nelems > 0);
 
     buffer_.push_back(cl::Buffer(context, flags, sizeof(cl_float) * nelems));
     nelems_allocated_ += nelems;
@@ -77,17 +77,15 @@ namespace jcl {
 
   void OpenCLBufferData::addReference() {
     std::lock_guard<std::mutex> guard(lock_);
-    if (reference_count_ <= 0 || buffer_.size() <= 0) {
-      throw std::runtime_error("Trying to add reference to a released buffer!");
-    }
+    // Check we're not trying to add reference to a released buffer!
+    assert(reference_count_ > 0 && buffer_.size() > 0);
     reference_count_++;
   }
 
   void OpenCLBufferData::releaseReference() {
     std::lock_guard<std::mutex> guard(lock_);
-    if (reference_count_ <= 0 || buffer_.size() <= 0) {
-      throw std::runtime_error("Trying to release reference to a released buffer!");
-    }
+    // Check we're not trying to add reference to a released buffer!
+    assert(reference_count_ > 0 && buffer_.size() > 0);
     reference_count_--;
     if (reference_count_ <= 0) {
       buffer_.clear();
@@ -100,9 +98,8 @@ namespace jcl {
 
   cl::Buffer& OpenCLBufferData::buffer() {
     std::lock_guard<std::mutex> guard(lock_);
-    if (reference_count_ <= 0 || buffer_.size() <= 0) {
-      throw std::runtime_error("Trying to access a released buffer!");
-    }
+    // Check we're not trying to access a released buffer!
+    assert(reference_count_ > 0 && buffer_.size() > 0);
     return buffer_[0];
   }
 

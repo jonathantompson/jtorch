@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -17,7 +17,7 @@ namespace jtorch {
   Sequential::Sequential() {
     // Create an empty container
     network_ = new VectorManaged<TorchStage*>(1);
-    output = NULL;
+    output = nullptr;
   }
 
   Sequential::~Sequential() {
@@ -48,7 +48,7 @@ namespace jtorch {
   }
 
   void Sequential::forwardProp(TorchData& input) {
-    if (network_ == NULL) {
+    if (network_ == nullptr) {
       throw std::runtime_error("Sequential::forwardProp() - ERROR: "
         "Network is empty!");
     }

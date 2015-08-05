@@ -11,9 +11,9 @@ namespace tests {
 
   // LogWriter static state
   bool LogWriter::init_control_ = true;
-  LogWriter*     LogWriter::instance_ = NULL;
+  LogWriter*     LogWriter::instance_ = nullptr;
 
-  LogWriter::LogWriter() : log_file_(NULL) {}
+  LogWriter::LogWriter() : log_file_(nullptr) {}
 
   LogWriter::~LogWriter() {
     fclose(log_file_);
@@ -38,7 +38,7 @@ namespace tests {
 #else
     log_file_ = fopen("log.txt", "w");
 #endif
-    if (log_file_ == NULL) {
+    if (log_file_ == nullptr) {
       perror("Could not create a log file");
       return false;
     }
@@ -48,7 +48,7 @@ namespace tests {
   void LogWriter::write(const string& msg) {
     m_.lock();
 
-    if ((log_file_ == NULL) && !createFile()) {
+    if ((log_file_ == nullptr) && !createFile()) {
       // If the log file is not there, there is no way to log a
       // message. We'll try to create a new one in the next write() in
       // the hopes that this is a transient error.

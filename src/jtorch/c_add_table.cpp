@@ -7,8 +7,8 @@
 #include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -17,7 +17,7 @@ using namespace jcl::data_str;
 namespace jtorch {
 
   CAddTable::CAddTable() {
-    output = NULL;
+    output = nullptr;
   }
 
   CAddTable::~CAddTable() {
@@ -58,7 +58,7 @@ namespace jtorch {
       }
     }
 
-    if (output == NULL || 
+    if (output == nullptr || 
       !TO_TENSOR_PTR(in(0))->isSameSizeAs(*TO_TENSOR_PTR(output))) {
       // Reinitialize the output Tensor
       SAFE_DELETE(output);

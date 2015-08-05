@@ -16,8 +16,10 @@
 
 #pragma once
 
-#include <string>
+#include <memory>
 #include <mutex>
+#include <string>
+
 #include "jcl/math/math_types.h"
 
 namespace jcl {
@@ -95,7 +97,7 @@ namespace jcl {
 
     // Set the current Kernel
     void useKernel(const char* filename, const char* kernel_name);  // USE THIS VERSION
-    void useKernelCStr(const char* kernel_c_str, const char* kernel_name);  // SLOWER WHEN SWITCHING
+    void useKernelCStr(const char* kernel_c_str, const char* kernel_name);  // SLOWER
 
     // Set an argument for the current kernel.
     // --> Unfortunately, this cannot be templatized since it would expose 
@@ -146,7 +148,7 @@ namespace jcl {
     bool strict_float_;
     CLDevice device_;
     CLVendor vendor_;
-    OpenCLContext* context_;
+    std::unique_ptr<OpenCLContext> context_;
     static std::mutex context_lock_;  // For creating contexts
 
     // Non-copyable, non-assignable.

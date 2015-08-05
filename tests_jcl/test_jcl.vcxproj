@@ -106,6 +106,8 @@
     <ClInclude Include="headers\test_callback.h" />
     <ClInclude Include="headers\test_callback_queue.h" />
     <ClInclude Include="headers\test_convolution.h" />
+    <ClInclude Include="headers\test_hash_map_managed.h" />
+    <ClInclude Include="headers\test_pair.h" />
     <ClInclude Include="headers\test_thread.h" />
     <ClInclude Include="headers\test_thread_pool.h" />
     <ClInclude Include="headers\test_unit\log_message.h" />
@@ -113,6 +115,8 @@
     <ClInclude Include="headers\test_unit\param_map.h" />
     <ClInclude Include="headers\test_unit\test_unit.h" />
     <ClInclude Include="headers\test_unit\test_util.h" />
+    <ClInclude Include="headers\test_vector.h" />
+    <ClInclude Include="headers\test_vector_managed.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\debug_util_win32.cpp" />

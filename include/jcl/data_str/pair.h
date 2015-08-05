@@ -3,9 +3,6 @@
 //
 //  Created by Jonathan Tompson on 4/26/12.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

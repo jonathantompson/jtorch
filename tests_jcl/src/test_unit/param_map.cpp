@@ -35,7 +35,7 @@ namespace tests {
   bool ParamMap::getParam(const string& param, string* value) const {
     // The 'value' parameter is optional.
     string dummy;
-    if (value == NULL) {
+    if (value == nullptr) {
       value = &dummy;
     }
 

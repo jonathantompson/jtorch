@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -16,7 +16,7 @@ using namespace jcl::data_str;
 namespace jtorch {
 
   Tanh::Tanh() : TorchStage() {
-    output = NULL;
+    output = nullptr;
   }
 
   Tanh::~Tanh() {
@@ -29,13 +29,13 @@ namespace jtorch {
     }
     Tensor<float>& in = (Tensor<float>&)input;
     Tensor<float>* out = (Tensor<float>*)output;
-    if (output != NULL) {
+    if (output != nullptr) {
       if (!out->isSameSizeAs(in)) {
         // Input dimension has changed!
         SAFE_DELETE(output);
       }
     }
-    if (output == NULL) {
+    if (output == nullptr) {
       output = new Tensor<float>(in.dim(), in.size());
       //cl_context->getOptimalLocalWorkgroupSizes(deviceid, 
       //  TO_TENSOR_PTR(output)->dim(), local_worgroup_size);

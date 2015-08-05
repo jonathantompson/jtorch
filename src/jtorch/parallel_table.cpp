@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -18,12 +18,12 @@ namespace jtorch {
   ParallelTable::ParallelTable() {
     // Create an empty container
     network_ = new VectorManaged<TorchStage*>(1);
-    output = NULL;
+    output = nullptr;
   }
 
   ParallelTable::~ParallelTable() {
     SAFE_DELETE(network_);
-    if (output != NULL) {
+    if (output != nullptr) {
       Table* out = (Table*)output;
       out->clearNoDelete();  // Remove the pointers without freeing memory
                              // Since they don't belong to this table.
@@ -33,7 +33,7 @@ namespace jtorch {
 
   void ParallelTable::add(TorchStage* stage) {
     network_->pushBack(stage);
-    output = NULL;
+    output = nullptr;
   }
 
   const uint32_t ParallelTable::size() const {
@@ -52,7 +52,7 @@ namespace jtorch {
   }
 
   void ParallelTable::initOutput() {
-    if (output == NULL) {
+    if (output == nullptr) {
       output = new Table();
     }
 
@@ -81,7 +81,7 @@ namespace jtorch {
   }
 
   uint32_t ParallelTable::numBanks() const {
-    if (network_ == NULL) {
+    if (network_ == nullptr) {
       throw std::runtime_error("Parallel::output() - ERROR: "
         "Network is empty!");
     }
@@ -89,7 +89,7 @@ namespace jtorch {
   }
 
   TorchStage* ParallelTable::get(const uint32_t i) {
-    if (network_ == NULL) {
+    if (network_ == nullptr) {
       throw std::runtime_error("Parallel::output() - ERROR: "
         "Network is empty!");
     }

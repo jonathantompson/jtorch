@@ -3,9 +3,6 @@
 //
 //  Created by Jonathan Tompson on 7/10/12.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
@@ -16,7 +13,7 @@ namespace threading {
   template <class T>
   struct CallbackQueueItem {
     explicit CallbackQueueItem(const T& value) {
-      next = NULL;
+      next = nullptr;
       data = value;
     }
     CallbackQueueItem* next;

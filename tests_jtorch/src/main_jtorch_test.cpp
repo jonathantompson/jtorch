@@ -492,7 +492,7 @@ int main(int argc, char *argv[]) {
         ss << "./test_data/big_model_input_bank" << i << ".bin";
         Table* cur_table = new Table();
         cur_table->add(Tensor<float>::loadFromFile(ss.str()));
-        cur_table->add(NULL);
+        cur_table->add(nullptr);
         input->add(cur_table);
       }
 

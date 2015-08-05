@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::data_str;
@@ -18,8 +18,8 @@ namespace jtorch {
   SpatialUpSamplingNearest::SpatialUpSamplingNearest(const int32_t scale) 
     : TorchStage() {
     scale_ = scale;
-    output = NULL;
-    out_size_ = NULL;
+    output = nullptr;
+    out_size_ = nullptr;
   }
 
   SpatialUpSamplingNearest::~SpatialUpSamplingNearest() {
@@ -41,12 +41,12 @@ namespace jtorch {
         "Input must be 2D or larger!");
     }
 
-    if (output != NULL && in.dim() != out->dim()) {
+    if (output != nullptr && in.dim() != out->dim()) {
       SAFE_DELETE(output);
     }
 
     // Check that the inner 2 dimensions differ by a single scale
-    if (output != NULL) {
+    if (output != nullptr) {
       if (in.size()[0] * scale_ != out->size()[0] || 
           in.size()[1] * scale_ != out->size()[1]) {
         SAFE_DELETE(output);
@@ -54,15 +54,15 @@ namespace jtorch {
     }
 
     // Check that the remaining dimensions are the same size
-    if (output != NULL) {
-      for (uint32_t i = 2; i < in.dim() && output != NULL; i++) {
+    if (output != nullptr) {
+      for (uint32_t i = 2; i < in.dim() && output != nullptr; i++) {
         if (in.size()[i] != out->size()[i]) {
           SAFE_DELETE(output);
         }
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       uint32_t* out_size = new uint32_t[in.dim()];
       memcpy(out_size, in.size(), sizeof(out_size[0]) * in.dim());
       out_size[0] *= scale_;

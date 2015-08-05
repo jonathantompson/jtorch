@@ -5,9 +5,6 @@
 //
 //  getTime() is threadsafe
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

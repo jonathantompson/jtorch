@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -18,7 +18,7 @@ namespace jtorch {
     odim_ = dim;
     osize_ = new uint32_t[odim_];
     memcpy(osize_, size, sizeof(osize_[0]) * odim_);
-    output = NULL;
+    output = nullptr;
   }
 
   Reshape::~Reshape() {
@@ -49,7 +49,7 @@ namespace jtorch {
       throw std::runtime_error("Reshape::init() - Bad input size!");
     }
 
-    if (output != NULL) {
+    if (output != nullptr) {
       Tensor<float>* out = (Tensor<float>*)output;
       if (out->storage() != in.storage()) {
         // The tensors don't share the same storage! Reinitialize the view.
@@ -57,7 +57,7 @@ namespace jtorch {
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       output = in.view(odim_, osize_);  // rets header that uses same storage
     }
   }

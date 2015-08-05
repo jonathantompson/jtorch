@@ -11,15 +11,10 @@
 //        Also, set(i, ...) will free anything that is in index i before
 //        writting to that index.
 //
-//        BOUNDS CHECKS ONLY PERFORMED ON _DEBUG builds.
-//
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 
-#include <stdio.h>  // For printf()
+#include <assert.h>
 #include "jcl/math/int_types.h"  // for uint
 
 namespace jcl {
@@ -55,7 +50,7 @@ namespace data_str {
 
   template <typename T>
   VectorManaged<T>::VectorManaged(const uint32_t capacity) {  // capacity = 0
-    pvec_ = NULL;
+    pvec_ = nullptr;
     capacity_ = 0;
     size_ = 0;
     if (capacity != 0) {
@@ -69,12 +64,8 @@ namespace data_str {
       for (uint32_t i = 0; i < capacity_; i ++) {
         (&pvec_[i])->~T();  // Call the destructor on each element of the array
       }
-#ifdef _WIN32
-      _aligned_free(pvec_); 
-#else
       free(pvec_); 
-#endif
-      pvec_ = NULL; 
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
     size_ = 0;
@@ -85,20 +76,11 @@ namespace data_str {
     if (capacity != capacity_ && capacity != 0) {
       T* pvec_old = pvec_;
 
-#ifdef _WIN32
       T dummy;
-      static_cast<void>(dummy);  // Get rid of unreference local variable warn
-      void* temp = NULL;
-      temp = _aligned_malloc(capacity * sizeof(dummy), ALIGNMENT);
-#else
-      T dummy;
-      void* temp = NULL;
+      void* temp = nullptr;
       temp = malloc(capacity * sizeof(dummy));
-#endif
 
-      if (temp == NULL) { 
-        throw std::runtime_error("VectorManaged<T>::capacity: Malloc Failed.");
-      }
+      assert(temp != nullptr);
 
       // Use placement new to call the constructors for the array
       pvec_ = reinterpret_cast<T*>(temp);
@@ -117,12 +99,8 @@ namespace data_str {
           }
         }
 
-#ifdef _WIN32
-        _aligned_free(pvec_old); 
-#else
         free(pvec_old); 
-#endif
-        pvec_old = NULL;
+        pvec_old = nullptr;
       }
 
       capacity_ = capacity;
@@ -141,12 +119,8 @@ namespace data_str {
       for (uint32_t i = 0; i < capacity_; i ++) {
         (&pvec_[i])->~T();  // explicitly call the destructor on each element
       }
-#ifdef _WIN32
-      _aligned_free(pvec_); 
-#else
-      free(pvec_);
-#endif      
-      pvec_ = NULL; 
+      free(pvec_);   
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
   };
@@ -163,10 +137,8 @@ namespace data_str {
   
   template <typename T>
   void VectorManaged<T>::popBack() {
-    if (size_ > 0)
-      size_ -= 1;  // just reduce the size_ by 1
-    else
-      throw std::runtime_error("VectorManaged<T>::popBack: Out of bounds");
+    assert(size_ > 0);
+    size_ -= 1;  // just reduce the size_ by 1
   };
 
   template <typename T>
@@ -176,51 +148,32 @@ namespace data_str {
 
   template <typename T>
   T* VectorManaged<T>::at(const uint32_t index ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return &pvec_[index];
   };
 
   template <typename T>
   T VectorManaged<T>::operator[](const uint32_t index) const { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   T& VectorManaged<T>::operator[](const uint32_t index) { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   void VectorManaged<T>::set(const uint32_t index, const T& val ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     pvec_[index] = val;
   };
 
   template <typename T>
   void VectorManaged<T>::resize(const uint32_t size) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if ( size > capacity_ || size < 0 ) { 
-      throw std::runtime_error("VectorManaged<T>::resize: Out of bounds");
-    } else { 
-#endif
-      size_ = size; 
-#if defined(_DEBUG) || defined(DEBUG)
-    } 
-#endif
+    assert(size <= capacity_);
+    size_ = size; 
   };   
 
   template <typename T>
@@ -256,11 +209,7 @@ namespace data_str {
 
   template <typename T>
   void VectorManaged<T>::deleteAtAndShift(const uint32_t index) {
-#ifdef _DEBUG
-    if (index > (size_-1)) {
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-    }
-#endif
+    assert(index < size_);
     for (uint32_t i = index; i < size_-1; i++) {
       pvec_[i] = pvec_[i+1];
     }
@@ -302,7 +251,7 @@ namespace data_str {
 
   template <typename T>
   VectorManaged<T*>::VectorManaged(const uint32_t capacity) {  // capacity = 0
-    pvec_ = NULL;
+    pvec_ = nullptr;
     capacity_ = 0;
     size_ = 0;
     if (capacity != 0) {
@@ -316,15 +265,11 @@ namespace data_str {
       for (uint32_t i = 0; i < capacity_; i ++) {
         if (pvec_[i]) {
           delete pvec_[i];  // Call the destructor on each element of the array
-          pvec_[i] = NULL;
+          pvec_[i] = nullptr;
         }
       }
-#ifdef _WIN32     
-      _aligned_free(pvec_); 
-#else
       free(pvec_);      
-#endif
-      pvec_ = NULL; 
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
     size_ = 0;
@@ -335,25 +280,13 @@ namespace data_str {
     if (capacity != capacity_ && capacity != 0) {
       T** pvec_old = pvec_;
 
-#ifdef _WIN32
-      T* dummy;
-      dummy = NULL;
-      void ** temp = NULL;
-      temp = reinterpret_cast<void**>(_aligned_malloc(capacity * 
-                                                      sizeof(dummy), 
-                                                      16));
-#else
       T** temp = new T*[capacity];
-#endif
-
-      if (temp == NULL) { 
-        throw std::runtime_error("VectorManaged<T>::capacity: Malloc Failed.");
-      }
+      assert(temp != nullptr);
 
       // Zero the array elements
       pvec_ = (T**)(temp);  // cannot use reinterpret case in case of const T
       for (uint32_t i = 0; i < capacity; i ++) {
-        pvec_[i] = NULL;
+        pvec_[i] = nullptr;
       }
 
       if (pvec_old) {
@@ -367,12 +300,8 @@ namespace data_str {
           }
         }
 
-#ifdef _WIN32
-        _aligned_free(pvec_old); 
-#else
         free(pvec_old);
-#endif
-        pvec_old = NULL;
+        pvec_old = nullptr;
       }
 
       capacity_ = capacity;
@@ -392,15 +321,11 @@ namespace data_str {
       for (uint32_t i = 0; i < capacity_; i ++) {
         if (pvec_[i]) {
           delete pvec_[i];  // delete each element
-          pvec_[i] = NULL;
+          pvec_[i] = nullptr;
         }
       }
-#ifdef _WIN32
-      _aligned_free(pvec_); 
-#else
       free(pvec_);
-#endif
-      pvec_ = NULL; 
+      pvec_ = nullptr; 
     }
     capacity_ = 0;
   };
@@ -417,94 +342,68 @@ namespace data_str {
   
   template <typename T>
   void VectorManaged<T*>::popBack() {
-    if (size_ > 0) {
-      if (pvec_[size_-1]) {
-        delete pvec_[size_-1];
-        pvec_[size_-1] = NULL;
-      }
-      size_ -= 1;
-    } else {
-      throw std::runtime_error("VectorManaged<T>::popBack: Out of bounds");
+    assert(size_ > 0);
+    if (pvec_[size_-1]) {
+      delete pvec_[size_-1];
+      pvec_[size_-1] = nullptr;
     }
+    size_ -= 1;
   };
 
   template <typename T>
   void VectorManaged<T*>::popBackUnsafe() {
     if (pvec_[size_-1]) {
       delete pvec_[size_-1];
-      pvec_[size_-1] = NULL;
+      pvec_[size_-1] = nullptr;
     }
     size_ -= 1;
   };
 
   template <typename T>
   T** VectorManaged<T*>::at(const uint32_t index ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return &pvec_[index];
   };
 
   template <typename T>
   T* VectorManaged<T*>::operator[](const uint32_t index) const { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   T*& VectorManaged<T*>::operator[](const uint32_t index) { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("Vector<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     return pvec_[index]; 
   };
 
   template <typename T>
   void VectorManaged<T*>::set(const uint32_t index, T * const val ) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1))
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-#endif
+    assert(index < size_);
     pvec_[index] = val;
   };
 
   template <typename T>
   void VectorManaged<T*>::deleteAt(const uint32_t index) {
-#if defined(_DEBUG) || defined(DEBUG)
-    if (index > (size_-1)) {
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-    }
-#endif
+    assert(index < size_);
     if (pvec_[index]) {
       delete pvec_[index];
-      pvec_[index] = NULL;
+      pvec_[index] = nullptr;
     }
   };
 
   template <typename T>
   void VectorManaged<T*>::resize(const uint32_t size) { 
-#if defined(_DEBUG) || defined(DEBUG)
-    if ( size > capacity_) { 
-      throw std::runtime_error("VectorManaged<T>::resize: Out of bounds");
-    } else { 
-#endif
-      if ( size < size_ ) {
-        for (uint32_t i = size_ - 1; i > size; i--) {
-          if (pvec_[i]) {
-            delete pvec_[i];
-            pvec_[i] = NULL;
-          }
+    assert(size <= capacity_);
+    if ( size < size_ ) {
+      for (uint32_t i = size_ - 1; i > size; i--) {
+        if (pvec_[i]) {
+          delete pvec_[i];
+          pvec_[i] = nullptr;
         }
       }
-      size_ = size; 
-#if defined(_DEBUG) || defined(DEBUG)
     }
-#endif
+    size_ = size; 
   };   
 
   template <typename T>
@@ -540,19 +439,15 @@ namespace data_str {
 
   template <typename T>
   void VectorManaged<T*>::deleteAtAndShift(const uint32_t index) {
-#ifdef _DEBUG
-    if (index > (size_-1)) {
-      throw std::runtime_error("VectorManaged<T>::at: Out of bounds");
-    }
-#endif
+    assert(index < size_);
     if (pvec_[index]) {
       delete pvec_[index];
-      pvec_[index] = NULL;
+      pvec_[index] = nullptr;
     }
     for (uint32_t i = index; i < size_-1; i++) {
       pvec_[i] = pvec_[i+1];
     }
-    pvec_[size_-1] = NULL;
+    pvec_[size_-1] = nullptr;
     size_--;
   };
 

@@ -6,8 +6,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -16,7 +16,7 @@ using namespace jcl::data_str;
 namespace jtorch {
 
   Threshold::Threshold() : TorchStage() {
-    output = NULL;
+    output = nullptr;
     threshold = 1e-6f;
     val = 0;
   }
@@ -31,14 +31,14 @@ namespace jtorch {
         "FloatTensor expected!");
     }
     Tensor<float>& in = (Tensor<float>&)input;
-    if (output != NULL) {
+    if (output != nullptr) {
       if (!in.isSameSizeAs(*TO_TENSOR_PTR(output))){
         // Input dimension has changed!
         delete output;
-        output = NULL;
+        output = nullptr;
       }
     }
-    if (output == NULL) {
+    if (output == nullptr) {
       output = new Tensor<float>(in.dim(), in.size());
     }
   }

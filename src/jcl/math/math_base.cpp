@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <cmath>
 #include <cstddef>
@@ -45,11 +46,8 @@ namespace math {
     const int32_t out_width, const int32_t out_height, 
     const int32_t kernel_size, const int32_t n_threads) {
     // Check the sizes (in case the user messed up)
-    if (out_width != in_width - kernel_size + 1 ||
-      out_height != in_height - kernel_size + 1) {
-      throw std::runtime_error("jcl::math::Convolve() - ERROR: "
-        "Input/Output size mismatch!");
-   } 
+    assert((out_width == in_width - kernel_size + 1) &&
+           (out_height == in_height - kernel_size + 1));
     // From:
     // http://developer.amd.com/resources/heterogeneous-computing/opencl-zone/programming-in-opencl/image-convolution-using-opencl/
     #pragma omp parallel for num_threads(n_threads)

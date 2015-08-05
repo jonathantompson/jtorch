@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -33,11 +33,11 @@ namespace jtorch {
     float sum = Tensor<float>::slowSum(*kernel_);
     Tensor<float>::div(*kernel_, sum);
 
-    output = NULL;
-    mean_coef_ = NULL;
-    mean_pass1_ = NULL;
-    mean_pass2_ = NULL;
-    mean_ = NULL;
+    output = nullptr;
+    mean_coef_ = nullptr;
+    mean_pass1_ = nullptr;
+    mean_pass2_ = nullptr;
+    mean_ = nullptr;
   }
 
   SpatialSubtractiveNormalization::~SpatialSubtractiveNormalization() {
@@ -69,20 +69,20 @@ namespace jtorch {
         "3D input is expected!");
     }
 
-    if (output != NULL) {
+    if (output != nullptr) {
       if (!in.isSameSizeAs(*(Tensor<float>*)output)) {
         // Input dimension has changed!
         cleanup();
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       output = new Tensor<float>(in.dim(), in.size());
       mean_pass1_ = new Tensor<float>(in.dim(), in.size());
       mean_pass2_ = new Tensor<float>(in.dim(), in.size());
     }
 
-    if (mean_coef_ == NULL) {
+    if (mean_coef_ == nullptr) {
       uint32_t mean_coeff_size[2];
       mean_coeff_size[0] = TO_TENSOR_PTR(output)->size()[0];
       mean_coeff_size[1] = TO_TENSOR_PTR(output)->size()[1];
@@ -149,7 +149,7 @@ namespace jtorch {
       delete[] mean_coef_cpu;
       delete[] kernel_cpu;
     }
-    if (mean_ == NULL) {
+    if (mean_ == nullptr) {
       uint32_t mean_coeff_size[2];
       mean_coeff_size[0] = TO_TENSOR_PTR(output)->size()[0];
       mean_coeff_size[1] = TO_TENSOR_PTR(output)->size()[1];

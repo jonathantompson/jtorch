@@ -5,21 +5,12 @@
 //
 //  This is where all the miscilaneous math functions go.  It's a little messy.
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #include "jcl/math/int_types.h"
 
 #pragma once
 
-// Define either ROW_MAJOR (DirectX) or COLUMN_MAJOR (openGL)
-// #define ROW_MAJOR
-#define COLUMN_MAJOR
-
-#ifdef __APPLE__
-  #include <algorithm>
-#endif
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 

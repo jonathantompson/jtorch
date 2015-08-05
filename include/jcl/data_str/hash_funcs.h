@@ -4,20 +4,15 @@
 //  Created by Jonathan Tompson on 4/26/12.
 //
 //  Just a database of some useful hash functions
-// 
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies). ******
 //
 
 #pragma once
 
+#include <limits>
 #include <string>
+
 #include "jcl/math/int_types.h"  // for uint
 #include "jcl/string_util/macros.h"
-
-#ifndef NULL
-#define NULL 0
-#endif
 
 #ifdef _WIN32
 #pragma inline_depth(255)
@@ -115,7 +110,7 @@ namespace data_str {
     ME_STRING_HASH_CONSTRUCTOR(63)
     ME_STRING_HASH_CONSTRUCTOR(64)
     INLINE StringHash(const std::string& str) { 
-      m_hash = HashString(MAX_UINT32, str);   // assume size is max UINT32_T
+      m_hash = HashString(std::numeric_limits<uint32_t>::max(), str);   // assume size is max UINT32_T
     }
     // other constructors omitted
   };

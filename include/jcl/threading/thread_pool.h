@@ -11,9 +11,6 @@
 //  directly to idle threads if any are idle, otherwise it will be placed on the
 //  queue for execution (with appropriate overhead).
 //
-//  ****** Originally from my jtil library (but pulled out for jcl to reduce
-//  compilation dependencies).  ******
-//
 
 #pragma once
 

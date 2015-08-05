@@ -5,8 +5,8 @@
 #include "jcl/threading/thread_pool.h"
 #include "jcl/data_str/vector_managed.h"
 
-#define SAFE_DELETE(x) if (x != NULL) { delete x; x = NULL; }
-#define SAFE_DELETE_ARR(x) if (x != NULL) { delete[] x; x = NULL; }
+#define SAFE_DELETE(x) if (x != nullptr) { delete x; x = nullptr; }
+#define SAFE_DELETE_ARR(x) if (x != nullptr) { delete[] x; x = nullptr; }
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -19,10 +19,10 @@ namespace jtorch {
     p_norm_ = p_norm;
     poolsize_v_ = poolsize_v;
     poolsize_u_ = poolsize_u;
-    output = NULL;
-    thread_cbs_ = NULL;
-    output_cpu_ = NULL;
-    input_cpu_ = NULL;
+    output = nullptr;
+    thread_cbs_ = nullptr;
+    output_cpu_ = nullptr;
+    input_cpu_ = nullptr;
 
     tp_ = new ThreadPool(JTIL_SPATIAL_LP_POOLING_NTHREADS);
 
@@ -53,21 +53,21 @@ namespace jtorch {
       throw std::runtime_error("Input dimension must be 2D or 3D!");
     }
 
-    if (output != NULL && TO_TENSOR_PTR(output)->dim() != in.dim()) {
+    if (output != nullptr && TO_TENSOR_PTR(output)->dim() != in.dim()) {
       // Input dimension has changed!
       cleanup();
     }
 
-    if (output != NULL) {
+    if (output != nullptr) {
       // Check that the dimensions above the lowest 2 match
-      for (uint32_t i = 2; i < in.dim() && output != NULL; i++) {
+      for (uint32_t i = 2; i < in.dim() && output != nullptr; i++) {
         if (TO_TENSOR_PTR(output)->size()[i] != in.size()[i]) {
           cleanup();
         }
       }
     }
 
-    if (output != NULL) {
+    if (output != nullptr) {
       // Check that the lowest 2 dimensions are the correct size
       if (TO_TENSOR_PTR(output)->size()[0] != in.size()[0] / poolsize_u_ ||
         TO_TENSOR_PTR(output)->size()[1] != in.size()[1] / poolsize_v_) {
@@ -75,7 +75,7 @@ namespace jtorch {
       }
     }
 
-    if (output == NULL) {
+    if (output == nullptr) {
       if (in.size()[0] % poolsize_u_ != 0 || 
           in.size()[1] % poolsize_v_ != 0) {
         throw std::runtime_error("width or height is not a multiple of "
@@ -95,7 +95,7 @@ namespace jtorch {
       SAFE_DELETE_ARR(out_size);
     }
 
-    if (thread_cbs_ == NULL) {
+    if (thread_cbs_ == nullptr) {
       uint32_t n_threads = 1;
       if (in.dim() > 2) {
         n_threads = TO_TENSOR_PTR(output)->size()[2];
