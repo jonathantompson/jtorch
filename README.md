@@ -16,7 +16,7 @@ The library consists of a simple lua codebase for recursively saving a torch mod
 model = nn.Sequential()
 model.add(x)  -- Add all the model components here
 jtorch_root = "path_to/jtorch/"
-dofile("../jtorch/jtorch.lua")
+dofile(jtorch_root .. "/jtorch.lua")
 saveModel(model, "my_model.bin")
 ```
 
