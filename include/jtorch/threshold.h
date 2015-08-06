@@ -12,31 +12,36 @@
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
-  
-  class Threshold : public TorchStage {
-  public:
-    // Constructor / Destructor
-    Threshold();
-    ~Threshold() override;
 
-    TorchStageType type() const override { return THRESHOLD_STAGE; }
-    std::string name() const override { return "Threshold"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class Threshold : public TorchStage {
+ public:
+  // Constructor / Destructor
+  Threshold();
+  ~Threshold() override;
 
-    float threshold;  // Single threshold value
-    float val;  // Single output value (when input < threshold)
+  TorchStageType type() const override { return THRESHOLD_STAGE; }
+  std::string name() const override { return "Threshold"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  float threshold;  // Single threshold value
+  float val;        // Single output value (when input < threshold)
 
-  protected:
-    void init(std::shared_ptr<TorchData> input);
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    // Non-copyable, non-assignable.
-    Threshold(Threshold&);
-    Threshold& operator=(const Threshold&);
-  };
-  
+ protected:
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  Threshold(Threshold&);
+  Threshold& operator=(const Threshold&);
+};
+
 };  // namespace jtorch

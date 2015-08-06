@@ -3,7 +3,7 @@
 //
 //  Created by Jonathan Tompson on 4/1/13.
 //
-//  Multithreading is not all that efficient:  Threads are split up per output 
+//  Multithreading is not all that efficient:  Threads are split up per output
 //  feature.
 //
 
@@ -15,34 +15,39 @@
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
-  
-  class SpatialMaxPooling : public TorchStage {
-  public:
-    // Constructor / Destructor
-    SpatialMaxPooling(const uint32_t poolsize_v, const uint32_t poolsize_u);
-    ~SpatialMaxPooling() override;
 
-    TorchStageType type() const override { return SPATIAL_MAX_POOLING_STAGE; }
-    std::string name() const override { return "SpatialMaxPooling"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class SpatialMaxPooling : public TorchStage {
+ public:
+  // Constructor / Destructor
+  SpatialMaxPooling(const uint32_t poolsize_v, const uint32_t poolsize_u);
+  ~SpatialMaxPooling() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return SPATIAL_MAX_POOLING_STAGE; }
+  std::string name() const override { return "SpatialMaxPooling"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    inline uint32_t poolsize_u() const { return poolsize_u_; }
-    inline uint32_t poolsize_v() const { return poolsize_v_; }
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-  protected:
-    uint32_t poolsize_v_;
-    uint32_t poolsize_u_;
+  inline uint32_t poolsize_u() const { return poolsize_u_; }
+  inline uint32_t poolsize_v() const { return poolsize_v_; }
 
-    void init(std::shared_ptr<TorchData> input);
+ protected:
+  uint32_t poolsize_v_;
+  uint32_t poolsize_u_;
 
-    // Non-copyable, non-assignable.
-    SpatialMaxPooling(SpatialMaxPooling&);
-    SpatialMaxPooling& operator=(const SpatialMaxPooling&);
-  };
-  
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  SpatialMaxPooling(SpatialMaxPooling&);
+  SpatialMaxPooling& operator=(const SpatialMaxPooling&);
+};
+
 };  // namespace jtorch

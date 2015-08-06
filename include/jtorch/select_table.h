@@ -13,25 +13,25 @@
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
-  
-  class SelectTable : public TorchStage {
-  public:
-    // Constructor / Destructor
-    SelectTable(int32_t index);
-    ~SelectTable() override;
 
-    TorchStageType type() const override { return SELECT_TABLE_STAGE; }
-    std::string name() const override { return "SelectTable"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class SelectTable : public TorchStage {
+ public:
+  // Constructor / Destructor
+  SelectTable(int32_t index);
+  ~SelectTable() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return SELECT_TABLE_STAGE; }
+  std::string name() const override { return "SelectTable"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-  protected:
-    uint32_t index_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    // Non-copyable, non-assignable.
-    SelectTable(SelectTable&);
-    SelectTable& operator=(const SelectTable&);
-  };
+ protected:
+  uint32_t index_;
+
+  // Non-copyable, non-assignable.
+  SelectTable(SelectTable&);
+  SelectTable& operator=(const SelectTable&);
+};
 
 };  // namespace jtorch

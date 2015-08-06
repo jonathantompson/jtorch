@@ -17,34 +17,40 @@
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_data.h"
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
-#define TO_TABLE_PTR(x) (x->type() == jtorch::TorchDataType::TABLE_DATA ? (jtorch::Table*)x : nullptr)
+#define TO_TABLE_PTR(x) \
+  (x->type() == jtorch::TorchDataType::TABLE_DATA ? (jtorch::Table*)x : nullptr)
 
 namespace jtorch {
-  
-  class Table : public TorchData {
-  public:
-    // Constructor / Destructor
-    Table();  // Create an empty table
-    ~Table() override;
 
-    std::shared_ptr<TorchData> operator()(const uint32_t i);
-    void add(std::shared_ptr<TorchData> new_data);
+class Table : public TorchData {
+ public:
+  // Constructor / Destructor
+  Table();  // Create an empty table
+  ~Table() override;
 
-    void clear();  
+  std::shared_ptr<TorchData> operator()(const uint32_t i);
+  void add(std::shared_ptr<TorchData> new_data);
 
-    TorchDataType type() const override { return TABLE_DATA; }
-    void print() override;  // print to std::cout
-    
-    uint32_t tableSize() const;
+  void clear();
 
-  protected:
-    std::vector<std::shared_ptr<TorchData>> data_;  // Internal data
+  TorchDataType type() const override { return TABLE_DATA; }
+  void print() override;  // print to std::cout
 
-    // Non-copyable, non-assignable.
-    Table(Table&);
-    Table& operator=(const Table&);
-  };
+  uint32_t tableSize() const;
+
+ protected:
+  std::vector<std::shared_ptr<TorchData>> data_;  // Internal data
+
+  // Non-copyable, non-assignable.
+  Table(Table&);
+  Table& operator=(const Table&);
+};
 
 };  // namespace jtorch

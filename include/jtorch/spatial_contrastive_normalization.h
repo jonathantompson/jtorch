@@ -5,7 +5,7 @@
 //
 //  This stage is only partially multi-threaded!
 //
-//  It is just a SpatialSubtractiveNormalization followed by a 
+//  It is just a SpatialSubtractiveNormalization followed by a
 //  SpatialDivisiveNormalization.  In other words, subtracting off the mean and
 //  dividing by the standard deviation.
 //
@@ -19,29 +19,35 @@
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
-  template <typename T> class Tensor;
-  class Sequential;
+template <typename T>
+class Tensor;
+class Sequential;
 
-  class SpatialContrastiveNormalization : public TorchStage {
-  public:
-    // Constructor / Destructor
-    // Note if kernel is nullptr, then a rectangular filter kernel is used
-    SpatialContrastiveNormalization(std::shared_ptr<Tensor<float>> kernel = nullptr, 
-      float threshold = 1e-4f);
-    ~SpatialContrastiveNormalization() override;
+class SpatialContrastiveNormalization : public TorchStage {
+ public:
+  // Constructor / Destructor
+  // Note if kernel is nullptr, then a rectangular filter kernel is used
+  SpatialContrastiveNormalization(
+      std::shared_ptr<Tensor<float>> kernel = nullptr, float threshold = 1e-4f);
+  ~SpatialContrastiveNormalization() override;
 
-    TorchStageType type() const override { return SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE; }
-    std::string name() const override { return "SpatialContrastiveNormalization"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+  TorchStageType type() const override {
+    return SPATIAL_CONTRASTIVE_NORMALIZATION_STAGE;
+  }
+  std::string name() const override {
+    return "SpatialContrastiveNormalization";
+  }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-  protected:
-    std::unique_ptr<Sequential> network_;
+ protected:
+  std::unique_ptr<Sequential> network_;
 
-    // Non-copyable, non-assignable.
-    SpatialContrastiveNormalization(SpatialContrastiveNormalization&);
-    SpatialContrastiveNormalization& operator=(const SpatialContrastiveNormalization&);
-  };
-  
+  // Non-copyable, non-assignable.
+  SpatialContrastiveNormalization(SpatialContrastiveNormalization&);
+  SpatialContrastiveNormalization& operator=(
+      const SpatialContrastiveNormalization&);
+};
+
 };  // namespace jtorch

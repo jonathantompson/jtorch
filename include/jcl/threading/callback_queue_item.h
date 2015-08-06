@@ -8,17 +8,17 @@
 
 namespace jcl {
 namespace threading {
-  
-  // This is simple singly-linked-list item.  Used as a sub-class of queue.
-  template <class T>
-  struct CallbackQueueItem {
-    explicit CallbackQueueItem(const T& value) {
-      next = nullptr;
-      data = value;
-    }
-    CallbackQueueItem* next;
-    T data;
-  };
-  
+
+// This is simple singly-linked-list item.  Used as a sub-class of queue.
+template <class T>
+struct CallbackQueueItem {
+  explicit CallbackQueueItem(const T& value) {
+    next = nullptr;
+    data = value;
+  }
+  CallbackQueueItem* next;
+  T data;
+};
+
 };  // namespace threading
 };  // namespace jcl

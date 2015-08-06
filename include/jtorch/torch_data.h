@@ -15,25 +15,25 @@
 
 namespace jtorch {
 
-  typedef enum {
-    UNDEFINED_DATA = 0,
-    TABLE_DATA = 1,
-    TENSOR_DATA = 2,
-  } TorchDataType;
+typedef enum {
+  UNDEFINED_DATA = 0,
+  TABLE_DATA = 1,
+  TENSOR_DATA = 2,
+} TorchDataType;
 
-  class TorchData {
-  public:
-    // Constructor / Destructor
-    TorchData();
-    virtual ~TorchData();
+class TorchData {
+ public:
+  // Constructor / Destructor
+  TorchData();
+  virtual ~TorchData();
 
-    virtual TorchDataType type() const { return UNDEFINED_DATA; }
-    virtual void print() = 0;
+  virtual TorchDataType type() const { return UNDEFINED_DATA; }
+  virtual void print() = 0;
 
-  protected:
-    // Non-copyable, non-assignable.
-    TorchData(TorchData&);
-    TorchData& operator=(const TorchData&);
-  };
+ protected:
+  // Non-copyable, non-assignable.
+  TorchData(TorchData&);
+  TorchData& operator=(const TorchData&);
+};
 
 };  // namespace jtorch

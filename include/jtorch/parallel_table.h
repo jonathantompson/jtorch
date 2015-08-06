@@ -13,37 +13,42 @@
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
-  
-  class ParallelTable : public TorchStage {
-  public:
-    // Constructor / Destructor
-    ParallelTable();
-    ~ParallelTable() override;
 
-    TorchStageType type() const override { return PARALLEL_TABLE_STAGE; }
-    std::string name() const override { return "ParallelTable"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class ParallelTable : public TorchStage {
+ public:
+  // Constructor / Destructor
+  ParallelTable();
+  ~ParallelTable() override;
 
-    void add(std::unique_ptr<TorchStage> stage);  // Memory is transferred
-    const uint32_t size() const;
+  TorchStageType type() const override { return PARALLEL_TABLE_STAGE; }
+  std::string name() const override { return "ParallelTable"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    uint32_t numBanks() const;
+  void add(std::unique_ptr<TorchStage> stage);  // Memory is transferred
+  const uint32_t size() const;
 
-    TorchStage* get(const uint32_t i);
+  uint32_t numBanks() const;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStage* get(const uint32_t i);
 
-  protected:
-    std::vector<std::unique_ptr<TorchStage>> network_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    void initOutput();
+ protected:
+  std::vector<std::unique_ptr<TorchStage>> network_;
 
-    // Non-copyable, non-assignable.
-    ParallelTable(ParallelTable&);
-    ParallelTable& operator=(const ParallelTable&);
-  };
+  void initOutput();
+
+  // Non-copyable, non-assignable.
+  ParallelTable(ParallelTable&);
+  ParallelTable& operator=(const ParallelTable&);
+};
 
 };  // namespace jtorch

@@ -15,7 +15,7 @@
 
 #include "jcl/threading/callback_instances.h"
 
-// If you need more template arguments, you can generate a new 
+// If you need more template arguments, you can generate a new
 // callback_instances.h file by typing:
 // >> python callback_instances.py N
 // with N being the maximum number of arguments you want.  By default I have 8.

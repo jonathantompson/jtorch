@@ -3,11 +3,6 @@
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
 
-using std::runtime_error;
-using std::string;
-using std::cout;
-using std::endl;
-
 namespace jcl {
 
   std::mutex JCL::context_lock_;

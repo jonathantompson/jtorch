@@ -13,24 +13,23 @@
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
-  
-  class CAddTable : public TorchStage {
-  public:
-    // Constructor / Destructor
-    CAddTable();
-    ~CAddTable() override;
 
-    TorchStageType type() const override { return C_ADD_TABLE_STAGE; }
-    std::string name() const override { return "CAddTable"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class CAddTable : public TorchStage {
+ public:
+  // Constructor / Destructor
+  CAddTable();
+  ~CAddTable() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return C_ADD_TABLE_STAGE; }
+  std::string name() const override { return "CAddTable"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-  protected:
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    // Non-copyable, non-assignable.
-    CAddTable(CAddTable&);
-    CAddTable& operator=(const CAddTable&);
-  };
+ protected:
+  // Non-copyable, non-assignable.
+  CAddTable(CAddTable&);
+  CAddTable& operator=(const CAddTable&);
+};
 
 };  // namespace jtorch

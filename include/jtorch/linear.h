@@ -15,37 +15,39 @@
 
 namespace jtorch {
 
-  template <typename T> class Tensor;
-  
-  class Linear : public TorchStage {
-  public:
-    // Constructor / Destructor
-    Linear(const uint32_t n_inputs, const uint32_t n_outputs);
-    ~Linear() override;
+template <typename T>
+class Tensor;
 
-    TorchStageType type() const override { return LINEAR_STAGE; }
-    std::string name() const override { return "Linear"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class Linear : public TorchStage {
+ public:
+  // Constructor / Destructor
+  Linear(const uint32_t n_inputs, const uint32_t n_outputs);
+  ~Linear() override;
 
-    void setWeights(const float* weights);
-    void setBiases(const float* biases);
-    Tensor<float>* weights() { return weights_.get(); }
-    Tensor<float>* biases() { return biases_.get(); }
+  TorchStageType type() const override { return LINEAR_STAGE; }
+  std::string name() const override { return "Linear"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  void setWeights(const float* weights);
+  void setBiases(const float* biases);
+  Tensor<float>* weights() { return weights_.get(); }
+  Tensor<float>* biases() { return biases_.get(); }
 
-  protected:
-    uint32_t n_inputs_;
-    uint32_t n_outputs_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    std::unique_ptr<Tensor<float>> weights_;  // n_outputs (rows) * n_inputs (columns), stored row major
-    std::unique_ptr<Tensor<float>> biases_;  // n_outputs
+ protected:
+  uint32_t n_inputs_;
+  uint32_t n_outputs_;
 
-    void init(std::shared_ptr<TorchData> input);
+  std::unique_ptr<Tensor<float>>
+      weights_;  // n_outputs (rows) * n_inputs (columns), stored row major
+  std::unique_ptr<Tensor<float>> biases_;  // n_outputs
 
-    // Non-copyable, non-assignable.
-    Linear(Linear&);
-    Linear& operator=(const Linear&);
-  };
-  
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  Linear(Linear&);
+  Linear& operator=(const Linear&);
+};
+
 };  // namespace jtorch

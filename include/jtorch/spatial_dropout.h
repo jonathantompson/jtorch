@@ -3,7 +3,7 @@
 //
 //  Created by Jonathan Tompson on 2/6/2015.
 //
-//  This is a feed forward (testing) only version.  No actual dropout is 
+//  This is a feed forward (testing) only version.  No actual dropout is
 //  implemented.
 //
 
@@ -16,32 +16,38 @@
 #include "jtorch/torch_stage.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
 
-  template <typename T> class Tensor;
-  
-  class SpatialDropout : public TorchStage {
-  public:
-    // Constructor / Destructor
-    SpatialDropout(const float p);
-    ~SpatialDropout() override;
+template <typename T>
+class Tensor;
 
-    TorchStageType type() const override { return SPATIAL_DROPOUT; }
-    std::string name() const override { return "SpatialDropout"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class SpatialDropout : public TorchStage {
+ public:
+  // Constructor / Destructor
+  SpatialDropout(const float p);
+  ~SpatialDropout() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return SPATIAL_DROPOUT; }
+  std::string name() const override { return "SpatialDropout"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-  protected:
-    float p_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    void init(std::shared_ptr<TorchData> input);
+ protected:
+  float p_;
 
-    // Non-copyable, non-assignable.
-    SpatialDropout(SpatialDropout&);
-    SpatialDropout& operator=(const SpatialDropout&);
-  };
-  
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  SpatialDropout(SpatialDropout&);
+  SpatialDropout& operator=(const SpatialDropout&);
+};
+
 };  // namespace jtorch

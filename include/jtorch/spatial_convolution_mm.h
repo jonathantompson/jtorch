@@ -13,49 +13,56 @@
 #include "jtorch/torch_stage.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
 
-  template <typename T> class Tensor;
-  
-  class SpatialConvolutionMM : public TorchStage {
-  public:
-    // Constructor / Destructor
-    SpatialConvolutionMM(const uint32_t feats_in, const uint32_t feats_out,
-      const uint32_t filt_height, const uint32_t filt_width, 
-      const uint32_t padding = 0);
-    ~SpatialConvolutionMM() override;
+template <typename T>
+class Tensor;
 
-    TorchStageType type() const override { return SPATIAL_CONVOLUTION_MM_STAGE; }
-    std::string name() const override { return "SpatialConvolutionMM"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class SpatialConvolutionMM : public TorchStage {
+ public:
+  // Constructor / Destructor
+  SpatialConvolutionMM(const uint32_t feats_in, const uint32_t feats_out,
+                       const uint32_t filt_height, const uint32_t filt_width,
+                       const uint32_t padding = 0);
+  ~SpatialConvolutionMM() override;
 
-    void setWeights(const float* weights);
-    void setBiases(const float* biases);
-    Tensor<float>* weights() { return weights_.get(); }
-    Tensor<float>* biases() { return biases_.get(); }
+  TorchStageType type() const override { return SPATIAL_CONVOLUTION_MM_STAGE; }
+  std::string name() const override { return "SpatialConvolutionMM"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  void setWeights(const float* weights);
+  void setBiases(const float* biases);
+  Tensor<float>* weights() { return weights_.get(); }
+  Tensor<float>* biases() { return biases_.get(); }
 
-  protected:
-    uint32_t filt_width_;
-    uint32_t filt_height_;
-    uint32_t feats_in_;
-    uint32_t feats_out_;
-    uint32_t padding_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    std::unique_ptr<Tensor<float>> weights_;
-    std::unique_ptr<Tensor<float>> biases_;
+ protected:
+  uint32_t filt_width_;
+  uint32_t filt_height_;
+  uint32_t feats_in_;
+  uint32_t feats_out_;
+  uint32_t padding_;
 
-    std::unique_ptr<Tensor<float>> columns_;  // This is finput in torch.  TODO: Share this!
-    std::unique_ptr<Tensor<float>> ones_;  // This is fgradinput in torch
+  std::unique_ptr<Tensor<float>> weights_;
+  std::unique_ptr<Tensor<float>> biases_;
 
-    void init(std::shared_ptr<TorchData> input);
+  std::unique_ptr<Tensor<float>>
+      columns_;  // This is finput in torch.  TODO: Share this!
+  std::unique_ptr<Tensor<float>> ones_;  // This is fgradinput in torch
 
-    // Non-copyable, non-assignable.
-    SpatialConvolutionMM(SpatialConvolutionMM&);
-    SpatialConvolutionMM& operator=(const SpatialConvolutionMM&);
-  };
-  
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  SpatialConvolutionMM(SpatialConvolutionMM&);
+  SpatialConvolutionMM& operator=(const SpatialConvolutionMM&);
+};
+
 };  // namespace jtorch

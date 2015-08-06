@@ -6,101 +6,106 @@
 namespace jcl {
 namespace threading {
 
-template<typename Res, typename Args1=void, typename Args2=void, typename Args3=void, typename Args4=void, typename Args5=void, typename Args6=void, typename Args7=void, typename Args8=void, typename Args9=void>
+template <typename Res, typename Args1 = void, typename Args2 = void,
+          typename Args3 = void, typename Args4 = void, typename Args5 = void,
+          typename Args6 = void, typename Args7 = void, typename Args8 = void,
+          typename Args9 = void>
 class Callback;
 
-template<typename Res>
+template <typename Res>
 class Callback<Res> {
-public:
+ public:
   virtual ~Callback() {}
 
   virtual Res operator()() = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1>
-class Callback<Res,Arg1> {
-public:
+template <typename Res, typename Arg1>
+class Callback<Res, Arg1> {
+ public:
   virtual ~Callback() {}
 
   virtual Res operator()(Arg1) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2>
-class Callback<Res,Arg1,Arg2> {
-public:
+template <typename Res, typename Arg1, typename Arg2>
+class Callback<Res, Arg1, Arg2> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2) = 0;
+  virtual Res operator()(Arg1, Arg2) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3>
-class Callback<Res,Arg1,Arg2,Arg3> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3>
+class Callback<Res, Arg1, Arg2, Arg3> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3,typename Arg4>
-class Callback<Res,Arg1,Arg2,Arg3,Arg4> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
+class Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3,Arg4) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3, Arg4) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3,typename Arg4,typename Arg5>
-class Callback<Res,Arg1,Arg2,Arg3,Arg4,Arg5> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+class Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3,Arg4,Arg5) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3, Arg4, Arg5) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3,typename Arg4,typename Arg5,typename Arg6>
-class Callback<Res,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6>
+class Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3,typename Arg4,typename Arg5,typename Arg6,typename Arg7>
-class Callback<Res,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+class Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Res,typename Arg1,typename Arg2,typename Arg3,typename Arg4,typename Arg5,typename Arg6,typename Arg7,typename Arg8>
-class Callback<Res,Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8> {
-public:
+template <typename Res, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6, typename Arg7,
+          typename Arg8>
+class Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+ public:
   virtual ~Callback() {}
 
-  virtual Res operator()(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7,Arg8) = 0;
+  virtual Res operator()(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8) = 0;
   virtual bool once() const = 0;
 };
 
-template<typename Target, typename Res>
-class CallableOnce_0_0 :
-  public Callback<Res> {
+template <typename Target, typename Res>
+class CallableOnce_0_0 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)();
 
-public:
-  typedef Res(Target::*TargetFunc)();
-
-  CallableOnce_0_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_0_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_0_0() {}
 
@@ -110,27 +115,20 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target>
-class CallableOnce_0_0<Target, void> :
-  public Callback<void> {
+template <typename Target>
+class CallableOnce_0_0<Target, void> : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)();
 
-public:
-  typedef void(Target::*TargetFunc)();
-
-  CallableOnce_0_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_0_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_0_0() {}
 
@@ -139,74 +137,50 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res>
-CallableOnce_0_0<Target, Res>*
-MakeCallableOnce(
-    Res (Target::*f)(),
-    Target* obj) {
-  return new CallableOnce_0_0<Target,Res>(
-    f,
-    obj);
+template <typename Target, typename Res>
+CallableOnce_0_0<Target, Res>* MakeCallableOnce(Res (Target::*f)(),
+                                                Target* obj) {
+  return new CallableOnce_0_0<Target, Res>(f, obj);
 }
 
-template<typename Target, typename Res>
-class CallableMany_0_0 :
-  public Callback<Res> {
+template <typename Target, typename Res>
+class CallableMany_0_0 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)();
 
-public:
-  typedef Res(Target::*TargetFunc)();
-
-  CallableMany_0_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_0_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_0_0() {}
 
-  virtual Res operator()() {
-    return ((*obj_).*target_func_)();
-  }
+  virtual Res operator()() { return ((*obj_).*target_func_)(); }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res>
-CallableMany_0_0<Target, Res>*
-MakeCallableMany(
-    Res (Target::*f)(),
-    Target* obj) {
-  return new CallableMany_0_0<Target,Res>(
-    f,
-    obj);
+template <typename Target, typename Res>
+CallableMany_0_0<Target, Res>* MakeCallableMany(Res (Target::*f)(),
+                                                Target* obj) {
+  return new CallableMany_0_0<Target, Res>(f, obj);
 }
-template<typename Target, typename Res, typename Arg1>
-class CallableOnce_1_0 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Arg1>
+class CallableOnce_1_0 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1);
-
-  CallableOnce_1_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_1_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_1_0() {}
 
@@ -216,27 +190,20 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1>
-class CallableOnce_1_0<Target, void, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Arg1>
+class CallableOnce_1_0<Target, void, Arg1> : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1);
-
-  CallableOnce_1_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_1_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_1_0() {}
 
@@ -245,77 +212,51 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1>
-CallableOnce_1_0<Target, Res, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1),
-    Target* obj) {
-  return new CallableOnce_1_0<Target,Res, Arg1>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1>
+CallableOnce_1_0<Target, Res, Arg1>* MakeCallableOnce(Res (Target::*f)(Arg1),
+                                                      Target* obj) {
+  return new CallableOnce_1_0<Target, Res, Arg1>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1>
-class CallableMany_1_0 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Arg1>
+class CallableMany_1_0 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1);
-
-  CallableMany_1_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_1_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_1_0() {}
 
-  virtual Res operator()(Arg1 arg1) {
-    return ((*obj_).*target_func_)(arg1);
-  }
+  virtual Res operator()(Arg1 arg1) { return ((*obj_).*target_func_)(arg1); }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1>
-CallableMany_1_0<Target, Res, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1),
-    Target* obj) {
-  return new CallableMany_1_0<Target,Res, Arg1>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1>
+CallableMany_1_0<Target, Res, Arg1>* MakeCallableMany(Res (Target::*f)(Arg1),
+                                                      Target* obj) {
+  return new CallableMany_1_0<Target, Res, Arg1>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1>
-class CallableOnce_1_1 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1>
+class CallableOnce_1_1 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1);
-
-  CallableOnce_1_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_1_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_1_1() {}
 
@@ -325,29 +266,21 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1>
-class CallableOnce_1_1<Target, void, Bind1> :
-  public Callback<void> {
+template <typename Target, typename Bind1>
+class CallableOnce_1_1<Target, void, Bind1> : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1);
-
-  CallableOnce_1_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_1_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_1_1() {}
 
@@ -356,80 +289,54 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1>
-CallableOnce_1_1<Target, Res, Bind1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_1_1<Target,Res, Bind1>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1>
+CallableOnce_1_1<Target, Res, Bind1>* MakeCallableOnce(Res (Target::*f)(Bind1),
+                                                       Target* obj,
+                                                       Bind1 bind1) {
+  return new CallableOnce_1_1<Target, Res, Bind1>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1>
-class CallableMany_1_1 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1>
+class CallableMany_1_1 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1);
-
-  CallableMany_1_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_1_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_1_1() {}
 
-  virtual Res operator()() {
-    return ((*obj_).*target_func_)(bind1_);
-  }
+  virtual Res operator()() { return ((*obj_).*target_func_)(bind1_); }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1>
-CallableMany_1_1<Target, Res, Bind1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_1_1<Target,Res, Bind1>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1>
+CallableMany_1_1<Target, Res, Bind1>* MakeCallableMany(Res (Target::*f)(Bind1),
+                                                       Target* obj,
+                                                       Bind1 bind1) {
+  return new CallableMany_1_1<Target, Res, Bind1>(f, obj, bind1);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2>
-class CallableOnce_2_0 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Arg1, typename Arg2>
+class CallableOnce_2_0 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2);
-
-  CallableOnce_2_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_2_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_2_0() {}
 
@@ -439,27 +346,21 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2>
-class CallableOnce_2_0<Target, void, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Arg1, typename Arg2>
+class CallableOnce_2_0<Target, void, Arg1, Arg2>
+    : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2);
-
-  CallableOnce_2_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_2_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_2_0() {}
 
@@ -468,37 +369,26 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2>
-CallableOnce_2_0<Target, Res, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2),
-    Target* obj) {
-  return new CallableOnce_2_0<Target,Res, Arg1, Arg2>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2>
+CallableOnce_2_0<Target, Res, Arg1, Arg2>* MakeCallableOnce(
+    Res (Target::*f)(Arg1, Arg2), Target* obj) {
+  return new CallableOnce_2_0<Target, Res, Arg1, Arg2>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2>
-class CallableMany_2_0 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Arg1, typename Arg2>
+class CallableMany_2_0 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2);
-
-  CallableMany_2_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_2_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_2_0() {}
 
@@ -506,39 +396,26 @@ public:
     return ((*obj_).*target_func_)(arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2>
-CallableMany_2_0<Target, Res, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2),
-    Target* obj) {
-  return new CallableMany_2_0<Target,Res, Arg1, Arg2>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2>
+CallableMany_2_0<Target, Res, Arg1, Arg2>* MakeCallableMany(
+    Res (Target::*f)(Arg1, Arg2), Target* obj) {
+  return new CallableMany_2_0<Target, Res, Arg1, Arg2>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1>
-class CallableOnce_2_1 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Arg1>
+class CallableOnce_2_1 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1);
-
-  CallableOnce_2_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_2_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_2_1() {}
 
@@ -548,29 +425,22 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1>
-class CallableOnce_2_1<Target, void, Bind1, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Arg1>
+class CallableOnce_2_1<Target, void, Bind1, Arg1>
+    : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1);
-
-  CallableOnce_2_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_2_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_2_1() {}
 
@@ -579,41 +449,27 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1>
-CallableOnce_2_1<Target, Res, Bind1, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_2_1<Target,Res, Bind1, Arg1>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1>
+CallableOnce_2_1<Target, Res, Bind1, Arg1>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Arg1), Target* obj, Bind1 bind1) {
+  return new CallableOnce_2_1<Target, Res, Bind1, Arg1>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1>
-class CallableMany_2_1 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Arg1>
+class CallableMany_2_1 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1);
-
-  CallableMany_2_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_2_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_2_1() {}
 
@@ -621,43 +477,28 @@ public:
     return ((*obj_).*target_func_)(bind1_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1>
-CallableMany_2_1<Target, Res, Bind1, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_2_1<Target,Res, Bind1, Arg1>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1>
+CallableMany_2_1<Target, Res, Bind1, Arg1>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Arg1), Target* obj, Bind1 bind1) {
+  return new CallableMany_2_1<Target, Res, Bind1, Arg1>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2>
-class CallableOnce_2_2 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2>
+class CallableOnce_2_2 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2);
-
-  CallableOnce_2_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_2_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_2_2() {}
 
@@ -667,32 +508,23 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2>
-class CallableOnce_2_2<Target, void, Bind1, Bind2> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2>
+class CallableOnce_2_2<Target, void, Bind1, Bind2> : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2);
-
-  CallableOnce_2_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_2_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_2_2() {}
 
@@ -701,88 +533,56 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2>
-CallableOnce_2_2<Target, Res, Bind1, Bind2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableOnce_2_2<Target,Res, Bind1, Bind2>(
-    f,
-    obj,
-    bind1,
-    bind2);
+template <typename Target, typename Res, typename Bind1, typename Bind2>
+CallableOnce_2_2<Target, Res, Bind1, Bind2>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2), Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableOnce_2_2<Target, Res, Bind1, Bind2>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2>
-class CallableMany_2_2 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2>
+class CallableMany_2_2 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2);
-
-  CallableMany_2_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_2_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_2_2() {}
 
-  virtual Res operator()() {
-    return ((*obj_).*target_func_)(bind1_, bind2_);
-  }
+  virtual Res operator()() { return ((*obj_).*target_func_)(bind1_, bind2_); }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2>
-CallableMany_2_2<Target, Res, Bind1, Bind2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableMany_2_2<Target,Res, Bind1, Bind2>(
-    f,
-    obj,
-    bind1,
-    bind2);
+template <typename Target, typename Res, typename Bind1, typename Bind2>
+CallableMany_2_2<Target, Res, Bind1, Bind2>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2), Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableMany_2_2<Target, Res, Bind1, Bind2>(f, obj, bind1, bind2);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_3_0 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableOnce_3_0 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3);
-
-  CallableOnce_3_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_3_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_3_0() {}
 
@@ -792,27 +592,21 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_3_0<Target, void, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3>
+class CallableOnce_3_0<Target, void, Arg1, Arg2, Arg3>
+    : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3);
-
-  CallableOnce_3_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_3_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_3_0() {}
 
@@ -821,37 +615,28 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3>
-CallableOnce_3_0<Target, Res, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3),
-    Target* obj) {
-  return new CallableOnce_3_0<Target,Res, Arg1, Arg2, Arg3>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3>
+CallableOnce_3_0<Target, Res, Arg1, Arg2, Arg3>* MakeCallableOnce(
+    Res (Target::*f)(Arg1, Arg2, Arg3), Target* obj) {
+  return new CallableOnce_3_0<Target, Res, Arg1, Arg2, Arg3>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_3_0 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableMany_3_0 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3);
-
-  CallableMany_3_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_3_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_3_0() {}
 
@@ -859,39 +644,28 @@ public:
     return ((*obj_).*target_func_)(arg1, arg2, arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3>
-CallableMany_3_0<Target, Res, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3),
-    Target* obj) {
-  return new CallableMany_3_0<Target,Res, Arg1, Arg2, Arg3>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3>
+CallableMany_3_0<Target, Res, Arg1, Arg2, Arg3>* MakeCallableMany(
+    Res (Target::*f)(Arg1, Arg2, Arg3), Target* obj) {
+  return new CallableMany_3_0<Target, Res, Arg1, Arg2, Arg3>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2>
-class CallableOnce_3_1 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2>
+class CallableOnce_3_1 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2);
-
-  CallableOnce_3_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_3_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_3_1() {}
 
@@ -901,29 +675,22 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2>
-class CallableOnce_3_1<Target, void, Bind1, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2>
+class CallableOnce_3_1<Target, void, Bind1, Arg1, Arg2>
+    : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2);
-
-  CallableOnce_3_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_3_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_3_1() {}
 
@@ -932,41 +699,29 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2>
-CallableOnce_3_1<Target, Res, Bind1, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_3_1<Target,Res, Bind1, Arg1, Arg2>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2>
+CallableOnce_3_1<Target, Res, Bind1, Arg1, Arg2>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Arg1, Arg2), Target* obj, Bind1 bind1) {
+  return new CallableOnce_3_1<Target, Res, Bind1, Arg1, Arg2>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2>
-class CallableMany_3_1 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2>
+class CallableMany_3_1 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2);
-
-  CallableMany_3_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_3_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_3_1() {}
 
@@ -974,43 +729,30 @@ public:
     return ((*obj_).*target_func_)(bind1_, arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2>
-CallableMany_3_1<Target, Res, Bind1, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_3_1<Target,Res, Bind1, Arg1, Arg2>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2>
+CallableMany_3_1<Target, Res, Bind1, Arg1, Arg2>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Arg1, Arg2), Target* obj, Bind1 bind1) {
+  return new CallableMany_3_1<Target, Res, Bind1, Arg1, Arg2>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1>
-class CallableOnce_3_2 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1>
+class CallableOnce_3_2 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1);
-
-  CallableOnce_3_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_3_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_3_2() {}
 
@@ -1020,32 +762,24 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1>
-class CallableOnce_3_2<Target, void, Bind1, Bind2, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1>
+class CallableOnce_3_2<Target, void, Bind1, Bind2, Arg1>
+    : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1);
-
-  CallableOnce_3_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_3_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_3_2() {}
 
@@ -1054,46 +788,33 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1>
-CallableOnce_3_2<Target, Res, Bind1, Bind2, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1>
+CallableOnce_3_2<Target, Res, Bind1, Bind2, Arg1>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Arg1), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableOnce_3_2<Target,Res, Bind1, Bind2, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableOnce_3_2<Target, Res, Bind1, Bind2, Arg1>(f, obj, bind1,
+                                                               bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1>
-class CallableMany_3_2 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1>
+class CallableMany_3_2 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1);
-
-  CallableMany_3_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_3_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_3_2() {}
 
@@ -1101,48 +822,37 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1>
-CallableMany_3_2<Target, Res, Bind1, Bind2, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1>
+CallableMany_3_2<Target, Res, Bind1, Bind2, Arg1>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Arg1), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableMany_3_2<Target,Res, Bind1, Bind2, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableMany_3_2<Target, Res, Bind1, Bind2, Arg1>(f, obj, bind1,
+                                                               bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3>
-class CallableOnce_3_3 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3>
+class CallableOnce_3_3 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3);
-
-  CallableOnce_3_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_3_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_3_3() {}
 
@@ -1152,35 +862,29 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3>
-class CallableOnce_3_3<Target, void, Bind1, Bind2, Bind3> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3>
+class CallableOnce_3_3<Target, void, Bind1, Bind2, Bind3>
+    : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3);
-
-  CallableOnce_3_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_3_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_3_3() {}
 
@@ -1189,51 +893,38 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3>
-CallableOnce_3_3<Target, Res, Bind1, Bind2, Bind3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_3_3<Target,Res, Bind1, Bind2, Bind3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3>
+CallableOnce_3_3<Target, Res, Bind1, Bind2, Bind3>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Bind3), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_3_3<Target, Res, Bind1, Bind2, Bind3>(f, obj, bind1,
+                                                                bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3>
-class CallableMany_3_3 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3>
+class CallableMany_3_3 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3);
-
-  CallableMany_3_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_3_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_3_3() {}
 
@@ -1241,44 +932,32 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3>
-CallableMany_3_3<Target, Res, Bind1, Bind2, Bind3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_3_3<Target,Res, Bind1, Bind2, Bind3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3>
+CallableMany_3_3<Target, Res, Bind1, Bind2, Bind3>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Bind3), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_3_3<Target, Res, Bind1, Bind2, Bind3>(f, obj, bind1,
+                                                                bind2, bind3);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_4_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+class CallableOnce_4_0 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_4_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_4_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_4_0() {}
 
@@ -1288,27 +967,22 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_4_0<Target, void, Arg1, Arg2, Arg3, Arg4> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
+class CallableOnce_4_0<Target, void, Arg1, Arg2, Arg3, Arg4>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_4_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_4_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_4_0() {}
 
@@ -1317,37 +991,28 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableOnce_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4),
-    Target* obj) {
-  return new CallableOnce_4_0<Target,Res, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+CallableOnce_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>* MakeCallableOnce(
+    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4), Target* obj) {
+  return new CallableOnce_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableMany_4_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+class CallableMany_4_0 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4);
-
-  CallableMany_4_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_4_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_4_0() {}
 
@@ -1355,39 +1020,28 @@ public:
     return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableMany_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4),
-    Target* obj) {
-  return new CallableMany_4_0<Target,Res, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+CallableMany_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>* MakeCallableMany(
+    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4), Target* obj) {
+  return new CallableMany_4_0<Target, Res, Arg1, Arg2, Arg3, Arg4>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_4_1 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3>
+class CallableOnce_4_1 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
-
-  CallableOnce_4_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_4_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_4_1() {}
 
@@ -1397,29 +1051,23 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_4_1<Target, void, Bind1, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableOnce_4_1<Target, void, Bind1, Arg1, Arg2, Arg3>
+    : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
-
-  CallableOnce_4_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_4_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_4_1() {}
 
@@ -1428,41 +1076,30 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3>
-CallableOnce_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_4_1<Target,Res, Bind1, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3>
+CallableOnce_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3), Target* obj, Bind1 bind1) {
+  return new CallableOnce_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>(f, obj,
+                                                                    bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_4_1 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3>
+class CallableMany_4_1 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3);
-
-  CallableMany_4_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_4_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_4_1() {}
 
@@ -1470,43 +1107,31 @@ public:
     return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3>
-CallableMany_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_4_1<Target,Res, Bind1, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3>
+CallableMany_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3), Target* obj, Bind1 bind1) {
+  return new CallableMany_4_1<Target, Res, Bind1, Arg1, Arg2, Arg3>(f, obj,
+                                                                    bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2>
-class CallableOnce_4_2 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2>
+class CallableOnce_4_2 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
-
-  CallableOnce_4_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_4_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_4_2() {}
 
@@ -1516,32 +1141,25 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1, typename Arg2>
-class CallableOnce_4_2<Target, void, Bind1, Bind2, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1,
+          typename Arg2>
+class CallableOnce_4_2<Target, void, Bind1, Bind2, Arg1, Arg2>
+    : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
-
-  CallableOnce_4_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_4_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_4_2() {}
 
@@ -1550,46 +1168,33 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2>
-CallableOnce_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2>
+CallableOnce_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableOnce_4_2<Target,Res, Bind1, Bind2, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableOnce_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>(
+      f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2>
-class CallableMany_4_2 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2>
+class CallableMany_4_2 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2);
-
-  CallableMany_4_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_4_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_4_2() {}
 
@@ -1597,48 +1202,37 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2>
-CallableMany_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2>
+CallableMany_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableMany_4_2<Target,Res, Bind1, Bind2, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableMany_4_2<Target, Res, Bind1, Bind2, Arg1, Arg2>(
+      f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1>
-class CallableOnce_4_3 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1>
+class CallableOnce_4_3 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
-
-  CallableOnce_4_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_4_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_4_3() {}
 
@@ -1648,35 +1242,30 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Arg1>
-class CallableOnce_4_3<Target, void, Bind1, Bind2, Bind3, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Arg1>
+class CallableOnce_4_3<Target, void, Bind1, Bind2, Bind3, Arg1>
+    : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
-
-  CallableOnce_4_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_4_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_4_3() {}
 
@@ -1685,51 +1274,38 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1>
-CallableOnce_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_4_3<Target,Res, Bind1, Bind2, Bind3, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1>
+CallableOnce_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>(
+      f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1>
-class CallableMany_4_3 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1>
+class CallableMany_4_3 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1);
-
-  CallableMany_4_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_4_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_4_3() {}
 
@@ -1737,53 +1313,39 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1>
-CallableMany_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_4_3<Target,Res, Bind1, Bind2, Bind3, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1>
+CallableMany_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_4_3<Target, Res, Bind1, Bind2, Bind3, Arg1>(
+      f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4>
-class CallableOnce_4_4 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4>
+class CallableOnce_4_4 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
-
-  CallableOnce_4_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_4_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_4_4() {}
 
@@ -1793,38 +1355,32 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4>
-class CallableOnce_4_4<Target, void, Bind1, Bind2, Bind3, Bind4> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4>
+class CallableOnce_4_4<Target, void, Bind1, Bind2, Bind3, Bind4>
+    : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
-
-  CallableOnce_4_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_4_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_4_4() {}
 
@@ -1833,56 +1389,40 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4>
-CallableOnce_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableOnce_4_4<Target,Res, Bind1, Bind2, Bind3, Bind4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4>
+CallableOnce_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3, Bind4 bind4) {
+  return new CallableOnce_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>(
+      f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4>
-class CallableMany_4_4 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4>
+class CallableMany_4_4 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4);
-
-  CallableMany_4_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableMany_4_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableMany_4_4() {}
 
@@ -1890,156 +1430,122 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4>
-CallableMany_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableMany_4_4<Target,Res, Bind1, Bind2, Bind3, Bind4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4>
+CallableMany_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4), Target* obj, Bind1 bind1,
+    Bind2 bind2, Bind3 bind3, Bind4 bind4) {
+  return new CallableMany_4_4<Target, Res, Bind1, Bind2, Bind3, Bind4>(
+      f, obj, bind1, bind2, bind3, bind4);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_5_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5>
+class CallableOnce_5_0 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_5_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_5_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_5_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
     Res ret = ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_5_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+class CallableOnce_5_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_5_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_5_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_5_0() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                          Arg5 arg5) {
     ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-CallableOnce_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj) {
-  return new CallableOnce_5_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5>
+CallableOnce_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>* MakeCallableOnce(
+    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5), Target* obj) {
+  return new CallableOnce_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>(f,
+                                                                         obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableMany_5_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5>
+class CallableMany_5_0 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableMany_5_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_5_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_5_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
     return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-CallableMany_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj) {
-  return new CallableMany_5_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj);
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5>
+CallableMany_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>* MakeCallableMany(
+    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5), Target* obj) {
+  return new CallableMany_5_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5>(f,
+                                                                         obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_5_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4>
+class CallableOnce_5_1 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_5_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_5_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_5_1() {}
 
@@ -2049,29 +1555,23 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_5_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+class CallableOnce_5_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_5_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_5_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_5_1() {}
 
@@ -2080,41 +1580,30 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableOnce_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_5_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4>
+CallableOnce_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4), Target* obj, Bind1 bind1) {
+  return new CallableOnce_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>(
+      f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableMany_5_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4>
+class CallableMany_5_1 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4);
-
-  CallableMany_5_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_5_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_5_1() {}
 
@@ -2122,43 +1611,31 @@ public:
     return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableMany_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_5_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1);
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4>
+CallableMany_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4), Target* obj, Bind1 bind1) {
+  return new CallableMany_5_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4>(
+      f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_5_2 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3>
+class CallableOnce_5_2 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
-
-  CallableOnce_5_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_5_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_5_2() {}
 
@@ -2168,32 +1645,25 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_5_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1,
+          typename Arg2, typename Arg3>
+class CallableOnce_5_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3>
+    : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
-
-  CallableOnce_5_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_5_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_5_2() {}
 
@@ -2202,46 +1672,33 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3>
-CallableOnce_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3>
+CallableOnce_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>* MakeCallableOnce(
+    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableOnce_5_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableOnce_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>(
+      f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_5_2 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3>
+class CallableMany_5_2 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3);
-
-  CallableMany_5_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_5_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_5_2() {}
 
@@ -2249,48 +1706,37 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3>
-CallableMany_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3>
+CallableMany_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>* MakeCallableMany(
+    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3), Target* obj, Bind1 bind1,
     Bind2 bind2) {
-  return new CallableMany_5_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2);
+  return new CallableMany_5_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3>(
+      f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2>
-class CallableOnce_5_3 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2>
+class CallableOnce_5_3 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
-
-  CallableOnce_5_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_5_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_5_3() {}
 
@@ -2300,35 +1746,30 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2>
-class CallableOnce_5_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Arg1, typename Arg2>
+class CallableOnce_5_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2>
+    : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
-
-  CallableOnce_5_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_5_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_5_3() {}
 
@@ -2337,51 +1778,38 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2>
 CallableOnce_5_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_5_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2), Target* obj,
+                 Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_5_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2>(
+      f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2>
-class CallableMany_5_3 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2>
+class CallableMany_5_3 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2);
-
-  CallableMany_5_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_5_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_5_3() {}
 
@@ -2389,53 +1817,39 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2>
 CallableMany_5_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_5_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2), Target* obj,
+                 Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_5_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2>(
+      f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1>
-class CallableOnce_5_4 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1>
+class CallableOnce_5_4 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
-
-  CallableOnce_5_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_5_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_5_4() {}
 
@@ -2445,38 +1859,32 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1>
-class CallableOnce_5_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Arg1>
+class CallableOnce_5_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1>
+    : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
-
-  CallableOnce_5_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_5_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_5_4() {}
 
@@ -2485,56 +1893,41 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1>
 CallableOnce_5_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableOnce_5_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableOnce_5_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1>(
+      f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1>
-class CallableMany_5_4 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1>
+class CallableMany_5_4 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1);
-
-  CallableMany_5_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableMany_5_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableMany_5_4() {}
 
@@ -2542,58 +1935,42 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1>
 CallableMany_5_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableMany_5_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableMany_5_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1>(
+      f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5>
-class CallableOnce_5_5 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5>
+class CallableOnce_5_5 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
-
-  CallableOnce_5_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_5_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_5_5() {}
 
@@ -2603,13 +1980,11 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -2617,27 +1992,22 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5>
-class CallableOnce_5_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5>
+class CallableOnce_5_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5>
+    : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
-
-  CallableOnce_5_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_5_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_5_5() {}
 
@@ -2646,13 +2016,11 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -2660,47 +2028,31 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5>
 CallableOnce_5_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableOnce_5_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableOnce_5_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5>(
+      f, obj, bind1, bind2, bind3, bind4, bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5>
-class CallableMany_5_5 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5>
+class CallableMany_5_5 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5);
-
-  CallableMany_5_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableMany_5_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableMany_5_5() {}
 
@@ -2708,13 +2060,11 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -2722,264 +2072,211 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5>
 CallableMany_5_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableMany_5_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableMany_5_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5>(
+      f, obj, bind1, bind2, bind3, bind4, bind5);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_6_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+class CallableOnce_6_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_6_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_6_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_6_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
     Res ret = ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_6_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6>
+class CallableOnce_6_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_6_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_6_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_6_0() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6) {
     ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6>
 CallableOnce_6_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj) {
-  return new CallableOnce_6_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj);
+MakeCallableOnce(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
+                 Target* obj) {
+  return new CallableOnce_6_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
+      f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableMany_6_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+class CallableMany_6_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableMany_6_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_6_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_6_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
     return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6>
 CallableMany_6_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj) {
-  return new CallableMany_6_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj);
+MakeCallableMany(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
+                 Target* obj) {
+  return new CallableMany_6_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
+      f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_6_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+class CallableOnce_6_1 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_6_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_6_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_6_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
     Res ret = ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_6_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5>
+class CallableOnce_6_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_6_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_6_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_6_1() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                          Arg5 arg5) {
     ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 CallableOnce_6_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_6_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1);
+MakeCallableOnce(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5),
+                 Target* obj, Bind1 bind1) {
+  return new CallableOnce_6_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>(
+      f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableMany_6_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+class CallableMany_6_1 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableMany_6_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_6_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_6_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
     return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5>
 CallableMany_6_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_6_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1);
+MakeCallableMany(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5),
+                 Target* obj, Bind1 bind1) {
+  return new CallableMany_6_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5>(
+      f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_6_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+class CallableOnce_6_2 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_6_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_6_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_6_2() {}
 
@@ -2989,32 +2286,25 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_6_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4>
+class CallableOnce_6_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_6_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_6_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_6_2() {}
 
@@ -3023,46 +2313,33 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 CallableOnce_6_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableOnce_6_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableOnce_6_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3,
+                              Arg4>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableMany_6_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+class CallableMany_6_2 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4);
-
-  CallableMany_6_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_6_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_6_2() {}
 
@@ -3070,48 +2347,37 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4>
 CallableMany_6_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableMany_6_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableMany_6_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3,
+                              Arg4>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_6_3 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3>
+class CallableOnce_6_3 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
-
-  CallableOnce_6_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_6_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_6_3() {}
 
@@ -3121,35 +2387,30 @@ public:
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_6_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Arg1, typename Arg2, typename Arg3>
+class CallableOnce_6_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3>
+    : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
-
-  CallableOnce_6_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_6_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_6_3() {}
 
@@ -3158,51 +2419,38 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3>
 CallableOnce_6_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_6_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_6_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_6_3 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3>
+class CallableMany_6_3 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3);
-
-  CallableMany_6_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_6_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_6_3() {}
 
@@ -3210,94 +2458,75 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3>
 CallableMany_6_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_6_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_6_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2>
-class CallableOnce_6_4 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2>
+class CallableOnce_6_4 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
-
-  CallableOnce_6_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_6_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_6_4() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2);
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2>
-class CallableOnce_6_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Arg1, typename Arg2>
+class CallableOnce_6_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2>
+    : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
-
-  CallableOnce_6_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_6_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_6_4() {}
 
@@ -3306,56 +2535,41 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2>
 CallableOnce_6_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableOnce_6_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableOnce_6_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2>(f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2>
-class CallableMany_6_4 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2>
+class CallableMany_6_4 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2);
-
-  CallableMany_6_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableMany_6_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableMany_6_4() {}
 
@@ -3363,74 +2577,57 @@ public:
     return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2>
 CallableMany_6_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableMany_6_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableMany_6_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2>(f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1>
-class CallableOnce_6_5 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1>
+class CallableOnce_6_5 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
-
-  CallableOnce_6_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_6_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_6_5() {}
 
   virtual Res operator()(Arg1 arg1) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1);
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3438,27 +2635,22 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1>
-class CallableOnce_6_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Arg1>
+class CallableOnce_6_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1>
+    : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
-
-  CallableOnce_6_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_6_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_6_5() {}
 
@@ -3467,13 +2659,11 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3481,61 +2671,44 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1>
 CallableOnce_6_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableOnce_6_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableOnce_6_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1>(f, obj, bind1, bind2, bind3, bind4, bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1>
-class CallableMany_6_5 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1>
+class CallableMany_6_5 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1);
-
-  CallableMany_6_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableMany_6_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableMany_6_5() {}
 
   virtual Res operator()(Arg1 arg1) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3543,65 +2716,48 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1>
 CallableMany_6_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableMany_6_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableMany_6_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1>(f, obj, bind1, bind2, bind3, bind4, bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6>
-class CallableOnce_6_6 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6>
+class CallableOnce_6_6 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
-
-  CallableOnce_6_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_6_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_6_6() {}
 
   virtual Res operator()() {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_);
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3610,29 +2766,24 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6>
-class CallableOnce_6_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6>
+class CallableOnce_6_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6>
+    : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
-
-  CallableOnce_6_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_6_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_6_6() {}
 
@@ -3641,13 +2792,11 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3656,65 +2805,47 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6>
 CallableOnce_6_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableOnce_6_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableOnce_6_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6>(f, obj, bind1, bind2, bind3, bind4, bind5,
+                                     bind6);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6>
-class CallableMany_6_6 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6>
+class CallableMany_6_6 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6);
-
-  CallableMany_6_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableMany_6_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableMany_6_6() {}
 
   virtual Res operator()() {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -3723,436 +2854,371 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6>
 CallableMany_6_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableMany_6_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableMany_6_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6>(f, obj, bind1, bind2, bind3, bind4, bind5,
+                                     bind6);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableOnce_7_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7>
+class CallableOnce_7_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableOnce_7_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_7_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_7_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7) {
     Res ret = ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableOnce_7_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+class CallableOnce_7_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableOnce_7_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_7_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_7_0() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6, Arg7 arg7) {
     ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7>
 CallableOnce_7_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
-    Target* obj) {
-  return new CallableOnce_7_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(
-    f,
-    obj);
+MakeCallableOnce(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
+                 Target* obj) {
+  return new CallableOnce_7_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                              Arg7>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableMany_7_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7>
+class CallableMany_7_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableMany_7_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_7_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_7_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7) {
     return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7>
 CallableMany_7_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
-    Target* obj) {
-  return new CallableMany_7_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(
-    f,
-    obj);
+MakeCallableMany(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
+                 Target* obj) {
+  return new CallableMany_7_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                              Arg7>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_7_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6>
+class CallableOnce_7_1
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_7_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_7_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_7_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
-    Res ret = ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_7_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+class CallableOnce_7_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_7_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_7_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_7_1() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6) {
     ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6>
 CallableOnce_7_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_7_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj,
-    bind1);
+MakeCallableOnce(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
+                 Target* obj, Bind1 bind1) {
+  return new CallableOnce_7_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5,
+                              Arg6>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableMany_7_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6>
+class CallableMany_7_1
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableMany_7_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_7_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_7_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
     return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6>
 CallableMany_7_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_7_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj,
-    bind1);
+MakeCallableMany(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
+                 Target* obj, Bind1 bind1) {
+  return new CallableMany_7_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5,
+                              Arg6>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_7_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5>
+class CallableOnce_7_2 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_7_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_7_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_7_2() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_7_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+class CallableOnce_7_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4,
+                                     Arg5);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_7_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_7_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_7_2() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                          Arg5 arg5) {
     ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5>
 CallableOnce_7_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableOnce_7_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableOnce_7_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4,
+                              Arg5>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableMany_7_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5>
+class CallableMany_7_2 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableMany_7_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_7_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_7_2() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
+    return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4,
+                                   arg5);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5>
 CallableMany_7_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableMany_7_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableMany_7_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4,
+                              Arg5>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_7_3 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
+class CallableOnce_7_3 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                                    Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_7_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_7_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_7_3() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4);
+    Res ret =
+        ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_7_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+class CallableOnce_7_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                       Arg4> : public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                                     Arg4);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_7_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_7_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_7_3() {}
 
@@ -4161,146 +3227,122 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
 CallableOnce_7_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_7_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_7_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3, Arg4>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableMany_7_3 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
+class CallableMany_7_3 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                                    Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4);
-
-  CallableMany_7_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_7_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_7_3() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3,
+                                   arg4);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
 CallableMany_7_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_7_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_7_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3, Arg4>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_7_4 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableOnce_7_4 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                    Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3);
-
-  CallableOnce_7_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_7_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_7_4() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1,
+                                      arg2, arg3);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_7_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Arg1, typename Arg2, typename Arg3>
+class CallableOnce_7_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                       Arg3> : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                     Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3);
-
-  CallableOnce_7_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_7_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_7_4() {}
 
@@ -4309,131 +3351,106 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3>
 CallableOnce_7_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableOnce_7_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableOnce_7_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2, Arg3>(f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_7_4 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableMany_7_4 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                    Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3);
-
-  CallableMany_7_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableMany_7_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableMany_7_4() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2,
+                                   arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3>
 CallableMany_7_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableMany_7_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableMany_7_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2, Arg3>(f, obj, bind1, bind2, bind3, bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2>
-class CallableOnce_7_5 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2>
+class CallableOnce_7_5 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                    Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2);
-
-  CallableOnce_7_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_7_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_7_5() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      arg1, arg2);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4441,27 +3458,23 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2>
-class CallableOnce_7_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Arg1, typename Arg2>
+class CallableOnce_7_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                       Arg2> : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                     Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2);
-
-  CallableOnce_7_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_7_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_7_5() {}
 
@@ -4470,13 +3483,11 @@ public:
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4484,61 +3495,49 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2>
 CallableOnce_7_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableOnce_7_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                  Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableOnce_7_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1, Arg2>(f, obj, bind1, bind2, bind3, bind4,
+                                          bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2>
-class CallableMany_7_5 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2>
+class CallableMany_7_5 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                    Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2);
-
-  CallableMany_7_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableMany_7_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableMany_7_5() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1,
+                                   arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4546,65 +3545,53 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2>
 CallableMany_7_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableMany_7_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                  Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableMany_7_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1, Arg2>(f, obj, bind1, bind2, bind3, bind4,
+                                          bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1>
-class CallableOnce_7_6 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1>
+class CallableOnce_7_6 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1);
-
-  CallableOnce_7_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_7_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_7_6() {}
 
   virtual Res operator()(Arg1 arg1) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      bind6_, arg1);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4613,44 +3600,39 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1>
-class CallableOnce_7_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6, typename Arg1>
+class CallableOnce_7_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                       Arg1> : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                     Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1);
-
-  CallableOnce_7_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_7_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_7_6() {}
 
   virtual void operator()(Arg1 arg1) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_,
+                            arg1);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4659,65 +3641,51 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1>
 CallableOnce_7_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableOnce_7_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableOnce_7_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Arg1>(f, obj, bind1, bind2, bind3, bind4,
+                                           bind5, bind6);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1>
-class CallableMany_7_6 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1>
+class CallableMany_7_6 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1);
-
-  CallableMany_7_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableMany_7_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableMany_7_6() {}
 
   virtual Res operator()(Arg1 arg1) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4726,69 +3694,54 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1>
 CallableMany_7_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableMany_7_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableMany_7_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Arg1>(f, obj, bind1, bind2, bind3, bind4,
+                                           bind5, bind6);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7>
-class CallableOnce_7_7 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7>
+class CallableOnce_7_7 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7);
-
-  CallableOnce_7_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableOnce_7_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableOnce_7_7() {}
 
   virtual Res operator()() {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      bind6_, bind7_);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4798,46 +3751,40 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7>
-class CallableOnce_7_7<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6, typename Bind7>
+class CallableOnce_7_7<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                       Bind7> : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                     Bind7);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7);
-
-  CallableOnce_7_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableOnce_7_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableOnce_7_7() {}
 
   virtual void operator()() {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_,
+                            bind7_);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4847,69 +3794,52 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7>
 CallableOnce_7_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7) {
-  return new CallableOnce_7_7<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7) {
+  return new CallableOnce_7_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7>(f, obj, bind1, bind2, bind3, bind4,
+                                            bind5, bind6, bind7);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7>
-class CallableMany_7_7 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7>
+class CallableMany_7_7 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7);
-
-  CallableMany_7_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableMany_7_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableMany_7_7() {}
 
   virtual Res operator()() {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_, bind7_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -4919,719 +3849,649 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7>
 CallableMany_7_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7) {
-  return new CallableMany_7_7<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7) {
+  return new CallableMany_7_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7>(f, obj, bind1, bind2, bind3, bind4,
+                                            bind5, bind6, bind7);
 }
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-class CallableOnce_8_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7, typename Arg8>
+class CallableOnce_8_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                                    Arg8);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
-
-  CallableOnce_8_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_8_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_8_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7, Arg8 arg8) {
-    Res ret = ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7, Arg8 arg8) {
+    Res ret =
+        ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-class CallableOnce_8_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+template <typename Target, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5, typename Arg6, typename Arg7,
+          typename Arg8>
+class CallableOnce_8_0<Target, void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                       Arg8>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+ public:
+  typedef void (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                                     Arg8);
 
-public:
-  typedef void(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
-
-  CallableOnce_8_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableOnce_8_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableOnce_8_0() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7, Arg8 arg8) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6, Arg7 arg7, Arg8 arg8) {
     ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7, typename Arg8>
 CallableOnce_8_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>*
-MakeCallableOnce(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8),
-    Target* obj) {
-  return new CallableOnce_8_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>(
-    f,
-    obj);
+MakeCallableOnce(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                                  Arg8),
+                 Target* obj) {
+  return new CallableOnce_8_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                              Arg7, Arg8>(f, obj);
 }
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
-class CallableMany_8_0 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7, typename Arg8>
+class CallableMany_8_0
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> {
+ public:
+  typedef Res (Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                                    Arg8);
 
-public:
-  typedef Res(Target::*TargetFunc)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8);
-
-  CallableMany_8_0(TargetFunc target_func,
-    Target* obj)
-    : target_func_(target_func),
-      obj_(obj) { }
+  CallableMany_8_0(TargetFunc target_func, Target* obj)
+      : target_func_(target_func), obj_(obj) {}
 
   virtual ~CallableMany_8_0() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7, Arg8 arg8) {
-    return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7, Arg8 arg8) {
+    return ((*obj_).*target_func_)(arg1, arg2, arg3, arg4, arg5, arg6, arg7,
+                                   arg8);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
-
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
 };
 
-template<typename Target, typename Res, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7, typename Arg8>
+template <typename Target, typename Res, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7, typename Arg8>
 CallableMany_8_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>*
-MakeCallableMany(
-    Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8),
-    Target* obj) {
-  return new CallableMany_8_0<Target,Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8>(
-    f,
-    obj);
+MakeCallableMany(Res (Target::*f)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7,
+                                  Arg8),
+                 Target* obj) {
+  return new CallableMany_8_0<Target, Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                              Arg7, Arg8>(f, obj);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableOnce_8_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6, typename Arg7>
+class CallableOnce_8_1
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                                    Arg7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableOnce_8_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_8_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_8_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
-    Res ret = ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7) {
+    Res ret = ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5,
+                                      arg6, arg7);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableOnce_8_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Bind1, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4, typename Arg5, typename Arg6,
+          typename Arg7>
+class CallableOnce_8_1<Target, void, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                       Arg7>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                                     Arg7);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableOnce_8_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableOnce_8_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableOnce_8_1() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6, Arg7 arg7) {
     ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6, typename Arg7>
 CallableOnce_8_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableOnce_8_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(
-    f,
-    obj,
-    bind1);
+MakeCallableOnce(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                                  Arg7),
+                 Target* obj, Bind1 bind1) {
+  return new CallableOnce_8_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5,
+                              Arg6, Arg7>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
-class CallableMany_8_1 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6, typename Arg7>
+class CallableMany_8_1
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                                    Arg7);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7);
-
-  CallableMany_8_1(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1) { }
+  CallableMany_8_1(TargetFunc target_func, Target* obj, Bind1 bind1)
+      : target_func_(target_func), obj_(obj), bind1_(bind1) {}
 
   virtual ~CallableMany_8_1() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6, Arg7 arg7) {
-    return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6, Arg7 arg7) {
+    return ((*obj_).*target_func_)(bind1_, arg1, arg2, arg3, arg4, arg5, arg6,
+                                   arg7);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6, typename Arg7>
+template <typename Target, typename Res, typename Bind1, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6, typename Arg7>
 CallableMany_8_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7),
-    Target* obj,
-    Bind1 bind1) {
-  return new CallableMany_8_1<Target,Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(
-    f,
-    obj,
-    bind1);
+MakeCallableMany(Res (Target::*f)(Bind1, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6,
+                                  Arg7),
+                 Target* obj, Bind1 bind1) {
+  return new CallableMany_8_1<Target, Res, Bind1, Arg1, Arg2, Arg3, Arg4, Arg5,
+                              Arg6, Arg7>(f, obj, bind1);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_8_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5, typename Arg6>
+class CallableOnce_8_2
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                                    Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_8_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_8_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_8_2() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5, arg6);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4,
+                                      arg5, arg6);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableOnce_8_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Bind1, typename Bind2, typename Arg1,
+          typename Arg2, typename Arg3, typename Arg4, typename Arg5,
+          typename Arg6>
+class CallableOnce_8_2<Target, void, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                       Arg6>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                                     Arg6);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableOnce_8_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableOnce_8_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableOnce_8_2() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                          Arg6 arg6) {
     ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5, arg6);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5, typename Arg6>
 CallableOnce_8_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableOnce_8_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                                  Arg6),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableOnce_8_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4,
+                              Arg5, Arg6>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
-class CallableMany_8_2 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5, typename Arg6>
+class CallableMany_8_2
+    : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                                    Arg6);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6);
-
-  CallableMany_8_2(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2) { }
+  CallableMany_8_2(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2)
+      : target_func_(target_func), obj_(obj), bind1_(bind1), bind2_(bind2) {}
 
   virtual ~CallableMany_8_2() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5, Arg6 arg6) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5, arg6);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5,
+                         Arg6 arg6) {
+    return ((*obj_).*target_func_)(bind1_, bind2_, arg1, arg2, arg3, arg4, arg5,
+                                   arg6);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5, typename Arg6>
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5, typename Arg6>
 CallableMany_8_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2) {
-  return new CallableMany_8_2<Target,Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(
-    f,
-    obj,
-    bind1,
-    bind2);
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Arg1, Arg2, Arg3, Arg4, Arg5,
+                                  Arg6),
+                 Target* obj, Bind1 bind1, Bind2 bind2) {
+  return new CallableMany_8_2<Target, Res, Bind1, Bind2, Arg1, Arg2, Arg3, Arg4,
+                              Arg5, Arg6>(f, obj, bind1, bind2);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_8_3 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+class CallableOnce_8_3 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                                    Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_8_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_8_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_8_3() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4, arg5);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3,
+                                      arg4, arg5);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableOnce_8_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Arg1, typename Arg2, typename Arg3, typename Arg4,
+          typename Arg5>
+class CallableOnce_8_3<Target, void, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                       Arg4, Arg5>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3,
+                                     Arg4, Arg5);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableOnce_8_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableOnce_8_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableOnce_8_3() {}
 
-  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4, arg5);
+  virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                          Arg5 arg5) {
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4,
+                            arg5);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-CallableOnce_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableOnce_8_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+CallableOnce_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                 Arg5>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                                  Arg5),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableOnce_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3, Arg4, Arg5>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-class CallableMany_8_3 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+class CallableMany_8_3 : public Callback<Res, Arg1, Arg2, Arg3, Arg4, Arg5> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                                    Arg5);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5);
-
-  CallableMany_8_3(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3) { }
+  CallableMany_8_3(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3) {}
 
   virtual ~CallableMany_8_3() {}
 
-  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4, Arg5 arg5) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3, arg4, arg5);
+  virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4,
+                         Arg5 arg5) {
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, arg1, arg2, arg3,
+                                   arg4, arg5);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Arg1, typename Arg2, typename Arg3, typename Arg4, typename Arg5>
-CallableMany_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3) {
-  return new CallableMany_8_3<Target,Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4, Arg5>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4, typename Arg5>
+CallableMany_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                 Arg5>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Arg1, Arg2, Arg3, Arg4,
+                                  Arg5),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3) {
+  return new CallableMany_8_3<Target, Res, Bind1, Bind2, Bind3, Arg1, Arg2,
+                              Arg3, Arg4, Arg5>(f, obj, bind1, bind2, bind3);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_8_4 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+class CallableOnce_8_4 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                    Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_8_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_8_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_8_4() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3, arg4);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1,
+                                      arg2, arg3, arg4);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableOnce_8_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4> :
-  public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Arg1, typename Arg2, typename Arg3,
+          typename Arg4>
+class CallableOnce_8_4<Target, void, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                       Arg3, Arg4>
+    : public Callback<void, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                     Arg3, Arg4);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4);
-
-  CallableOnce_8_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableOnce_8_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableOnce_8_4() {}
 
   virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3, arg4);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3,
+                            arg4);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableOnce_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableOnce_8_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+CallableOnce_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3,
+                 Arg4>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3,
+                                  Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableOnce_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2, Arg3, Arg4>(f, obj, bind1, bind2, bind3,
+                                                bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-class CallableMany_8_4 :
-  public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+class CallableMany_8_4 : public Callback<Res, Arg1, Arg2, Arg3, Arg4> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2,
+                                    Arg3, Arg4);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4);
-
-  CallableMany_8_4(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4) { }
+  CallableMany_8_4(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4) {}
 
   virtual ~CallableMany_8_4() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2, arg3, arg4);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, arg1, arg2,
+                                   arg3, arg4);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
   Bind4 bind4_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Arg1, typename Arg2, typename Arg3, typename Arg4>
-CallableMany_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4) {
-  return new CallableMany_8_4<Target,Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3, Arg4>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Arg1, typename Arg2,
+          typename Arg3, typename Arg4>
+CallableMany_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3,
+                 Arg4>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Arg1, Arg2, Arg3,
+                                  Arg4),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4) {
+  return new CallableMany_8_4<Target, Res, Bind1, Bind2, Bind3, Bind4, Arg1,
+                              Arg2, Arg3, Arg4>(f, obj, bind1, bind2, bind3,
+                                                bind4);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_8_5 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2, typename Arg3>
+class CallableOnce_8_5 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                    Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3);
-
-  CallableOnce_8_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_8_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_8_5() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2, arg3);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      arg1, arg2, arg3);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5639,42 +4499,38 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2, typename Arg3>
-class CallableOnce_8_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3> :
-  public Callback<void, Arg1, Arg2, Arg3> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Arg1, typename Arg2,
+          typename Arg3>
+class CallableOnce_8_5<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                       Arg2, Arg3> : public Callback<void, Arg1, Arg2, Arg3> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                     Arg2, Arg3);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3);
-
-  CallableOnce_8_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableOnce_8_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableOnce_8_5() {}
 
   virtual void operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2, arg3);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2,
+                            arg3);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5682,61 +4538,50 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2, typename Arg3>
-CallableOnce_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableOnce_8_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2, typename Arg3>
+CallableOnce_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2,
+                 Arg3>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2,
+                                  Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableOnce_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1, Arg2, Arg3>(f, obj, bind1, bind2, bind3,
+                                                bind4, bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2, typename Arg3>
-class CallableMany_8_5 :
-  public Callback<Res, Arg1, Arg2, Arg3> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2, typename Arg3>
+class CallableMany_8_5 : public Callback<Res, Arg1, Arg2, Arg3> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1,
+                                    Arg2, Arg3);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3);
-
-  CallableMany_8_5(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5) { }
+  CallableMany_8_5(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5) {}
 
   virtual ~CallableMany_8_5() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2, Arg3 arg3) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1, arg2, arg3);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, arg1,
+                                   arg2, arg3);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5744,65 +4589,54 @@ private:
   Bind5 bind5_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Arg1, typename Arg2, typename Arg3>
-CallableMany_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5) {
-  return new CallableMany_8_5<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2, Arg3>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Arg1,
+          typename Arg2, typename Arg3>
+CallableMany_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2,
+                 Arg3>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Arg1, Arg2,
+                                  Arg3),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5) {
+  return new CallableMany_8_5<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Arg1, Arg2, Arg3>(f, obj, bind1, bind2, bind3,
+                                                bind4, bind5);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1, typename Arg2>
-class CallableOnce_8_6 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1, typename Arg2>
+class CallableOnce_8_6 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2);
-
-  CallableOnce_8_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_8_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_8_6() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1, arg2);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      bind6_, arg1, arg2);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5811,44 +4645,40 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1, typename Arg2>
-class CallableOnce_8_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2> :
-  public Callback<void, Arg1, Arg2> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6, typename Arg1,
+          typename Arg2>
+class CallableOnce_8_6<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                       Arg1, Arg2> : public Callback<void, Arg1, Arg2> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                     Arg1, Arg2);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2);
-
-  CallableOnce_8_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableOnce_8_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableOnce_8_6() {}
 
   virtual void operator()(Arg1 arg1, Arg2 arg2) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1, arg2);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_,
+                            arg1, arg2);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5857,65 +4687,52 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1, typename Arg2>
-CallableOnce_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableOnce_8_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1, typename Arg2>
+CallableOnce_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1,
+                 Arg2>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Arg1, Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableOnce_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Arg1, Arg2>(f, obj, bind1, bind2, bind3,
+                                                 bind4, bind5, bind6);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1, typename Arg2>
-class CallableMany_8_6 :
-  public Callback<Res, Arg1, Arg2> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1, typename Arg2>
+class CallableMany_8_6 : public Callback<Res, Arg1, Arg2> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Arg1, Arg2);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2);
-
-  CallableMany_8_6(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6) { }
+  CallableMany_8_6(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6) {}
 
   virtual ~CallableMany_8_6() {}
 
   virtual Res operator()(Arg1 arg1, Arg2 arg2) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, arg1, arg2);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_, arg1, arg2);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5924,69 +4741,55 @@ private:
   Bind6 bind6_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Arg1, typename Arg2>
-CallableMany_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6) {
-  return new CallableMany_8_6<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1, Arg2>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Arg1, typename Arg2>
+CallableMany_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Arg1,
+                 Arg2>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Arg1, Arg2),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6) {
+  return new CallableMany_8_6<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Arg1, Arg2>(f, obj, bind1, bind2, bind3,
+                                                 bind4, bind5, bind6);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Arg1>
-class CallableOnce_8_7 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Arg1>
+class CallableOnce_8_7 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1);
-
-  CallableOnce_8_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableOnce_8_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableOnce_8_7() {}
 
   virtual Res operator()(Arg1 arg1) {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, arg1);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      bind6_, bind7_, arg1);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -5996,46 +4799,41 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Arg1>
-class CallableOnce_8_7<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1> :
-  public Callback<void, Arg1> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6, typename Bind7,
+          typename Arg1>
+class CallableOnce_8_7<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                       Bind7, Arg1> : public Callback<void, Arg1> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                     Bind7, Arg1);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1);
-
-  CallableOnce_8_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableOnce_8_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableOnce_8_7() {}
 
   virtual void operator()(Arg1 arg1) {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, arg1);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_,
+                            bind7_, arg1);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -6045,69 +4843,53 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Arg1>
-CallableOnce_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7) {
-  return new CallableOnce_8_7<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Arg1>
+CallableOnce_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7,
+                 Arg1>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7) {
+  return new CallableOnce_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7, Arg1>(f, obj, bind1, bind2, bind3,
+                                                  bind4, bind5, bind6, bind7);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Arg1>
-class CallableMany_8_7 :
-  public Callback<Res, Arg1> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Arg1>
+class CallableMany_8_7 : public Callback<Res, Arg1> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7, Arg1);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1);
-
-  CallableMany_8_7(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7) { }
+  CallableMany_8_7(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7) {}
 
   virtual ~CallableMany_8_7() {}
 
   virtual Res operator()(Arg1 arg1) {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, arg1);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_, bind7_, arg1);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -6117,73 +4899,56 @@ private:
   Bind7 bind7_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Arg1>
-CallableMany_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7) {
-  return new CallableMany_8_7<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Arg1>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Arg1>
+CallableMany_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7,
+                 Arg1>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7, Arg1),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7) {
+  return new CallableMany_8_7<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7, Arg1>(f, obj, bind1, bind2, bind3,
+                                                  bind4, bind5, bind6, bind7);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Bind8>
-class CallableOnce_8_8 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Bind8>
+class CallableOnce_8_8 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7, Bind8);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8);
-
-  CallableOnce_8_8(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7,
-    Bind8 bind8)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7),
-      bind8_(bind8) { }
+  CallableOnce_8_8(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7, Bind8 bind8)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7),
+        bind8_(bind8) {}
 
   virtual ~CallableOnce_8_8() {}
 
   virtual Res operator()() {
-    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, bind8_);
+    Res ret = ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                      bind6_, bind7_, bind8_);
     delete this;
     return ret;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -6194,48 +4959,42 @@ private:
   Bind8 bind8_;
 };
 
-template<typename Target, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Bind8>
-class CallableOnce_8_8<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8> :
-  public Callback<void> {
+template <typename Target, typename Bind1, typename Bind2, typename Bind3,
+          typename Bind4, typename Bind5, typename Bind6, typename Bind7,
+          typename Bind8>
+class CallableOnce_8_8<Target, void, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                       Bind7, Bind8> : public Callback<void> {
+ public:
+  typedef void (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                     Bind7, Bind8);
 
-public:
-  typedef void(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8);
-
-  CallableOnce_8_8(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7,
-    Bind8 bind8)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7),
-      bind8_(bind8) { }
+  CallableOnce_8_8(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7, Bind8 bind8)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7),
+        bind8_(bind8) {}
 
   virtual ~CallableOnce_8_8() {}
 
   virtual void operator()() {
-    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, bind8_);
+    ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_,
+                            bind7_, bind8_);
     delete this;
   }
 
-  virtual bool once() const {
-    return true;
-  }
+  virtual bool once() const { return true; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -6246,73 +5005,55 @@ private:
   Bind8 bind8_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Bind8>
-CallableOnce_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8>*
-MakeCallableOnce(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7,
-    Bind8 bind8) {
-  return new CallableOnce_8_8<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7,
-    bind8);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Bind8>
+CallableOnce_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7,
+                 Bind8>*
+MakeCallableOnce(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7, Bind8),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7,
+                 Bind8 bind8) {
+  return new CallableOnce_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7, Bind8>(
+      f, obj, bind1, bind2, bind3, bind4, bind5, bind6, bind7, bind8);
 }
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Bind8>
-class CallableMany_8_8 :
-  public Callback<Res> {
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Bind8>
+class CallableMany_8_8 : public Callback<Res> {
+ public:
+  typedef Res (Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                    Bind7, Bind8);
 
-public:
-  typedef Res(Target::*TargetFunc)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8);
-
-  CallableMany_8_8(TargetFunc target_func,
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7,
-    Bind8 bind8)
-    : target_func_(target_func),
-      obj_(obj),
-      bind1_(bind1),
-      bind2_(bind2),
-      bind3_(bind3),
-      bind4_(bind4),
-      bind5_(bind5),
-      bind6_(bind6),
-      bind7_(bind7),
-      bind8_(bind8) { }
+  CallableMany_8_8(TargetFunc target_func, Target* obj, Bind1 bind1,
+                   Bind2 bind2, Bind3 bind3, Bind4 bind4, Bind5 bind5,
+                   Bind6 bind6, Bind7 bind7, Bind8 bind8)
+      : target_func_(target_func),
+        obj_(obj),
+        bind1_(bind1),
+        bind2_(bind2),
+        bind3_(bind3),
+        bind4_(bind4),
+        bind5_(bind5),
+        bind6_(bind6),
+        bind7_(bind7),
+        bind8_(bind8) {}
 
   virtual ~CallableMany_8_8() {}
 
   virtual Res operator()() {
-    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_, bind6_, bind7_, bind8_);
+    return ((*obj_).*target_func_)(bind1_, bind2_, bind3_, bind4_, bind5_,
+                                   bind6_, bind7_, bind8_);
   }
 
-  virtual bool once() const {
-    return false;
-  }
+  virtual bool once() const { return false; }
 
-private:
-  TargetFunc target_func_; // not owned here
-  Target* obj_;            // not owned here
+ private:
+  TargetFunc target_func_;  // not owned here
+  Target* obj_;             // not owned here
   Bind1 bind1_;
   Bind2 bind2_;
   Bind3 bind3_;
@@ -6323,30 +5064,19 @@ private:
   Bind8 bind8_;
 };
 
-template<typename Target, typename Res, typename Bind1, typename Bind2, typename Bind3, typename Bind4, typename Bind5, typename Bind6, typename Bind7, typename Bind8>
-CallableMany_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8>*
-MakeCallableMany(
-    Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8),
-    Target* obj,
-    Bind1 bind1,
-    Bind2 bind2,
-    Bind3 bind3,
-    Bind4 bind4,
-    Bind5 bind5,
-    Bind6 bind6,
-    Bind7 bind7,
-    Bind8 bind8) {
-  return new CallableMany_8_8<Target,Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7, Bind8>(
-    f,
-    obj,
-    bind1,
-    bind2,
-    bind3,
-    bind4,
-    bind5,
-    bind6,
-    bind7,
-    bind8);
+template <typename Target, typename Res, typename Bind1, typename Bind2,
+          typename Bind3, typename Bind4, typename Bind5, typename Bind6,
+          typename Bind7, typename Bind8>
+CallableMany_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5, Bind6, Bind7,
+                 Bind8>*
+MakeCallableMany(Res (Target::*f)(Bind1, Bind2, Bind3, Bind4, Bind5, Bind6,
+                                  Bind7, Bind8),
+                 Target* obj, Bind1 bind1, Bind2 bind2, Bind3 bind3,
+                 Bind4 bind4, Bind5 bind5, Bind6 bind6, Bind7 bind7,
+                 Bind8 bind8) {
+  return new CallableMany_8_8<Target, Res, Bind1, Bind2, Bind3, Bind4, Bind5,
+                              Bind6, Bind7, Bind8>(
+      f, obj, bind1, bind2, bind3, bind4, bind5, bind6, bind7, bind8);
 }
 };  // namespace threading
 };  // namespace jcl

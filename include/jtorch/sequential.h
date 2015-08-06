@@ -14,32 +14,37 @@
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
-  
-  class Sequential : public TorchStage {
-  public:
-    // Constructor / Destructor
-    Sequential();
-    ~Sequential() override;
 
-    TorchStageType type() const override { return SEQUENTIAL_STAGE; }
-    std::string name() const override { return "Sequential"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class Sequential : public TorchStage {
+ public:
+  // Constructor / Destructor
+  Sequential();
+  ~Sequential() override;
 
-    void add(std::unique_ptr<TorchStage> stage);
-    TorchStage* get(const uint32_t i);
-    uint32_t size() const;
+  TorchStageType type() const override { return SEQUENTIAL_STAGE; }
+  std::string name() const override { return "Sequential"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  void add(std::unique_ptr<TorchStage> stage);
+  TorchStage* get(const uint32_t i);
+  uint32_t size() const;
 
-  protected:
-    std::vector<std::unique_ptr<TorchStage>> network_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    // Non-copyable, non-assignable.
-    Sequential(Sequential&);
-    Sequential& operator=(const Sequential&);
-  };
+ protected:
+  std::vector<std::unique_ptr<TorchStage>> network_;
+
+  // Non-copyable, non-assignable.
+  Sequential(Sequential&);
+  Sequential& operator=(const Sequential&);
+};
 
 };  // namespace jtorch

@@ -3,9 +3,6 @@
 #include "jcl/jcl.h"
 #include "jcl/opencl_context.h"
 
-using std::string;
-using std::runtime_error;
-
 namespace jcl {
 
   OpenCLProgram::OpenCLProgram(const std::string& filename, 
@@ -58,52 +55,48 @@ namespace jcl {
 
   void OpenCLProgram::compileProgram(cl::Context& context,
     std::vector<cl::Device>& devices, const bool strict_float) {
-    try {
-      cl::Program::Sources source(1, std::make_pair(code_.get(), strlen(code_.get())));
-      program_ = cl::Program(context, source);
-    } catch (cl::Error err) {
-      std::cout << "cl::Program() failed: "
-                << OpenCLContext::GetCLErrorString(err) << std::endl;
-      assert(false);
-    }
+    cl::Program::Sources source(
+        1, std::make_pair(code_.get(), strlen(code_.get())));
+    cl_int err;
+    program_ = cl::Program(context, source, &err);
+    cl::CheckError(err);
 
-    try {
-      std::cout << "\tBuilding program: " << filename_ << std::endl;
+    std::cout << "\tBuilding program: " << filename_ << std::endl;
 #if !defined(__APPLE__)
-      const char* options = "-Werror";  // Make warnings into errors"
+    const char* options = "-Werror";  // Make warnings into errors"
 #else
       // Unfortunately, on Mac OS X, I think there are warnings that don't get
       // logged, so sometimes kernels wont compile and there's no info to fix it
       const char* options = nullptr;
 #endif
-      if (!strict_float) {
+    if (!strict_float) {
 #if !defined(__APPLE__)
-        options = "-Werror -cl-mad-enable -cl-fast-relaxed-math "
-          "-cl-no-signed-zeros -cl-denorms-are-zero "
-          "-cl-unsafe-math-optimizations";
+      options = "-Werror -cl-mad-enable -cl-fast-relaxed-math "
+        "-cl-no-signed-zeros -cl-denorms-are-zero "
+        "-cl-unsafe-math-optimizations";
 #else
-        options = "-cl-mad-enable -cl-fast-relaxed-math -cl-no-signed-zeros "
-                  "-cl-auto-vectorize-enable -cl-denorms-are-zero "
-                  "-cl-unsafe-math-optimizations";
+      options = "-cl-mad-enable -cl-fast-relaxed-math -cl-no-signed-zeros "
+                "-cl-auto-vectorize-enable -cl-denorms-are-zero "
+                "-cl-unsafe-math-optimizations";
 #endif
-      }
+    }
 #if defined(DEBUG) || defined(_DEBUG)
-      if (options != nullptr) {
-        std::cout << "\t --> With options: " << options << std::endl;
-      }
+    if (options != nullptr) {
+      std::cout << "\t --> With options: " << options << std::endl;
+    }
 #endif
-      program_.build(devices, options);
+    err = program_.build(devices, options);
 #if defined(DEBUG) || defined(_DEBUG)
       std::cout << "\t --> Finished building program" << std::endl;
 #endif
-    } catch (cl::Error err) {
+    if (err != CL_SUCCESS) {
       std::cout << "\t --> Build failed for source: " << std::endl;
-      std::cout << code_ << std::endl;
+      std::cout << code_.get() << std::endl;
 			string str = program_.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0]);
       std::cout << "ERROR: program_.build() failed." 
-                << OpenCLContext::GetCLErrorString(err) << std::endl;
+                << cl::GetCLErrorEnumString(err) << std::endl;
       std::cout << "    Program Info: " << str << std::endl;
-      assert(false);
+      cl::CheckError(err);
     }
   }
 

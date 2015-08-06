@@ -17,28 +17,28 @@
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
-  
-  class JoinTable : public TorchStage {
-  public:
-    // Constructor / Destructor
-    JoinTable(const uint32_t dimension);
-    ~JoinTable() override;
 
-    TorchStageType type() const override { return JOIN_TABLE_STAGE; }
-    std::string name() const override { return "JoinTable"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class JoinTable : public TorchStage {
+ public:
+  // Constructor / Destructor
+  JoinTable(const uint32_t dimension);
+  ~JoinTable() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return JOIN_TABLE_STAGE; }
+  std::string name() const override { return "JoinTable"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-    inline uint32_t dimension() const { return dimension_; }
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-  protected:
-    void init(std::shared_ptr<TorchData> input);
-    uint32_t dimension_;
+  inline uint32_t dimension() const { return dimension_; }
 
-    // Non-copyable, non-assignable.
-    JoinTable(JoinTable&);
-    JoinTable& operator=(const JoinTable&);
-  };
+ protected:
+  void init(std::shared_ptr<TorchData> input);
+  uint32_t dimension_;
+
+  // Non-copyable, non-assignable.
+  JoinTable(JoinTable&);
+  JoinTable& operator=(const JoinTable&);
+};
 
 };  // namespace jtorch

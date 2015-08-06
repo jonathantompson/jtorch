@@ -13,34 +13,42 @@
 #include "jtorch/torch_stage.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
 
-namespace jcl { namespace data_str { template <typename T> class VectorManaged; } }
+namespace jcl {
+namespace data_str {
+template <typename T>
+class VectorManaged;
+}
+}
 
 namespace jtorch {
 
-  template <typename T> class Tensor;
-  
-  class SpatialUpSamplingNearest : public TorchStage {
-  public:
-    // Constructor / Destructor
-    SpatialUpSamplingNearest(const int32_t scale);
-    ~SpatialUpSamplingNearest() override;
+template <typename T>
+class Tensor;
 
-    TorchStageType type() const override { return SPATIAL_UP_SAMPLING_NEAREST_STAGE; }
-    std::string name() const override { return "SpatialUpSamplingNearest"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class SpatialUpSamplingNearest : public TorchStage {
+ public:
+  // Constructor / Destructor
+  SpatialUpSamplingNearest(const int32_t scale);
+  ~SpatialUpSamplingNearest() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override {
+    return SPATIAL_UP_SAMPLING_NEAREST_STAGE;
+  }
+  std::string name() const override { return "SpatialUpSamplingNearest"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-  protected:
-    uint32_t scale_;
-    uint32_t out_dim_;
-    std::unique_ptr<uint32_t[]> out_size_;
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    void init(std::shared_ptr<TorchData> input);
+ protected:
+  uint32_t scale_;
+  uint32_t out_dim_;
+  std::unique_ptr<uint32_t[]> out_size_;
 
-    // Non-copyable, non-assignable.
-    SpatialUpSamplingNearest(SpatialUpSamplingNearest&);
-    SpatialUpSamplingNearest& operator=(const SpatialUpSamplingNearest&);
-  };
-  
+  void init(std::shared_ptr<TorchData> input);
+
+  // Non-copyable, non-assignable.
+  SpatialUpSamplingNearest(SpatialUpSamplingNearest&);
+  SpatialUpSamplingNearest& operator=(const SpatialUpSamplingNearest&);
+};
+
 };  // namespace jtorch

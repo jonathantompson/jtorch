@@ -14,24 +14,23 @@
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
-  
-  class Identity : public TorchStage {
-  public:
-    // Constructor / Destructor
-    Identity();
-    ~Identity() override;
 
-    TorchStageType type() const override { return IDENTITY_STAGE; }
-    std::string name() const override { return "Identity"; }
-    void forwardProp(std::shared_ptr<TorchData> input) override;
+class Identity : public TorchStage {
+ public:
+  // Constructor / Destructor
+  Identity();
+  ~Identity() override;
 
-    static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
+  TorchStageType type() const override { return IDENTITY_STAGE; }
+  std::string name() const override { return "Identity"; }
+  void forwardProp(std::shared_ptr<TorchData> input) override;
 
-  protected:
+  static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-    // Non-copyable, non-assignable.
-    Identity(Identity&);
-    Identity& operator=(const Identity&);
-  };
+ protected:
+  // Non-copyable, non-assignable.
+  Identity(Identity&);
+  Identity& operator=(const Identity&);
+};
 
 };  // namespace jtorch

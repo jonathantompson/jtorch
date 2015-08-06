@@ -3,11 +3,6 @@
 #include "jcl/opencl_context.h"
 #include "jcl/opencl_buffer_data.h"
 
-using namespace jcl::data_str;
-using std::runtime_error;
-using std::cout;
-using std::endl;
-
 namespace jcl {
 
   uint64_t OpenCLBufferData::nelems_allocated_ = 0;
@@ -62,6 +57,7 @@ namespace jcl {
   OpenCLBufferData::~OpenCLBufferData() {
     std::lock_guard<std::mutex> guard(lock_);
     size_t sz = buffer_.size();
+    static_cast<void>(sz);
     buffer_.clear();
     nelems_allocated_ -= nelems;
 #if defined(TRACK_ALLOCATIONS)
