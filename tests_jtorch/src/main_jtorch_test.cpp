@@ -30,7 +30,6 @@
 #include "jtorch/select_table.h"
 #include "jtorch/c_add_table.h"
 #include "jcl/threading/thread_pool.h"
-#include "jcl/data_str/vector_managed.h"
 #include "debug_util.h"
 #include "file_io.h"
 #include "clk/clk.h"
@@ -45,7 +44,6 @@ using namespace std;
 using namespace jtorch;
 using namespace jcl::threading;
 using namespace jcl::math;
-using namespace jcl::data_str;
 using namespace jcl::file_io;
 using namespace clk;
 

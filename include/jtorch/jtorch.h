@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include "jcl/math/int_types.h"
 
