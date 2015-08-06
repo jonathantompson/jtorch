@@ -9,6 +9,143 @@ using namespace jcl::math;
 
 namespace jtorch {
 
+static const char* kSpatialSubtractiveNormalizationKernel =
+"    __kernel void SpatialSubtractiveNormalizationHoriz("
+"      const __global float* input,     /* 0 */"
+"      __global float* output,          /* 1 */"
+"      const __global float* kernel1d,  /* 2 */"
+"      const int filt_rad) {            /* 3 */"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      /* Initilize the output to zero and accumulate the input values */"
+"      float sum = 0;"
+""
+"      const int iout = x_out + width * (y_out + height * f_out);"
+""
+"      int i = 0;"
+"      for (int u_offset = -filt_rad; u_offset <= filt_rad; u_offset++, i++) {"
+"        int u = x_out + u_offset;"
+"        if (u >= 0 && u < width) {"
+"          sum += kernel1d[i] * input[iout + u_offset];"
+"        }"
+"      }"
+""
+"      output[iout] = sum;"
+"    }"
+""
+"    __kernel void SpatialSubtractiveNormalizationVert("
+"      const __global float* input,     /* 0 */"
+"      __global  float* output,         /* 1 */"
+"      const __global float* kernel1d,  /* 2 */"
+"      const int filt_rad) {            /* 3 */"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      /* Initilize the output to zero and accumulate the input values */"
+"      float sum = 0;"
+""
+"      const int iout = x_out + width * (y_out + height * f_out);"
+""
+"      int i = 0;"
+"      for (int v_offset = -filt_rad; v_offset <= filt_rad; v_offset++, i++) {"
+"        int v = y_out + v_offset;"
+"        if (v >= 0 && v < height) {"
+"          sum += kernel1d[i] * input[iout + v_offset * width];"
+"        }"
+"      }"
+""
+"      output[iout] = sum;"
+"    }"
+""
+"    __kernel void SpatialSubtractiveNormalization2D("
+"      const __global float* input,     /* 0 */"
+"      __global  float* output,         /* 1 */"
+"      const __global float* kernel2d,  /* 2 */"
+"      const int filt_rad_u,            /* 3 */"
+"      const int filt_rad_v) {          /* 4 */"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      /* Initilize the output to zero and accumulate the input values */"
+"      float sum = 0;"
+""
+"      const int iout = x_out + width * (y_out + height * f_out);"
+"      const int filt_size_u = 2 * filt_rad_u + 1;"
+""
+"      for (int v_offset = -filt_rad_v; v_offset <= filt_rad_v; v_offset++) {"
+"        int v = y_out + v_offset;"
+"        int v_filt = v_offset + filt_rad_v;"
+"        for (int u_offset = -filt_rad_u; u_offset <= filt_rad_u; u_offset++) {"
+"          int u = x_out + u_offset;"
+"          int u_filt = u_offset + filt_rad_u;"
+"          if (v >= 0 && v < height && u >= 0 && u < width) {"
+"            sum += kernel2d[v_filt * filt_size_u + u_filt] * "
+"              input[iout + v_offset * width + u_offset];"
+"          }"
+"        }"
+"      }"
+""
+"      output[iout] = sum;"
+"    }"
+""
+"    __kernel void SpatialSubtractiveNormalizationAccumDiv("
+"      const __global float* input,       /* 0 */"
+"      __global  float* output,           /* 1 */"
+"      const __global float* mean_coeff,  /* 2 */"
+"      const int input_nfeats) {          /* 3 */"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      /* Initilize the output to zero and accumulate the input values */"
+"      float sum = 0;"
+""
+"      const int uvout = x_out + width * y_out;  /* index on each input image */"
+"      const int im_dim = width * height;"
+"      for (int f = 0; f < input_nfeats; f++) {"
+"        sum += input[f * im_dim + uvout];"
+"      }"
+""
+"      output[uvout] = sum / ((float)input_nfeats * (float)input_nfeats * mean_coeff[uvout]);"
+"    }"
+""
+"    __kernel void SpatialSubtractiveNormalization("
+"      const __global float* input,      /* 0 */"
+"      __global float* output,           /* 1 */"
+"      const __global float* mean) {     /* 2 */"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      const int index = x_out + width * (y_out + height * f_out);"
+"      output[index] = input[index] - mean[y_out * width + x_out];"
+"    }";
+
+
 // kernel1d default is either TorchStage::gaussian1D<float>(n) or just a
 // vector of 1 values.
 SpatialSubtractiveNormalization::SpatialSubtractiveNormalization(
@@ -143,15 +280,13 @@ void SpatialSubtractiveNormalization::forwardProp(
 
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
   Tensor<float>* out = TO_TENSOR_PTR(output.get());
-  std::string kernel =
-      jtorch::jtorch_path + "kernels/spatial_subtractive_normalization.cl";
 
   if (onedim_kernel) {
     int32_t filt_rad = ((int32_t)kernel_->size()[0] - 1) / 2;
 
     // Perform horizontal filter pass
-    cl_context->useKernel(kernel.c_str(),
-                          "SpatialSubtractiveNormalizationHoriz");
+    cl_context->useKernelCStr(kSpatialSubtractiveNormalizationKernel,
+                              "SpatialSubtractiveNormalizationHoriz");
     cl_context->setArg(0, in->storage());
     cl_context->setArg(1, mean_pass1_->storage());
     cl_context->setArg(2, kernel_->storage());
@@ -160,8 +295,8 @@ void SpatialSubtractiveNormalization::forwardProp(
                           mean_pass1_->size(), false);
 
     // Perform vertical filter pass
-    cl_context->useKernel(kernel.c_str(),
-                          "SpatialSubtractiveNormalizationVert");
+    cl_context->useKernelCStr(kSpatialSubtractiveNormalizationKernel,
+                              "SpatialSubtractiveNormalizationVert");
     cl_context->setArg(0, mean_pass1_->storage());
     cl_context->setArg(1, mean_pass2_->storage());
     cl_context->setArg(2, kernel_->storage());
@@ -173,7 +308,8 @@ void SpatialSubtractiveNormalization::forwardProp(
     int32_t filt_rad_v = ((int32_t)kernel_->size()[1] - 1) / 2;
 
     // Perform horizontal filter pass
-    cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalization2D");
+    cl_context->useKernelCStr(kSpatialSubtractiveNormalizationKernel,
+                              "SpatialSubtractiveNormalization2D");
     cl_context->setArg(0, in->storage());
     cl_context->setArg(1, mean_pass2_->storage());
     cl_context->setArg(2, kernel_->storage());
@@ -184,8 +320,8 @@ void SpatialSubtractiveNormalization::forwardProp(
   }
 
   // Perform accumulation and division pass
-  cl_context->useKernel(kernel.c_str(),
-                        "SpatialSubtractiveNormalizationAccumDiv");
+  cl_context->useKernelCStr(kSpatialSubtractiveNormalizationKernel,
+                            "SpatialSubtractiveNormalizationAccumDiv");
   cl_context->setArg(0, mean_pass2_->storage());
   cl_context->setArg(1, mean_->storage());
   cl_context->setArg(2, mean_coef_->storage());
@@ -193,7 +329,8 @@ void SpatialSubtractiveNormalization::forwardProp(
   cl_context->runKernel(jtorch::deviceid, mean_->dim(), mean_->size(), false);
 
   // Perform normalization pass
-  cl_context->useKernel(kernel.c_str(), "SpatialSubtractiveNormalization");
+  cl_context->useKernelCStr(kSpatialSubtractiveNormalizationKernel,
+                            "SpatialSubtractiveNormalization");
   cl_context->setArg(0, in->storage());
   cl_context->setArg(1, out->storage());
   cl_context->setArg(2, mean_->storage());

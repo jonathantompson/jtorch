@@ -10,6 +10,29 @@ using namespace jcl::math;
 
 namespace jtorch {
 
+static const char* kTanhKernel =
+"    __kernel void TanH(const __global float* input, __global float* output) {"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      const int index = x_out + width * (y_out + height * f_out);"
+""
+"      output[index] = tanh(input[index]);"
+"    }"
+""
+"    __kernel void TanH1D(const __global float* input, __global float* output) {"
+""
+"      const int x_out = get_global_id(0);"
+""
+"      output[x_out] = tanh(input[x_out]);"
+"    }";
+
+
 Tanh::Tanh() : TorchStage() { output = nullptr; }
 
 Tanh::~Tanh() {}
@@ -31,8 +54,7 @@ void Tanh::init(std::shared_ptr<TorchData> input) {
 
 void Tanh::forwardProp(std::shared_ptr<TorchData> input) {
   init(input);
-  std::string kernel = jtorch::jtorch_path + "kernels/tanh.cl";
-  cl_context->useKernel(kernel.c_str(), "TanH1D");
+  cl_context->useKernelCStr(kTanhKernel, "TanH1D");
   cl_context->setArg(0, TO_TENSOR_PTR(input.get())->storage());
   cl_context->setArg(1, TO_TENSOR_PTR(output.get())->storage());
   uint32_t dim = 1;

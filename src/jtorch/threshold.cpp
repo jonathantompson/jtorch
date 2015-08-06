@@ -10,6 +10,38 @@ using namespace jcl::math;
 
 namespace jtorch {
 
+static const char* kThresholdKernel =
+"    __kernel void Threshold("
+"      const __global  float* input, "
+"      __global float* output,"
+"      const float threshold, "
+"      const float val) {"
+""
+"      const int width = get_global_size(0);"
+"      const int height = get_global_size(1);"
+""
+"      const int x_out = get_global_id(0);"
+"      const int y_out = get_global_id(1);"
+"      const int f_out = get_global_id(2);"
+""
+"      const int index = x_out + width * (y_out + height * f_out);"
+""
+"      output[index] = input[index] > threshold ? input[index] : val;"
+"    }"
+""
+"    __kernel void Threshold1D("
+"      const __global  float* input, "
+"      __global float* output,"
+"      const float threshold, "
+"      const float val) {"
+""
+"      const int x_out = get_global_id(0);"
+""
+"      output[x_out] = input[x_out] > threshold ? input[x_out] : val;"
+"    }";
+
+
+
 Threshold::Threshold() : TorchStage() {
   output = nullptr;
   threshold = 1e-6f;
@@ -34,8 +66,7 @@ void Threshold::init(std::shared_ptr<TorchData> input) {
 
 void Threshold::forwardProp(std::shared_ptr<TorchData> input) {
   init(input);
-  std::string kernel = jtorch::jtorch_path + "kernels/threshold.cl";
-  cl_context->useKernel(kernel.c_str(), "Threshold1D");
+  cl_context->useKernelCStr(kThresholdKernel, "Threshold1D");
   cl_context->setArg(0, TO_TENSOR_PTR(input.get())->storage());
   cl_context->setArg(1, TO_TENSOR_PTR(output.get())->storage());
   cl_context->setArg(2, threshold);

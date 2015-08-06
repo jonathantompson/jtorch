@@ -11,6 +11,16 @@ using namespace jcl::math;
 
 namespace jtorch {
 
+static const char* kJoinTable1DKernel =
+"__kernel void JoinTable1D("
+"  const __global  float* input,  /* 0 */"
+"  __global  float* output,       /* 1 */"
+"  const int output_offset) {     /* 2 */"
+"  const int x_in = get_global_id(0);"
+"  output[x_in + output_offset] = input[x_in];"
+"}";
+
+
 JoinTable::JoinTable(const uint32_t dimension) {
   dimension_ = dimension;
   output = nullptr;
@@ -87,8 +97,7 @@ void JoinTable::forwardProp(std::shared_ptr<TorchData> input) {
   assert(dimension_ == 0);  // Only dimension=0 is supported for now
 
   // Copy each table element's raw data into the output
-  std::string kernel = jtorch::jtorch_path + "kernels/join_table.cl";
-  cl_context->useKernel(kernel.c_str(), "JoinTable1D");
+  cl_context->useKernelCStr(kJoinTable1DKernel, "JoinTable1D");
   int out_offset = 0;
   for (uint32_t i = 0; i < in->tableSize(); i++) {
     Tensor<float>* cur_input = TO_TENSOR_PTR((*in)(i).get());

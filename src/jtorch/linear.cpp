@@ -10,6 +10,67 @@ using namespace jcl::math;
 
 namespace jtorch {
 
+static const char* kLinearKernel =
+"    __kernel void MatVecMultSimple("
+"      /* Y = A * X (matrix-vector mulitply)*/"
+"      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored column major */"
+"      __global const float* X,  /* 1  --> Size N */"
+"      __global  float* Y,       /* 2  --> Size M */"
+"      const int M,              /* 3 */"
+"      const int N) {            /* 4 */"
+"      const int i = get_global_id(0);  /* row index */"
+"      float sum = 0;"
+"      /* Perform the linear accumulation */"
+"      for (int k = 0; k < N; k++) {"
+"        sum += A[i + M * k] * X[k];"
+"      }"
+"      Y[i] = sum;"
+"    }"
+""
+"    #define ROW_DIM 0\n"
+"    #define COL_DIM 1\n"
+""
+"    __kernel void MatVecMultThreads("
+"      /* Y = A * X (matrix-vector mulitply) */"
+"      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored column major */"
+"      __global const float* X,  /* 1  --> Size N */"
+"      __global  float* Y,       /* 2  --> Size M */"
+"      __local float* work,      /* 3  --> Size M by p */"
+"      const int M,              /* 4 */"
+"      const int N) {            /* 5 */"
+"      /* Compute partial dot product */"
+"      float sum = 0;"
+"      for (int k = get_global_id(COL_DIM); k < N; k += get_global_size(COL_DIM)) {"
+"        sum += A[get_global_id(ROW_DIM) + M * k] * X[k];"
+"      }"
+"      /* Each thread stores its partial sum in WORK */"
+"      int rows = get_local_size(ROW_DIM); /* rows in group */"
+"      int cols = get_local_size(COL_DIM); /* initial cols in group */"
+"      int ii = get_local_id(ROW_DIM); /* local row index in group, 0<=ii<rows */"
+"      int jj = get_local_id(COL_DIM); /* block index in column, 0<=jj<cols */"
+"      work[ii+rows*jj] = sum;"
+"      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */"
+"      /* Reduce sums in log2(cols) steps */"
+"      while (cols > 1) {"
+"        cols >>= 1;"
+"      if (jj < cols) { "
+"        work[ii + rows * jj] += work[ii + rows * (jj + cols)];"
+"      }"
+"      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */"
+"      }"
+"      /* Write final result in Y */"
+"      if ( jj == 0 ) {"
+"        Y[ get_global_id(ROW_DIM) ] = work[ii];"
+"      }"
+"    }"
+""
+"    __kernel void Accum ("
+"      __global  float* output,          /* 0 */"
+"      const __global float* biases) {   /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] += biases[x_out];"
+"    }";
+
 Linear::Linear(const uint32_t n_inputs, const uint32_t n_outputs)
     : TorchStage() {
   n_inputs_ = n_inputs;
@@ -41,8 +102,7 @@ void Linear::init(std::shared_ptr<TorchData> input) {
 void Linear::forwardProp(std::shared_ptr<TorchData> input) {
   init(input);
 #ifdef SIMPLE_LINEAR
-  std::string kernel = jtorch::jtorch_path + "kernels/linear.cl";
-  cl_context->useKernel(kernel.c_str(), "MatVecMultSimple");
+  cl_context->useKernelCStr(kLinearKernel, "MatVecMultSimple");
   cl_context->setArg(0, weights_->storage());
   cl_context->setArg(1, TO_TENSOR_PTR(input.get())->storage());
   cl_context->setArg(2, TO_TENSOR_PTR(output.get())->storage());
@@ -51,8 +111,7 @@ void Linear::forwardProp(std::shared_ptr<TorchData> input) {
   uint32_t dim = 1;
   cl_context->runKernel(jtorch::deviceid, dim, &n_outputs_, false);
 #else
-  std::string kernel = jtorch::jtorch_path + "kernels/linear.cl";
-  cl_context->useKernel(kernel.c_str(), "MatVecMultThreads");
+  cl_context->useKernelCStr(kLinearKernel, "MatVecMultThreads");
 
   uint32_t max_worksize =
       cl_context->queryMaxWorkgroupSizeForCurKernel(jtorch::deviceid);
@@ -91,7 +150,7 @@ void Linear::forwardProp(std::shared_ptr<TorchData> input) {
 #endif
 
   // Now add in the bias
-  cl_context->useKernel(kernel.c_str(), "Accum");
+  cl_context->useKernelCStr(kLinearKernel, "Accum");
   cl_context->setArg(0, TO_TENSOR_PTR(output.get())->storage());
   cl_context->setArg(1, biases_->storage());
   dim = 1;

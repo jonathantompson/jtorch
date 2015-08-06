@@ -36,6 +36,59 @@ class ThreadPool;
 
 namespace jtorch {
 
+static const char* kFillKernel =
+"    __kernel void Fill("
+"      __global float* output,  /* 0 */"
+"      const float value) {     /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] = value;"
+"    }";
+
+static const char* kDivKernel =
+"    /* output = output / div_val */"
+"    __kernel void Div("
+"      const  float div_val,  /* 0 */"
+"      __global  float* output) {      /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] /= div_val;"
+"    }";
+
+static const char* kAccumulateKernel =
+"    /* output += input1 */"
+"    __kernel void Accumulate("
+"      const __global  float* input1,  /* 0 */"
+"      __global  float* output) {      /* 2 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] += input1[x_out];"
+"    }";
+
+static const char* kAddKernel =
+"    /* output = input1 + input2 */"
+"    __kernel void Add("
+"      const __global  float* input1,  /* 0 */"
+"      const __global  float* input2,  /* 1 */"
+"      __global  float* output) {      /* 2 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] = input1[x_out] + input2[x_out];"
+"    }";
+
+static const char* kCopyKernel =
+"    __kernel void Copy("
+"      const __global float* input,  /* 0 */"
+"      __global float* output) {     /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] = input[x_out];"
+"    }";
+
+static const char* kMulKernel =
+"    /* output = mul_val * output */"
+"    __kernel void Mul("
+"      const  float mul_val,  /* 0 */"
+"      __global  float* output) {      /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] *= mul_val;"
+"    }";
+
 template <typename T>
 class Tensor : public TorchData {
  public:
@@ -348,8 +401,7 @@ Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
 template <typename T>
 Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
   Tensor<T>* ret = new Tensor<T>(x.dim_, x.size_);
-  std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
-  cl_context->useKernel(kernel.c_str(), "Copy");
+  cl_context->useKernelCStr(kCopyKernel, "Copy");
   cl_context->setArg(0, x.storage());
   cl_context->setArg(1, ret->storage());
   uint32_t dim = 1;
@@ -360,8 +412,7 @@ Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
 
 template <typename T>
 void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
-  std::string kernel = jtorch::jtorch_path + "kernels/copy.cl";
-  cl_context->useKernel(kernel.c_str(), "Copy");
+  cl_context->useKernelCStr(kCopyKernel, "Copy");
   cl_context->setArg(0, src.storage());
   cl_context->setArg(1, dst.storage());
   uint32_t dim = 1;
@@ -371,8 +422,7 @@ void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
 
 template <typename T>
 void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
-  std::string kernel = jtorch::jtorch_path + "kernels/add.cl";
-  cl_context->useKernel(kernel.c_str(), "Add");
+  cl_context->useKernelCStr(kAddKernel, "Add");
   cl_context->setArg(0, x.storage());
   cl_context->setArg(1, y.storage());
   cl_context->setArg(2, dst.storage());
@@ -383,8 +433,7 @@ void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
 
 template <typename T>
 void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
-  std::string kernel = jtorch::jtorch_path + "kernels/mul.cl";
-  cl_context->useKernel(kernel.c_str(), "Mul");
+  cl_context->useKernelCStr(kMulKernel, "Mul");
   cl_context->setArg(0, mul_val);
   cl_context->setArg(1, x.storage());
   uint32_t dim = 1;
@@ -394,8 +443,7 @@ void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
 
 template <typename T>
 void Tensor<T>::div(Tensor<T>& x, float div_val) {
-  std::string kernel = jtorch::jtorch_path + "kernels/div.cl";
-  cl_context->useKernel(kernel.c_str(), "Div");
+  cl_context->useKernelCStr(kDivKernel, "Div");
   cl_context->setArg(0, div_val);
   cl_context->setArg(1, x.storage());
   uint32_t dim = 1;
@@ -405,8 +453,7 @@ void Tensor<T>::div(Tensor<T>& x, float div_val) {
 
 template <typename T>
 void Tensor<T>::accumulate(Tensor<T>& dst, const Tensor<T>& src) {
-  std::string kernel = jtorch::jtorch_path + "kernels/accumulate.cl";
-  cl_context->useKernel(kernel.c_str(), "Accumulate");
+  cl_context->useKernelCStr(kAccumulateKernel, "Accumulate");
   cl_context->setArg(0, src.storage());
   cl_context->setArg(1, dst.storage());
   uint32_t dim = 1;
@@ -421,8 +468,7 @@ void Tensor<T>::zero(Tensor<T>& dst) {
 
 template <typename T>
 void Tensor<T>::fill(Tensor<T>& dst, float value) {
-  std::string kernel = jtorch::jtorch_path + "kernels/fill.cl";
-  cl_context->useKernel(kernel.c_str(), "Fill");
+  cl_context->useKernelCStr(kFillKernel, "Fill");
   cl_context->setArg(0, dst.storage());
   cl_context->setArg(1, value);
   uint32_t dim = 1;

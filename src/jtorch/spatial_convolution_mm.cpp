@@ -13,6 +13,48 @@ using namespace jcl;
 
 namespace jtorch {
 
+static const char* kSpatialConvolutionMMKernel =
+"    #define CUDA_KERNEL_LOOP(i, n)                                        \\\\n"
+"      for (int i = get_group_id(0) * get_local_size(0) + get_local_id(0); \\\\n"
+"          i < (n);                                                        \\\\n"
+"          i += get_local_size(0) * get_num_groups(0))"
+""
+"    /* Kernel for fast unfold+copy */"
+"    __kernel void im2col_kernel(const int n,                    /* 0 */"
+"                                const __global float* data_im,  /* 1 */"
+"                                const int height,               /* 2 */"
+"                                const int width,                /* 3 */"
+"                                const int ksize_h,              /* 4 */"
+"                                const int ksize_w,              /* 5 */"
+"                                const int pad_h,                /* 6 */"
+"                                const int pad_w,                /* 7 */"
+"                                const int stride_h,             /* 8 */"
+"                                const int stride_w,             /* 9 */"
+"                                const int height_col,           /* 10 */"
+"                                const int width_col,            /* 11 */"
+"                                __global float* data_col) {     /* 12 */"
+"      CUDA_KERNEL_LOOP(index, n) {"
+"        int w_out = index % width_col;"
+"        index /= width_col;"
+"        int h_out = index % height_col;"
+"        int channel_in = index / height_col;"
+"        int channel_out = channel_in * ksize_h * ksize_w;"
+"        int h_in = h_out * stride_h - pad_h;"
+"        int w_in = w_out * stride_w - pad_w;"
+"        data_col += (channel_out * height_col + h_out) * width_col + w_out;"
+"        data_im += (channel_in * height + h_in) * width + w_in;"
+"        for (int i = 0; i < ksize_h; ++i) {"
+"          for (int j = 0; j < ksize_w; ++j) {"
+"            int h = h_in + i;"
+"            int w = w_in + j;"
+"            *data_col = (h >= 0 && w >= 0 && h < height && w < width) ?"
+"              data_im[i * width + j] : 0;"
+"            data_col += height_col * width_col;"
+"          }"
+"        }"
+"      }"
+"    }";
+
 // Function signatures from Torch (for easy code reuse)
 void THCudaBlas_gemm(void* state, char transa, char transb, size_t m, size_t n,
                      size_t k, float alpha, Tensor<float>* a, size_t lda,
@@ -288,22 +330,6 @@ void THCudaBlas_gemm(void* state, char transa, char transb, size_t m, size_t n,
   clblasTranspose opa = convertTransToCublasOperation(transa);
   clblasTranspose opb = convertTransToCublasOperation(transb);
 
-  // The Torch call:
-  // THCublasCheck(cublasSgemm(*state->blasState->current_handle,
-  //   opa,
-  //   opb,
-  //   i_m,
-  //   i_n,
-  //   i_k,
-  //   &alpha,
-  //   a,
-  //   i_lda,
-  //   b,
-  //   i_ldb,
-  //   &beta,
-  //   c,
-  //   i_ldc));
-
   clblasOrder order = clblasColumnMajor;  // Not sure what this is
   cl_command_queue queue =
       (cl_command_queue)cl_context->queue(jtorch::deviceid);
@@ -338,26 +364,7 @@ void im2col(const Tensor<float>* data_im, const int channels, const int height,
   int num_kernels = channels * height_col * width_col;
   // Launch
 
-  // The call in torch
-  //  im2col_kernel <<<GET_BLOCKS(num_kernels), CUDA_NUM_THREADS>>> (
-  //    num_kernels,   // 0
-  //    data_im,       // 1
-  //    height,        // 2
-  //    width,         // 3
-  //    ksize_h,       // 4
-  //    ksize_w,       // 5
-  //    pad_h,         // 6
-  //    pad_w,         // 7
-  //    stride_h,      // 8
-  //    stride_w,      // 9
-  //    height_col,    // 10
-  //    width_col,     // 11
-  //    data_col       // 12
-  //    );
-
-  std::string kernel =
-      jtorch::jtorch_path + "kernels/spatial_convolution_mm.cl";
-  cl_context->useKernel(kernel.c_str(), "im2col_kernel");
+  cl_context->useKernelCStr(kSpatialConvolutionMMKernel, "im2col_kernel");
 
   cl_context->setArg(0, num_kernels);
   cl_context->setArg(1, TO_TENSOR_PTR(data_im)->storage());

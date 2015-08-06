@@ -5,24 +5,24 @@
 namespace jcl {
 namespace debug {
 
-  void EnableMemoryLeakChecks() {
+void EnableMemoryLeakChecks() {
 #ifdef _DEBUG
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-  }
+}
 
-  void EnableAggressiveMemoryLeakChecks() {
+void EnableAggressiveMemoryLeakChecks() {
 #ifdef _DEBUG
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | 
-      _CRTDBG_CHECK_ALWAYS_DF );
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF |
+                 _CRTDBG_CHECK_ALWAYS_DF);
 #endif
-  }
+}
 
-  void SetBreakPointOnAlocation(int alloc_num) {
+void SetBreakPointOnAlocation(int alloc_num) {
 #ifdef _DEBUG
-    _CrtSetBreakAlloc(alloc_num);
+  _CrtSetBreakAlloc(alloc_num);
 #endif
-  }
+}
 
 }  // namespace debug
 }  // namespace jcl
