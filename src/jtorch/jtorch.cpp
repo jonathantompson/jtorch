@@ -10,9 +10,8 @@ namespace jtorch {
 
 std::unique_ptr<jcl::JCL> cl_context = nullptr;
 std::mutex cl_context_lock_;
-std::string jtorch_path;
 
-void InitJTorchInternal(const std::string& path_to_jtorch, const bool use_cpu) {
+void InitJTorchInternal(const bool use_cpu) {
   const bool strict_float = false;
   if (!strict_float) {
     std::cout << "\tWARNING: not using strict floats." << std::endl;
@@ -31,11 +30,6 @@ void InitJTorchInternal(const std::string& path_to_jtorch, const bool use_cpu) {
           new jcl::JCL(jcl::CLDeviceCPU, jcl::CLVendorAny, strict_float));
     }
   }
-  jtorch_path = path_to_jtorch;
-  if (jtorch_path.at(jtorch_path.size() - 1) != '\\' &&
-      jtorch_path.at(jtorch_path.size() - 1) != '/') {
-    jtorch_path = jtorch_path + '/';
-  }
 
   cl_int err = clblasSetup();
   if (err != CL_SUCCESS) {
@@ -45,19 +39,19 @@ void InitJTorchInternal(const std::string& path_to_jtorch, const bool use_cpu) {
   }
 }
 
-void InitJTorch(const std::string& path_to_jtorch, const bool use_cpu) {
+void InitJTorch(const bool use_cpu) {
   std::lock_guard<std::mutex> lck(cl_context_lock_);
   // Check we haven't already called init.
   assert(cl_context == nullptr);
-  InitJTorchInternal(path_to_jtorch, use_cpu);
+  InitJTorchInternal(use_cpu);
 }
 
-void InitJTorchSafe(const std::string& path_to_jtorch, const bool use_cpu) {
+void InitJTorchSafe(const bool use_cpu) {
   std::lock_guard<std::mutex> lck(cl_context_lock_);
   if (cl_context != nullptr) {
     return;
   }
-  InitJTorchInternal(path_to_jtorch, use_cpu);
+  InitJTorchInternal(use_cpu);
 }
 
 void ShutdownJTorch() {

@@ -67,6 +67,9 @@ const uint32_t lin_size_out = 20;
 float lweights[lin_size_in * lin_size_out];
 float lbiases[lin_size_out];
 
+// Path to the jtorch test binaries:
+std::string test_path;
+
 void testJTorchValue(std::shared_ptr<TorchData> t_data,
                      const std::string& filename,
                      float precision = JTORCH_FLOAT_PRECISION) {
@@ -77,7 +80,7 @@ void testJTorchValue(std::shared_ptr<TorchData> t_data,
   memset(correct_data.get(), 0, sizeof(correct_data[0]) * data->nelems());
 
   std::shared_ptr<jtorch::Tensor<float>> correct_data_tensor(
-      Tensor<float>::loadFromFile(filename));
+      Tensor<float>::loadFromFile(test_path + filename));
 
   if (!correct_data_tensor->isSameSizeAs(*data)) {
     std::cout << "Test FAILED (size mismatch)!: " << filename << std::endl;
@@ -138,10 +141,22 @@ int main(int argc, char* argv[]) {
   // jcl::debug::SetBreakPointOnAlocation(7145);
 #endif
 
+  if (argc != 2) {
+    std::cerr << "Usage:jtorch_test <path_to_jtorch>/tests_jtorch/test_data" << std::endl;
+    std::cerr << "  (i.e. you must provide the path to the test_data directory)" << std::endl;
+#if defined(WIN32) || defined(_WIN32)
+    cout << endl;
+    system("PAUSE");
+#endif
+    return 1;
+  } else {
+    test_path = std::string(argv[1]) + std::string("/");
+  }
+
   std::cout << "Beginning jtorch tests..." << std::endl;
 
   const bool use_cpu = false;
-  jtorch::InitJTorch("../", use_cpu);
+  jtorch::InitJTorch(use_cpu);
 
   {
     const uint32_t isize[3] = {width, height, num_feats_in};
@@ -159,7 +174,7 @@ int main(int argc, char* argv[]) {
       }
     }
     data_in->setData(din);
-    testJTorchValue(data_in, "./test_data/data_in.bin");
+    testJTorchValue(data_in, "data_in.bin");
 
     // Test Tanh, Threshold and SpatialConvolutionMap in a Sequential container
     // (this means we can also test Sequential at the same time)
@@ -169,7 +184,7 @@ int main(int argc, char* argv[]) {
       // Test Tanh
       stages.add(std::unique_ptr<TorchStage>(new Tanh()));
       stages.forwardProp(data_in);
-      testJTorchValue(stages.output, "./test_data/tanh_result.bin");
+      testJTorchValue(stages.output, "tanh_result.bin");
 
       // ***********************************************
       // Test Threshold
@@ -179,7 +194,7 @@ int main(int argc, char* argv[]) {
       ((jtorch::Threshold*)stages.get(1))->threshold = threshold;
       ((jtorch::Threshold*)stages.get(1))->val = val;
       stages.forwardProp(data_in);
-      testJTorchValue(stages.output, "./test_data/threshold.bin");
+      testJTorchValue(stages.output, "threshold.bin");
 
       // ***********************************************
       // Test SpatialConvolutionMap --> THIS STAGE IS STILL ON THE CPU!!
@@ -217,7 +232,7 @@ int main(int argc, char* argv[]) {
         }
       }
       stages.forwardProp(data_in);
-      testJTorchValue(stages.output, "./test_data/spatial_convolution_map.bin");
+      testJTorchValue(stages.output, "spatial_convolution_map.bin");
     }
 
     // ***********************************************
@@ -251,7 +266,7 @@ int main(int argc, char* argv[]) {
       conv.setBiases(cbiases);
       // TODO: This shouldn't use the output from the previous test
       conv.forwardProp(stages.get(1)->output);
-      testJTorchValue(conv.output, "./test_data/spatial_convolution.bin");
+      testJTorchValue(conv.output, "spatial_convolution.bin");
 
       const uint32_t padding = 6;
       SpatialConvolutionMM convmm(num_feats_in, num_feats_out, filt_height,
@@ -260,7 +275,7 @@ int main(int argc, char* argv[]) {
       Tensor<float>::copy(*convmm.biases(), *conv.biases());
       convmm.forwardProp(stages.get(1)->output);
       testJTorchValue(convmm.output,
-                      "./test_data/spatial_convolution_mm_padding.bin");
+                      "spatial_convolution_mm_padding.bin");
     }
 
     // ***********************************************
@@ -272,7 +287,7 @@ int main(int argc, char* argv[]) {
       stages.add(std::unique_ptr<TorchStage>(
           new SpatialLPPooling(pnorm, pool_v, pool_u)));
       stages.forwardProp(data_in);
-      testJTorchValue(stages.output, "./test_data/spatial_lp_pooling.bin");
+      testJTorchValue(stages.output, "spatial_lp_pooling.bin");
     }
 
     // ***********************************************
@@ -283,7 +298,7 @@ int main(int argc, char* argv[]) {
       SpatialMaxPooling max_pool_stage(pool_v, pool_u);
       max_pool_stage.forwardProp(data_in);
       testJTorchValue(max_pool_stage.output,
-                      "./test_data/spatial_max_pooling.bin");
+                      "spatial_max_pooling.bin");
     }
 
     // ***********************************************
@@ -299,13 +314,13 @@ int main(int argc, char* argv[]) {
       SpatialSubtractiveNormalization sub_norm_stage(kernel_1d);
       sub_norm_stage.forwardProp(data_in);
       testJTorchValue(sub_norm_stage.output,
-                      "./test_data/spatial_subtractive_normalization.bin",
+                      "spatial_subtractive_normalization.bin",
                       precision);
 
       SpatialSubtractiveNormalization sub_norm_stage_2d(kernel_2d);
       sub_norm_stage_2d.forwardProp(data_in);
       testJTorchValue(sub_norm_stage_2d.output,
-                      "./test_data/spatial_subtractive_normalization_2d.bin",
+                      "spatial_subtractive_normalization_2d.bin",
                       precision);
     }
 
@@ -322,13 +337,13 @@ int main(int argc, char* argv[]) {
       SpatialDivisiveNormalization div_norm_stage(kernel_1d);
       div_norm_stage.forwardProp(data_in);
       testJTorchValue(div_norm_stage.output,
-                      "./test_data/spatial_divisive_normalization.bin",
+                      "spatial_divisive_normalization.bin",
                       precision);
 
       SpatialDivisiveNormalization div_norm_stage_2d(kernel_2d);
       div_norm_stage_2d.forwardProp(data_in);
       testJTorchValue(div_norm_stage_2d.output,
-                      "./test_data/spatial_divisive_normalization_2d.bin",
+                      "spatial_divisive_normalization_2d.bin",
                       precision);
     }
 
@@ -336,7 +351,7 @@ int main(int argc, char* argv[]) {
     // Test SpatialContrastiveNormalization
     {
       std::shared_ptr<Tensor<float>> lena(
-          Tensor<float>::loadFromFile("./test_data/lena_image.bin"));
+          Tensor<float>::loadFromFile(test_path + "lena_image.bin"));
 
       const uint32_t kernel_size = 7;
       std::shared_ptr<Tensor<float>> kernel2(new Tensor<float>(1, &kernel_size));
@@ -345,7 +360,7 @@ int main(int argc, char* argv[]) {
       cont_norm_stage.forwardProp(lena);
       const float precision = JTORCH_FLOAT_PRECISION * 10;
       testJTorchValue(cont_norm_stage.output,
-                      "./test_data/spatial_contrastive_normalization.bin",
+                      "spatial_contrastive_normalization.bin",
                       precision);
     }
 
@@ -374,7 +389,7 @@ int main(int argc, char* argv[]) {
       lin->setWeights(lweights);
       lin_stage.add(std::move(lin));
       lin_stage.forwardProp(data_in);
-      testJTorchValue(lin_stage.output, "./test_data/linear.bin");
+      testJTorchValue(lin_stage.output, "linear.bin");
     }
 
     // ***********************************************
@@ -455,14 +470,14 @@ int main(int argc, char* argv[]) {
       SpatialUpSamplingNearest module(scale);
       module.forwardProp(data_in);
       testJTorchValue(module.output,
-                      "./test_data/spatial_up_sampling_nearest.bin");
+                      "spatial_up_sampling_nearest.bin");
     }
 
     // ***********************************************
     // Test Loading and running a model
     {
       std::unique_ptr<TorchStage> model =
-          TorchStage::loadFromFile("./test_data/testmodel.bin");
+          TorchStage::loadFromFile(test_path + "testmodel.bin");
 
       model->forwardProp(data_in);
 
@@ -484,7 +499,7 @@ int main(int argc, char* argv[]) {
         assert(stage->type() == stages[i]);
       }
 
-      testJTorchValue(model->output, "./test_data/test_model_result.bin");
+      testJTorchValue(model->output, "test_model_result.bin");
     }
 
     // ***********************************************
