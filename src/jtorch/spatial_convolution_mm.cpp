@@ -205,17 +205,19 @@ void SpatialConvolutionMM::forwardProp(std::shared_ptr<TorchData> input) {
 
 std::unique_ptr<TorchStage> SpatialConvolutionMM::loadFromFile(
     std::ifstream& file) {
-  int32_t filt_width, filt_height, n_input_features, n_output_features, padding;
+  int32_t filt_width, filt_height, n_input_features, n_output_features, 
+    padw, padh;
   file.read((char*)(&filt_width), sizeof(filt_width));
   file.read((char*)(&filt_height), sizeof(filt_height));
   file.read((char*)(&n_input_features), sizeof(n_input_features));
   file.read((char*)(&n_output_features), sizeof(n_output_features));
-  file.read((char*)(&padding), sizeof(padding));
+  file.read((char*)(&padw), sizeof(padw));
+  file.read((char*)(&padh), sizeof(padh));
 
 #if defined(DEBUG) || defined(_DEBUG)
   std::cout << "\t\t(fout,fin,kh,kw,pad)=(" << n_output_features << ","
             << n_input_features << "," << filt_height << "," << filt_width
-            << "," << padding << ")" << std::endl;
+            << "," << padw << "," << padh << ")" << std::endl;
 #endif
 
   std::unique_ptr<SpatialConvolutionMM> ret(new SpatialConvolutionMM(

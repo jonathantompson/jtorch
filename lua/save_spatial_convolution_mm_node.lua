@@ -12,7 +12,14 @@ function saveSpatialConvolutionMMNode(node, ofile)
   ofile:writeInt(node.kH)
   ofile:writeInt(node.nInputPlane)
   ofile:writeInt(node.nOutputPlane)
-  ofile:writeInt(node.padding)
+  if (node.padding) then
+    -- Old version
+    ofile:writeInt(node.padding)
+    ofile:writeInt(node.padding)
+  else
+    ofile:writeInt(node.padW)
+    ofile:writeInt(node.padH)
+  end
 
   local fanin = node.nInputPlane
 

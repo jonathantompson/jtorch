@@ -156,10 +156,14 @@ void SpatialMaxPooling::forwardProp(std::shared_ptr<TorchData> input) {
 
 std::unique_ptr<TorchStage> SpatialMaxPooling::loadFromFile(
     std::ifstream& file) {
-  int poolu, poolv;
-  file.read((char*)(&poolu), sizeof(poolu));
-  file.read((char*)(&poolv), sizeof(poolv));
-  return std::unique_ptr<TorchStage>(new SpatialMaxPooling(poolu, poolv));
+  int kw, kh, dw, dh, padw, padh;
+  file.read((char*)(&kw), sizeof(kw));
+  file.read((char*)(&kh), sizeof(kh));
+  file.read((char*)(&dw), sizeof(dw));
+  file.read((char*)(&dh), sizeof(dh));
+  file.read((char*)(&padw), sizeof(padw));
+  file.read((char*)(&padh), sizeof(padh));
+  return std::unique_ptr<TorchStage>(new SpatialMaxPooling(kw, kh));
 }
 
 }  // namespace jtorch

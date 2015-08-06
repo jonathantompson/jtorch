@@ -6,5 +6,8 @@ function saveSpatialMaxPoolingNode(node, ofile)
 
   ofile:writeInt(node.kW)
   ofile:writeInt(node.kH)
-
+  ofile:writeInt(node.dW)
+  ofile:writeInt(node.dH)
+  ofile:writeInt(node.padW)
+  ofile:writeInt(node.padH)
 end
