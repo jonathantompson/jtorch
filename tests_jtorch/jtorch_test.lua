@@ -128,8 +128,9 @@ saveTensor(res, "test_data/spatial_convolution.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
 
 -- Test SpatialConvolutionMM with padding
-padding = 6
-spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, 1, 1, padding)
+padw = 6
+padh = 3
+spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, 1, 1, padw, padh)
 spat_conv_mm.bias:copy(spat_conv.bias)
 spat_conv_mm.weight:copy(spat_conv.weight)
 -- print('Spatial Convolution Weights')
@@ -144,6 +145,10 @@ pnorm = 2.0
 nstates = num_feats_out
 poolsize_u = 2
 poolsize_v = 2
+pooldw = 1
+pooldh = 1
+poolpadw = 1
+poolpadh = 1
 pool_stage = nn.SpatialLPPooling(nstates, poolsize_u, poolsize_v, poolsize_u, poolsize_v)
 model:add(pool_stage)
 res = model:forward(data_in)
@@ -157,6 +162,14 @@ model3:add(max_pool_stage)
 res = model3:forward(data_in)
 saveTensor(res, "test_data/spatial_max_pooling.bin")
 print('Spatial Max Pooling result saved to test_data/spatial_max_pooling.bin')
+
+-- Test SpatialMaxPooling with padding and stride
+model3_1 = nn.Sequential()
+max_pool_stage_1 = nn.SpatialMaxPooling(poolsize_u, poolsize_v, pooldw, pooldh, poolpadw, poolpadh)
+model3_1:add(max_pool_stage_1)
+res = model3_1:forward(data_in)
+saveTensor(res, "test_data/spatial_max_pooling_pad_stride.bin")
+print('Spatial Max Pooling result saved to test_data/spatial_max_pooling_pad_stride.bin')
 
 -- Test SpatialSubtractiveNormalization
 model4 = nn.Sequential()
