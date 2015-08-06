@@ -65,9 +65,6 @@
     <ClInclude Include="headers\test_vector_managed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\test_pair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\test_jcl.cpp">

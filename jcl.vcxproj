@@ -118,10 +118,6 @@
   <ItemGroup>
     <ClInclude Include="include\jcl\cl_include.h" />
     <ClInclude Include="include\jcl\data_str\hash_funcs.h" />
-    <ClInclude Include="include\jcl\data_str\hash_map_managed.h" />
-    <ClInclude Include="include\jcl\data_str\pair.h" />
-    <ClInclude Include="include\jcl\data_str\vector.h" />
-    <ClInclude Include="include\jcl\data_str\vector_managed.h" />
     <ClInclude Include="include\jcl\jcl.h" />
     <ClInclude Include="include\jcl\math\int_types.h" />
     <ClInclude Include="include\jcl\math\math_base.h" />
@@ -139,6 +135,7 @@
     <ClInclude Include="include\jcl\threading\thread_pool.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\jcl\cl_include.cpp" />
     <ClCompile Include="src\jcl\data_str\hash_funcs.cpp" />
     <ClCompile Include="src\jcl\jcl.cpp" />
     <ClCompile Include="src\jcl\math\math_base.cpp" />

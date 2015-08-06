@@ -48,7 +48,7 @@ The following stages have partial implementations:
 **Compilation Overview**
 ------------------------
 
-Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X. The only dependencies are the OpenCL drivers / SDKs for your desired OpenCL compute plateform and clBLAS. See <https://github.com/clMathLibraries/clBLAS> for more details (also for clBLAS I have a "Compiling_clBLAS.txt" helper if you get stuck).
+Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X (note: the CMakeLists need updating, but shouldn't be too hard). I have also built on clang and gcc on Ubuntu 14.04, but I don't supply the build files. The only dependencies are the OpenCL drivers / SDKs for your desired OpenCL compute plateform and clBLAS. See <https://github.com/clMathLibraries/clBLAS> for more details (also for clBLAS I have a "Compiling_clBLAS.txt" helper if you get stuck).
 
 VS2012 and cmake expect a specific directory structure:
 

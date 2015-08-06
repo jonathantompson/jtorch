@@ -92,7 +92,7 @@ namespace jcl {
     if (err != CL_SUCCESS) {
       std::cout << "\t --> Build failed for source: " << std::endl;
       std::cout << code_.get() << std::endl;
-			string str = program_.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0]);
+			std::string str = program_.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0]);
       std::cout << "ERROR: program_.build() failed." 
                 << cl::GetCLErrorEnumString(err) << std::endl;
       std::cout << "    Program Info: " << str << std::endl;

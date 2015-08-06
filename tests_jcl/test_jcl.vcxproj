@@ -107,7 +107,6 @@
     <ClInclude Include="headers\test_callback_queue.h" />
     <ClInclude Include="headers\test_convolution.h" />
     <ClInclude Include="headers\test_hash_map_managed.h" />
-    <ClInclude Include="headers\test_pair.h" />
     <ClInclude Include="headers\test_thread.h" />
     <ClInclude Include="headers\test_thread_pool.h" />
     <ClInclude Include="headers\test_unit\log_message.h" />

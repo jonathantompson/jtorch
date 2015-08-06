@@ -11,14 +11,12 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 #include "jcl/cl_include.h"
 #include "jcl/jcl.h"
 #include "jcl/opencl_kernel.h"
 #include "jcl/opencl_buffer_data.h"
-#include "jcl/data_str/hash_map_managed.h"
-#include "jcl/data_str/vector_managed.h"
 #include "jcl/opencl_kernel.h"
-#include "jcl/data_str/vector.h"
 #include "jcl/math/math_types.h"  // for jcl::math::Int2 and Int3
 
 #define OPENCL_KERNEL_STARTING_HASH_SIZE 11  // Make it a prime
@@ -35,11 +33,13 @@ struct OpenCLContext {
   cl::Context context;
   std::vector<cl::Device> devices;
   std::vector<cl::CommandQueue> queues;
-  std::unique_ptr<jcl::data_str::HashMapManaged<std::string, OpenCLProgram*>>
-      programs;  // Stored by filename
-  std::unique_ptr<jcl::data_str::HashMapManaged<std::string, OpenCLKernel*>>
-      kernels;  // Stored by (filename + kernel)
-  std::unique_ptr<jcl::data_str::VectorManaged<OpenCLBufferData*>> buffers;
+  
+  // Stored by filename, or in the case of char* kernel, it's 32bit hash.
+  std::unordered_map<std::string, std::unique_ptr<OpenCLProgram>> programs;
+  // Stored by (filename + kernel)
+  std::unordered_map<std::string, std::unique_ptr<OpenCLKernel>> kernels;
+
+  std::vector<std::unique_ptr<OpenCLBufferData>> buffers;
 
   static bool queryDeviceExists(const CLDevice device, const CLVendor vendor);
 
@@ -98,8 +98,8 @@ struct OpenCLContext {
  private:
   OpenCLProgram* cur_program_;  // Not owned here
   OpenCLKernel* cur_kernel_;    // Now owned here
-  jcl::data_str::Vector<int> devices_max_workgroup_size_;
-  jcl::data_str::VectorManaged<uint32_t*> devices_max_workitem_size_;
+  std::vector<int> devices_max_workgroup_size_;
+  std::vector<std::unique_ptr<uint32_t[]>> devices_max_workitem_size_;
 
   static bool getPlatform(const CLDevice device, const CLVendor vendor,
                           cl::Platform& return_platform);
@@ -125,8 +125,8 @@ template <typename T>
 void OpenCLContext::writeToBuffer(const T* data, const uint32_t device_index,
                                   const JCLBuffer buffer, const bool blocking) {
   assert(device_index < devices.size());
-  assert(static_cast<uint32_t>(buffer) < buffers->size());
-  OpenCLBufferData* buf = (*buffers)[(uint32_t)buffer];
+  assert(static_cast<uint32_t>(buffer) < buffers.size());
+  OpenCLBufferData* buf = buffers[(uint32_t)buffer].get();
   cl::Event cur_event;
   cl::CheckError(queues[device_index].enqueueWriteBuffer(
       buf->buffer(), blocking ? CL_TRUE : CL_FALSE, 0,
@@ -141,8 +141,8 @@ void OpenCLContext::readFromBuffer(T* data, const uint32_t device_index,
                                    const JCLBuffer buffer,
                                    const bool blocking) {
   assert(device_index < devices.size());
-  assert(static_cast<uint32_t>(buffer) < buffers->size());
-  OpenCLBufferData* buf = (*buffers)[(uint32_t)buffer];
+  assert(static_cast<uint32_t>(buffer) < buffers.size());
+  OpenCLBufferData* buf = buffers[(uint32_t)buffer].get();
   cl::Event cur_event;
   cl::CheckError(queues[device_index].enqueueReadBuffer(
       buf->buffer(), blocking ? CL_TRUE : CL_FALSE, 0,

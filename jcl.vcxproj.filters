@@ -65,18 +65,6 @@
     <ClInclude Include="include\jcl\math\int_types.h">
       <Filter>Header Files\jcl\math</Filter>
     </ClInclude>
-    <ClInclude Include="include\jcl\data_str\vector_managed.h">
-      <Filter>Header Files\jcl\data_str</Filter>
-    </ClInclude>
-    <ClInclude Include="include\jcl\data_str\hash_map_managed.h">
-      <Filter>Header Files\jcl\data_str</Filter>
-    </ClInclude>
-    <ClInclude Include="include\jcl\data_str\vector.h">
-      <Filter>Header Files\jcl\data_str</Filter>
-    </ClInclude>
-    <ClInclude Include="include\jcl\data_str\pair.h">
-      <Filter>Header Files\jcl\data_str</Filter>
-    </ClInclude>
     <ClInclude Include="include\jcl\math\math_base.h">
       <Filter>Header Files\jcl\math</Filter>
     </ClInclude>
@@ -129,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="src\jcl\threading\thread.cpp">
       <Filter>Source Files\jcl\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jcl\cl_include.cpp">
+      <Filter>Source Files\jcl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,11 +12,6 @@ namespace jcl {
 OpenCLContext::OpenCLContext() {
   cur_program_ = nullptr;
   cur_kernel_ = nullptr;
-  programs.reset(new data_str::HashMapManaged<std::string, OpenCLProgram*>(
-      OPENCL_KERNEL_STARTING_HASH_SIZE, &data_str::HashString));
-  kernels.reset(new data_str::HashMapManaged<std::string, OpenCLKernel*>(
-      OPENCL_KERNEL_STARTING_HASH_SIZE, &data_str::HashString));
-  buffers.reset(new data_str::VectorManaged<OpenCLBufferData*>());
 }
 
 OpenCLContext::~OpenCLContext() {
@@ -50,9 +45,9 @@ void OpenCLContext::createContext(const CLDevice device,
   cl_int err;
   context = cl::Context(device_cl, cps, nullptr, &err);
   cl::CheckError(err);
-  cout << "\tCreated OpenCL Context: " << endl;
-  cout << "\t - vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>();
-  cout << endl;
+  std::cout << "\tCreated OpenCL Context: " << std::endl;
+  std::cout << "\t - vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>();
+  std::cout << std::endl;
 }
 
 void OpenCLContext::InitDevices(const CLDevice device) {
@@ -72,46 +67,46 @@ void OpenCLContext::InitDevices(const CLDevice device) {
   }
 
   for (uint32_t i = 0; i < devices.size(); i++) {
-    cout << "\t - device " << i << " CL_DEVICE_NAME: ";
-    cout << devices[i].getInfo<CL_DEVICE_NAME>(&err) << endl;
+    std::cout << "\t - device " << i << " CL_DEVICE_NAME: ";
+    std::cout << devices[i].getInfo<CL_DEVICE_NAME>(&err) << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DEVICE_VERSION: ";
-    cout << devices[i].getInfo<CL_DEVICE_VERSION>(&err) << endl;
+    std::cout << "\t - device " << i << " CL_DEVICE_VERSION: ";
+    std::cout << devices[i].getInfo<CL_DEVICE_VERSION>(&err) << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DRIVER_VERSION: ";
-    cout << devices[i].getInfo<CL_DRIVER_VERSION>(&err) << endl;
+    std::cout << "\t - device " << i << " CL_DRIVER_VERSION: ";
+    std::cout << devices[i].getInfo<CL_DRIVER_VERSION>(&err) << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DEVICE_MAX_COMPUTE_UNITS: ";
-    cout << devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(&err) << endl;
+    std::cout << "\t - device " << i << " CL_DEVICE_MAX_COMPUTE_UNITS: ";
+    std::cout << devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(&err) << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: ";
-    cout << devices[i].getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>(&err)
-         << endl;
+    std::cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: ";
+    std::cout << devices[i].getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>(&err)
+         << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_GROUP_SIZE: ";
+    std::cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_GROUP_SIZE: ";
     size_t max_size = devices[i].getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>(&err);
     cl::CheckError(err);
-    devices_max_workgroup_size_.pushBack((int)max_size);
-    cout << devices_max_workgroup_size_[i] << endl;
-    cout << "\t - device " << i << " CL_DEVICE_GLOBAL_MEM_SIZE: ";
-    cout << devices[i].getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>(&err) << endl;
+    devices_max_workgroup_size_.push_back((int)max_size);
+    std::cout << devices_max_workgroup_size_[i] << std::endl;
+    std::cout << "\t - device " << i << " CL_DEVICE_GLOBAL_MEM_SIZE: ";
+    std::cout << devices[i].getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>(&err) << std::endl;
     cl::CheckError(err);
-    cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_ITEM_SIZES: ";
+    std::cout << "\t - device " << i << " CL_DEVICE_MAX_WORK_ITEM_SIZES: ";
     std::vector<size_t> item_sizes =
         devices[i].getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>(&err);
     cl::CheckError(err);
-    uint32_t* item_sizes_arr = new uint32_t[3];
+    std::unique_ptr<uint32_t[]> item_sizes_arr(new uint32_t[3]);
     item_sizes_arr[0] = (uint32_t)item_sizes[0];
     item_sizes_arr[1] = (uint32_t)item_sizes[1];
     item_sizes_arr[2] = (uint32_t)item_sizes[2];
     // Note: The c_arr ownership is transferred to VectorManaged
-    devices_max_workitem_size_.pushBack(item_sizes_arr);
+    devices_max_workitem_size_.push_back(std::move(item_sizes_arr));
     std::cout << "(i=2) ";
     for (int32_t j = 2; j >= 0; j--) {
       std::cout << item_sizes[j] << " ";
     }
     std::cout << "(i=0)";
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
@@ -135,7 +130,7 @@ uint32_t OpenCLContext::getMaxWorkitemSize(const uint32_t device_index,
 }
 
 std::string OpenCLContext::getDeviceName(const uint32_t device_index) {
-  string name;
+  std::string name;
   cl_int err;
   name = devices[device_index].getInfo<CL_DEVICE_NAME>(&err);
   cl::CheckError(err);
@@ -168,7 +163,7 @@ bool OpenCLContext::getPlatform(const CLDevice device, const CLVendor vendor,
   std::vector<cl_device_id> devices;
   for (uint32_t i = 0; i < (uint32_t)platforms.size(); i++) {
     if (vendor == CLVendorAny ||
-        platforms[i].getInfo<CL_PLATFORM_VENDOR>().find(find) != string::npos) {
+        platforms[i].getInfo<CL_PLATFORM_VENDOR>().find(find) != std::string::npos) {
       // Check this platform for the device type we want
       getPlatformDeviceIDsOfType(platforms[i], type_cl, devices);
       if (devices.size() > 0) {
@@ -179,17 +174,17 @@ bool OpenCLContext::getPlatform(const CLDevice device, const CLVendor vendor,
   }
 
   if (platformID == -1) {
-    cout << "\tNo compatible OpenCL platform found" << endl;
-    cout << "\tDevices attached to each platform:" << endl;
+    std::cout << "\tNo compatible OpenCL platform found" << std::endl;
+    std::cout << "\tDevices attached to each platform:" << std::endl;
     char* name = new char[1024];
     for (uint32_t i = 0; i < (uint32_t)platforms.size(); i++) {
-      cout << "\tPlatform " << i << ": ";
-      cout << platforms[i].getInfo<CL_PLATFORM_VENDOR>() << endl;
+      std::cout << "\tPlatform " << i << ": ";
+      std::cout << platforms[i].getInfo<CL_PLATFORM_VENDOR>() << std::endl;
       getPlatformDeviceIDsOfType(platforms[i], CL_DEVICE_TYPE_ALL, devices);
       for (uint32_t j = 0; j < (uint32_t)devices.size(); j++) {
         cl::CheckError(clGetDeviceInfo(devices[i], CL_DEVICE_NAME,
                                    1023 * sizeof(name[0]), &name, nullptr));
-        cout << "\t - device " << j << " name: " << name << endl;
+        std::cout << "\t - device " << j << " name: " << name << std::endl;
       }
     }
     delete[] name;
@@ -235,43 +230,45 @@ void OpenCLContext::getPlatformDeviceIDsOfType(
 
 JCLBuffer OpenCLContext::allocateBuffer(const CLBufferType type,
                                         const uint32_t nelems) {
-  buffers->pushBack(new OpenCLBufferData(type, nelems, context));
-  return (JCLBuffer)(buffers->size() - 1);
+  buffers.push_back(std::unique_ptr<OpenCLBufferData>(new OpenCLBufferData(type, nelems, context)));
+  return (JCLBuffer)(buffers.size() - 1);
 }
 
 cl_mem OpenCLContext::getCLMem(const JCLBuffer buffer) {
-  assert(buffer < buffers->size());
-  return (*buffers)[buffer]->buffer()();
+  assert(buffer < buffers.size());
+  return buffers[buffer]->buffer()();
 }
 
 void OpenCLContext::releaseReference(const JCLBuffer buffer) {
-  assert(buffer < buffers->size());
-  (*buffers)[buffer]->releaseReference();
+  assert(buffer < buffers.size());
+  buffers[buffer]->releaseReference();
 }
 
 void OpenCLContext::addReference(const JCLBuffer buffer) {
-  assert(buffer < buffers->size());
-  (*buffers)[buffer]->addReference();
+  assert(buffer < buffers.size());
+  buffers[buffer]->addReference();
 }
 
 void OpenCLContext::useKernel(const char* filename, const char* kernel_name,
                               const bool strict_float) {
   // Make sure the program is compiled
   if (cur_program_ == nullptr || cur_program_->filename() != filename) {
-    if (!programs->lookup(filename, cur_program_)) {
-      cur_program_ =
-          new OpenCLProgram(filename, context, devices, strict_float);
-      programs->insert(filename, cur_program_);
+	  if (programs.find(filename) == programs.end()) {
+      programs[filename] = std::unique_ptr<OpenCLProgram>(
+        new OpenCLProgram(filename, context, devices, strict_float));
     }
+    cur_program_ = programs[filename].get();
   }
+
   // Make sure the Kernel is compiled
   if (cur_kernel_ == nullptr || cur_kernel_->program() != cur_program_ ||
-      cur_kernel_->kernel_name() != kernel_name) {
+    cur_kernel_->kernel_name() != kernel_name) {
     std::string id = std::string(filename) + kernel_name;
-    if (!kernels->lookup(id, cur_kernel_)) {
-      cur_kernel_ = new OpenCLKernel(kernel_name, cur_program_);
-      kernels->insert(id, cur_kernel_);
+    if (kernels.find(id) == kernels.end()) {
+      kernels[id] = std::unique_ptr<OpenCLKernel>(
+        new OpenCLKernel(kernel_name, cur_program_));
     }
+    cur_kernel_ = kernels[id].get();
   }
 }
 
@@ -286,27 +283,29 @@ void OpenCLContext::useKernelCStr(const char* kernel_c_str,
 
   // Make sure the program is compiled
   if (cur_program_ == nullptr || cur_program_->filename() != filename.str()) {
-    if (!programs->lookup(filename.str(), cur_program_)) {
-      cur_program_ = new OpenCLProgram(kernel_c_str, filename.str(), context,
-                                       devices, strict_float);
-      programs->insert(filename.str(), cur_program_);
+     if (programs.find(filename.str()) == programs.end()) {
+      programs[filename.str()] = std::unique_ptr<OpenCLProgram>(
+        new OpenCLProgram(kernel_c_str, filename.str(), context,
+                          devices, strict_float));
     }
+    cur_program_ = programs[filename.str()].get();
   }
   // Make sure the Kernel is compiled
   if (cur_kernel_ == nullptr || cur_kernel_->program() != cur_program_ ||
       cur_kernel_->kernel_name() != kernel_name) {
     std::string id = filename.str() + kernel_name;
-    if (!kernels->lookup(id, cur_kernel_)) {
-      cur_kernel_ = new OpenCLKernel(kernel_name, cur_program_);
-      kernels->insert(id, cur_kernel_);
+    if (kernels.find(id) == kernels.end()) {
+      kernels[id] = std::unique_ptr<OpenCLKernel>(
+        new OpenCLKernel(kernel_name, cur_program_));
     }
+    cur_kernel_ = kernels[id].get();
   }
 }
 
 void OpenCLContext::setArg(const uint32_t index, const JCLBuffer& val) {
   // You must call OpenCL::useKernel() first.
   assert(cur_kernel_ != nullptr);
-  cur_kernel_->setArg(index, (*buffers)[(uint32_t)val]->buffer());
+  cur_kernel_->setArg(index, buffers[(uint32_t)val]->buffer());
 }
 
 void OpenCLContext::setArg(const uint32_t index, const uint32_t size,
