@@ -33,7 +33,7 @@ struct OpenCLContext {
   cl::Context context;
   std::vector<cl::Device> devices;
   std::vector<cl::CommandQueue> queues;
-  
+
   // Stored by filename, or in the case of char* kernel, it's 32bit hash.
   std::unordered_map<std::string, std::unique_ptr<OpenCLProgram>> programs;
   // Stored by (filename + kernel)

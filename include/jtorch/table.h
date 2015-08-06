@@ -17,13 +17,6 @@
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_data.h"
 
-namespace jcl {
-namespace data_str {
-template <typename T>
-class VectorManaged;
-}
-}
-
 #define TO_TABLE_PTR(x) \
   (x->type() == jtorch::TorchDataType::TABLE_DATA ? (jtorch::Table*)x : nullptr)
 

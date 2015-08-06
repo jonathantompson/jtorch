@@ -20,12 +20,6 @@
 #define JTIL_SPATIAL_LP_POOLING_NTHREADS 4
 
 namespace jcl {
-namespace data_str {
-template <typename T>
-class VectorManaged;
-}
-}
-namespace jcl {
 namespace threading {
 class ThreadPool;
 }

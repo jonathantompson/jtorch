@@ -99,7 +99,6 @@ void OpenCLContext::InitDevices(const CLDevice device) {
     item_sizes_arr[0] = (uint32_t)item_sizes[0];
     item_sizes_arr[1] = (uint32_t)item_sizes[1];
     item_sizes_arr[2] = (uint32_t)item_sizes[2];
-    // Note: The c_arr ownership is transferred to VectorManaged
     devices_max_workitem_size_.push_back(std::move(item_sizes_arr));
     std::cout << "(i=2) ";
     for (int32_t j = 2; j >= 0; j--) {

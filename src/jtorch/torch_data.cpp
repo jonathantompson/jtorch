@@ -6,10 +6,8 @@
 
 namespace jtorch {
 
-  TorchData::TorchData() {
-  }
+TorchData::TorchData() {}
 
-  TorchData::~TorchData() {
-  }
+TorchData::~TorchData() {}
 
 }  // namespace jtorch

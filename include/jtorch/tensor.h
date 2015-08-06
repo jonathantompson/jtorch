@@ -373,8 +373,8 @@ template <typename T>
 void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
   std::string kernel = jtorch::jtorch_path + "kernels/add.cl";
   cl_context->useKernel(kernel.c_str(), "Add");
-  cl_context->setArg(0, src1.storage());
-  cl_context->setArg(1, src2.storage());
+  cl_context->setArg(0, x.storage());
+  cl_context->setArg(1, y.storage());
   cl_context->setArg(2, dst.storage());
   uint32_t dim = 1;
   uint32_t nelem = dst.nelems();

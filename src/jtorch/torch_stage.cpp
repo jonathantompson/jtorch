@@ -28,44 +28,37 @@
 
 namespace jtorch {
 
-  static std::mutex torch_init_lock_;
-  static bool torch_init_;
+TorchStage::TorchStage() { output = nullptr; }
 
-  TorchStage::TorchStage() {
-    output = nullptr; 
+TorchStage::~TorchStage() {}
+
+std::unique_ptr<TorchStage> TorchStage::loadFromFile(const std::string& file) {
+  std::unique_ptr<TorchStage> ret;
+  std::ifstream ifile(file.c_str(), std::ios::in | std::ios::binary);
+  if (ifile.is_open()) {
+    ifile.seekg(0, std::ios::beg);
+    // Now recursively load the network
+    std::cout << "Loading torch model..." << std::endl;
+    ret = std::move(TorchStage::loadFromFile(ifile));
+    ifile.close();
+  } else {
+    std::cout << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
+    std::cout << " file " << file << std::endl;
+    assert(false);
   }
+  return ret;
+}
 
-  TorchStage::~TorchStage() {
-    
-  }
+std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
+  // Read in the enum type:
 
-  std::unique_ptr<TorchStage> TorchStage::loadFromFile(const std::string& file) {
-    std::unique_ptr<TorchStage> ret;
-    std::ifstream ifile(file.c_str(), std::ios::in|std::ios::binary);
-    if (ifile.is_open()) {
-      ifile.seekg(0, std::ios::beg);
-      // Now recursively load the network
-      std::cout << "Loading torch model..." << std::endl;
-      ret = std::move(TorchStage::loadFromFile(ifile));
-      ifile.close();
-    } else {
-      std::cout << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
-      std::cout << " file " << file << std::endl;
-      assert(false);
-    }
-    return ret;
-  }
+  int type;
+  ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
 
-  std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) { 
-    // Read in the enum type:
-
-    int type;
-    ifile.read(reinterpret_cast<char*>(&type), sizeof(type));
-
-    // Now load in the module
-    std::unique_ptr<TorchStage> node;
-    switch (type) {
-    case SEQUENTIAL_STAGE: 
+  // Now load in the module
+  std::unique_ptr<TorchStage> node;
+  switch (type) {
+    case SEQUENTIAL_STAGE:
       node = Sequential::loadFromFile(ifile);
       break;
     case PARALLEL_TABLE_STAGE:
@@ -130,14 +123,15 @@ namespace jtorch {
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "
-        "Node type not recognized!" << std::endl;
+                   "Node type not recognized!"
+                << std::endl;
       assert(false);
-    }
+  }
 
 #if defined(DEBUG) || defined(_DEBUG)
-    std::cout << "\tLoaded " << node->name() << std::endl;
+  std::cout << "\tLoaded " << node->name() << std::endl;
 #endif
-    return node;
-  }
+  return node;
+}
 
 }  // namespace jtorch

@@ -13,13 +13,6 @@
 #include "jtorch/torch_stage.h"
 #include "jcl/jcl.h"  // For jcl::JCLBuffer
 
-namespace jcl {
-namespace data_str {
-template <typename T>
-class VectorManaged;
-}
-}
-
 namespace jtorch {
 
 template <typename T>

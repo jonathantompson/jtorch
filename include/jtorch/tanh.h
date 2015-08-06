@@ -12,13 +12,6 @@
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
 
-namespace jcl {
-namespace data_str {
-template <typename T>
-class VectorManaged;
-}
-}
-
 namespace jtorch {
 
 class Tanh : public TorchStage {

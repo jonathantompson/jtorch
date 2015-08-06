@@ -3,11 +3,9 @@
 #include "jcl/threading/thread.h"
 #include "jcl/threading/callback.h"
 #include "jcl/threading/thread_pool.h"
-#include "jcl/data_str/vector_managed.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
-using namespace jcl::data_str;
 
 namespace jtorch {
 

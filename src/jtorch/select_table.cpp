@@ -4,41 +4,38 @@
 #include "jcl/threading/thread.h"
 #include "jcl/threading/callback.h"
 #include "jcl/threading/thread_pool.h"
-#include "jcl/data_str/vector_managed.h"
 #include "jcl/jcl.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
-using namespace jcl::data_str;
 
 namespace jtorch {
 
-  SelectTable::SelectTable(int32_t index) {
-    output = nullptr;
-    index_ = index;
-  }
+SelectTable::SelectTable(int32_t index) {
+  output = nullptr;
+  index_ = index;
+}
 
-  SelectTable::~SelectTable() {
-    // Nothing to do for output (we don't own it)
-  }
+SelectTable::~SelectTable() {
+  // Nothing to do for output (we don't own it)
+}
 
+std::unique_ptr<TorchStage> SelectTable::loadFromFile(std::ifstream& file) {
+  int32_t index;
+  file.read((char*)(&index), sizeof(index));
+  index = index - 1;  // We index from 0 in C++
+  return std::unique_ptr<TorchStage>(new SelectTable(index));
+}
 
-  std::unique_ptr<TorchStage> SelectTable::loadFromFile(std::ifstream& file) {
-    int32_t index;
-    file.read((char*)(&index), sizeof(index));
-    index = index - 1;  // We index from 0 in C++
-    return std::unique_ptr<TorchStage>(new SelectTable(index));
-  }
+void SelectTable::forwardProp(std::shared_ptr<TorchData> input) {
+  assert(input->type() == TorchDataType::TABLE_DATA);
 
-  void SelectTable::forwardProp(std::shared_ptr<TorchData> input) {
-    assert(input->type() == TorchDataType::TABLE_DATA);
+  Table* in = (Table*)input.get();
 
-    Table* in = (Table*)input.get();
+  // Check that the input table isn't too small.
+  assert(in->tableSize() > index_);
 
-    // Check that the input table isn't too small.
-    assert(in->tableSize() > index_);
-
-    output = (*in)(index_);
-  }
+  output = (*in)(index_);
+}
 
 }  // namespace jtorch
