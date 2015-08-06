@@ -43,7 +43,7 @@ void OpenCLContext::createContext(const CLDevice device,
 
   cl_device_type device_cl = CLDevice2CLDeviceType(device);
   cl_int err;
-  context = cl::Context(device_cl, cps, nullptr, &err);
+  context = cl::Context(device_cl, cps, nullptr, nullptr, &err);
   cl::CheckError(err);
   std::cout << "\tCreated OpenCL Context: " << std::endl;
   std::cout << "\t - vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>();
