@@ -106,7 +106,7 @@ class Tensor : public TorchData {
   std::shared_ptr<Tensor<T>> view(const uint32_t dim, const uint32_t* size);
 
   const uint32_t dim() const { return dim_; }
-  const uint32_t* size() const { return size_; }
+  const uint32_t* size() const { return size_.get(); }
   const bool isSameSizeAs(const Tensor<T>& src) const;
 
   // Print --> EXPENSIVE
@@ -139,8 +139,8 @@ class Tensor : public TorchData {
  protected:
   jcl::JCLBuffer storage_;  // Internal data
   uint32_t dim_;
-  uint32_t* size_;  // size_[0] is lowest contiguous dimension,
-                    // size_[2] is highest dimension
+  std::unique_ptr<uint32_t[]> size_;  // size_[0] is lowest contiguous dimension,
+                                      // size_[2] is highest dimension
 
   Tensor();  // Default constructor used internally (in view function)
 
@@ -152,8 +152,8 @@ class Tensor : public TorchData {
 template <typename T>
 Tensor<T>::Tensor(const uint32_t dim, const uint32_t* size) {
   this->dim_ = dim;
-  this->size_ = new uint32_t[dim];
-  memcpy(this->size_, size, sizeof(this->size_[0]) * dim);
+  this->size_.reset(new uint32_t[dim]);
+  memcpy(this->size_.get(), size, sizeof(this->size_[0]) * dim);
   storage_ = jtorch::cl_context->allocateBuffer(
       jcl::CLBufferTypeReadWrite,
       nelems());  // Adds a reference to the reference count
@@ -165,16 +165,17 @@ Tensor<T>::Tensor() {
   // Default constructor returns an empty header.  Used internally (ie
   // private).
   dim_ = 0;
-  size_ = nullptr;
+  size_.reset(nullptr);
   storage_ = (jcl::JCLBuffer)-1;
 }
 
 template <typename T>
 Tensor<T>::~Tensor() {
+  // Note: If the following assertions are breaking, it means
+  // that you are not cleaning up your allocated tensors
+  // before shutting down jtorch.
+  assert(jtorch::cl_context);
   jtorch::cl_context->releaseReference(storage_);
-  if (size_) {
-    delete[] size_;
-  }
 }
 
 template <typename T>
@@ -222,8 +223,8 @@ std::shared_ptr<Tensor<T>> Tensor<T>::view(const uint32_t dim,
 
   std::shared_ptr<Tensor<T>> return_header(new Tensor<T>());
   return_header->dim_ = dim;
-  return_header->size_ = new uint32_t[dim];
-  memcpy(return_header->size_, size, sizeof(return_header->size_[0]) * dim);
+  return_header->size_.reset(new uint32_t[dim]);
+  memcpy(return_header->size_.get(), size, sizeof(return_header->size_[0]) * dim);
   return_header->storage_ = storage_;
   jtorch::cl_context->addReference(storage_);
   return return_header;
@@ -400,7 +401,7 @@ Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
 
 template <typename T>
 Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
-  Tensor<T>* ret = new Tensor<T>(x.dim_, x.size_);
+  Tensor<T>* ret = new Tensor<T>(x.dim_, x.size_.get());
   cl_context->useKernelCStr(kCopyKernel, "Copy");
   cl_context->setArg(0, x.storage());
   cl_context->setArg(1, ret->storage());

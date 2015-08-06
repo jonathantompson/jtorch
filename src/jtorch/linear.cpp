@@ -26,7 +26,7 @@ static const char* kLinearKernel =
 "      }"
 "      Y[i] = sum;"
 "    }"
-""
+"\n"
 "    #define ROW_DIM 0\n"
 "    #define COL_DIM 1\n"
 ""

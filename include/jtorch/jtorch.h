@@ -35,6 +35,8 @@ void ShutdownJTorch();                            // Thread safe
 void Sync();                                      // NOT Thread safe
 
 // Some constants and globals for the jtorch instance
+// Note: cl_context cannot be a unique_ptr because we need to
+// ensure that the context is shutdown last.
 extern std::unique_ptr<jcl::JCL> cl_context;
 extern std::string jtorch_path;
 const uint32_t deviceid = 0;
