@@ -34,6 +34,7 @@ void Reshape::init(std::shared_ptr<TorchData> input) {
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
 
   int32_t nelems = outNElem();
+  static_cast<void>(nelems);
   // Check the input size.
   assert(in->nelems() == nelems);
 

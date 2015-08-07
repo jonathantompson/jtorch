@@ -95,6 +95,7 @@ void Linear::init(std::shared_ptr<TorchData> input) {
   // FloatTensor expected
   assert(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
+  static_cast<void>(in);
   // Check input size
   assert(in->dim() == 1 && in->size()[0] == n_inputs_);
 }

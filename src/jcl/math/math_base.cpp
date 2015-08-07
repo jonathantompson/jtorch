@@ -50,7 +50,7 @@ namespace math {
            (out_height == in_height - kernel_size + 1));
     // From:
     // http://developer.amd.com/resources/heterogeneous-computing/opencl-zone/programming-in-opencl/image-convolution-using-opencl/
-    #pragma omp parallel for num_threads(n_threads)
+    // #pragma omp parallel for num_threads(n_threads)
     for (int32_t yOut = 0; yOut < out_height; yOut++) {
       const int32_t yInTopLeft = yOut;
       for (int32_t xOut = 0; xOut < out_width; xOut++) {

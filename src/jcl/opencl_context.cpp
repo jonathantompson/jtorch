@@ -60,8 +60,10 @@ void OpenCLContext::InitDevices(const CLDevice device) {
 
   // Make sure all of the devices match what the user asked for
   cl_device_type device_cl = CLDevice2CLDeviceType(device);
+  static_cast<void>(device_cl);
   for (uint32_t i = 0; i < devices.size(); i++) {
     cl_device_type cur_device_cl = devices[i].getInfo<CL_DEVICE_TYPE>(&err);
+    static_cast<void>(cur_device_cl);
     cl::CheckError(err);
     assert(cur_device_cl == device_cl);
   }
@@ -328,6 +330,7 @@ uint32_t OpenCLContext::queryMaxWorkgroupSizeForCurKernel(
   size_t max_workgroup_size;
   cl_int rc = cur_kernel_->kernel().getWorkGroupInfo<size_t>(
       devices[device_index], CL_KERNEL_WORK_GROUP_SIZE, &max_workgroup_size);
+  static_cast<void>(rc);
   assert(rc == CL_SUCCESS);
   return (uint32_t)max_workgroup_size;
 }
@@ -356,6 +359,7 @@ void OpenCLContext::runKernel(const uint32_t device_index, const uint32_t dim,
   // CL_DEVICE_MAX_WORK_GROUP_SIZE!
   assert(total_worksize <= (uint32_t)devices_max_workgroup_size_[device_index]);
   uint32_t max_size = queryMaxWorkgroupSizeForCurKernel(device_index);
+  static_cast<void>(max_size);
   // Check that: Local workgroup size is not greater than
   // CL_KERNEL_WORK_GROUP_SIZE!
   assert(total_worksize <= (uint32_t)max_size);
@@ -491,6 +495,8 @@ CLDevice OpenCLContext::CLDeviceType2CLDevice(const cl_device_type device) {
     default:
       std::cout << "Invalid enumerant" << std::endl;
       assert(false);
+      ret  = CLDeviceDefault;
+      break;
   }
   return ret;
 }
