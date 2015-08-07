@@ -22,7 +22,6 @@ end
 
 dofile(jtorch_root..'/lua/save_spatial_lp_pooling_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_max_pooling_node.lua')
-dofile(jtorch_root..'/lua/save_spatial_max_pooling_cuda_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_subtractive_normalization_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_divisive_normalization_node.lua')
 dofile(jtorch_root..'/lua/save_spatial_contrastive_normalization_node.lua')
@@ -89,7 +88,7 @@ function saveNNNode(node, ofile)
      -- Note: SpatialMaxPoolingCUDA gets saved with the same index
      --       as SpatialMaxPooling
      ofile:writeInt(10)
-     saveSpatialMaxPoolingCUDANode(node, ofile)
+     saveSpatialMaxPoolingNode(node, ofile)
   elseif ((class_str == "nn.SpatialSubtractiveNormalization") or 
           (class_str == "nn.SpatialSubtractiveNormalizationBatch")) then
      ofile:writeInt(11)
