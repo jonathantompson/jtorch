@@ -39,9 +39,9 @@ SpatialLPPooling::~SpatialLPPooling() {
 }
 
 void SpatialLPPooling::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
-  assert(in->dim() == 2 || in->dim() == 3);
+  RASSERT(in->dim() == 2 || in->dim() == 3);
 
   if (output != nullptr && TO_TENSOR_PTR(output.get())->dim() != in->dim()) {
     // Input dimension has changed!
@@ -67,7 +67,7 @@ void SpatialLPPooling::init(std::shared_ptr<TorchData> input) {
 
   if (output == nullptr) {
     // Check that the width and height is a multiple of the poolsize
-    assert(in->size()[0] % poolsize_u_ == 0 &&
+    RASSERT(in->size()[0] % poolsize_u_ == 0 &&
            in->size()[1] % poolsize_v_ == 0);
 
     std::unique_ptr<uint32_t[]> out_size(new uint32_t[in->dim()]);

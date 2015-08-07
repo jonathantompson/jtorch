@@ -37,20 +37,20 @@ std::unique_ptr<TorchStage> JoinTable::loadFromFile(std::ifstream& file) {
 }
 
 void JoinTable::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TABLE_DATA);  // Table expected
+  RASSERT(input->type() == TorchDataType::TABLE_DATA);  // Table expected
 
   Table* in = TO_TABLE_PTR(input.get());
 
-  assert(in->tableSize() > 0);
+  RASSERT(in->tableSize() > 0);
 
   // Check that it is a table of FloatTensors
   for (uint32_t i = 0; i < in->tableSize(); i++) {
     // Table of float tensors expected
-    assert((*in)(i)->type() == TENSOR_DATA);
+    RASSERT((*in)(i)->type() == TENSOR_DATA);
   }
 
   uint32_t dim = TO_TENSOR_PTR((*in)(0).get())->dim();
-  assert(dim > dimension_);  // Otherwise input is smaller than join dimension
+  RASSERT(dim > dimension_);  // Otherwise input is smaller than join dimension
   uint32_t jdim = dim - dimension_ - 1;  // dimension_=0 is the top dim
 
   // Make sure the dimensions OTHER than the join dimension are all the same
@@ -58,7 +58,7 @@ void JoinTable::init(std::shared_ptr<TorchData> input) {
     if (d != jdim) {
       for (uint32_t j = 1; j < in->tableSize(); j++) {
         // sizes must match
-        assert(TO_TENSOR_PTR((*in)(j).get())->size()[d] ==
+        RASSERT(TO_TENSOR_PTR((*in)(j).get())->size()[d] ==
                TO_TENSOR_PTR((*in)(0).get())->size()[d]);
       }
       if (output != nullptr &&
@@ -94,7 +94,7 @@ void JoinTable::forwardProp(std::shared_ptr<TorchData> input) {
   Table* in = (Table*)input.get();
 
   // AT THE MOMENT ONLY JOINS ALONG THE TOP DIMENSION ARE SUPPORTED
-  assert(dimension_ == 0);  // Only dimension=0 is supported for now
+  RASSERT(dimension_ == 0);  // Only dimension=0 is supported for now
 
   // Copy each table element's raw data into the output
   cl_context->useKernelCStr(kJoinTable1DKernel, "JoinTable1D");

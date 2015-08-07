@@ -151,10 +151,10 @@ static const char* kSpatialSubtractiveNormalizationKernel =
 SpatialSubtractiveNormalization::SpatialSubtractiveNormalization(
     const std::shared_ptr<Tensor<float>> kernel)
     : TorchStage() {
-  assert(kernel->dim() <= 2);
+  RASSERT(kernel->dim() <= 2);
 
   // Averaging kernel must have odd size!
-  assert(kernel->size()[0] % 2 != 0 &&
+  RASSERT(kernel->size()[0] % 2 != 0 &&
          !(kernel->dim() == 2 && kernel->size()[1] % 2 == 0));
 
   // Clone and normalize the input kernel
@@ -182,10 +182,10 @@ void SpatialSubtractiveNormalization::cleanup() {
 }
 
 void SpatialSubtractiveNormalization::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
 
-  assert(in->dim() == 3);
+  RASSERT(in->dim() == 3);
 
   if (output != nullptr) {
     if (!in->isSameSizeAs(*TO_TENSOR_PTR(output.get()))) {

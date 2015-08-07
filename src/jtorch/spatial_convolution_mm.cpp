@@ -101,10 +101,10 @@ void SpatialConvolutionMM::setBiases(const float* biases) {
 }
 
 void SpatialConvolutionMM::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
-  assert(in->dim() == 3);
-  assert(in->size()[2] == feats_in_);
+  RASSERT(in->dim() == 3);
+  RASSERT(in->size()[2] == feats_in_);
   if (output != nullptr) {
     uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padw_;
     uint32_t oheight = in->size()[1] - filt_height_ + 1 + 2 * padh_;
@@ -271,7 +271,7 @@ clblasTranspose convertTransToCublasOperation(char trans) {
     return clblasConjTrans;  // Or CUBLAS_OP_C
   else {
     std::cout << "trans must be one of: t, n, c" << std::endl;
-    assert(false);
+    RASSERT(false);
     return clblasNoTrans;
   }
 }
@@ -355,7 +355,7 @@ void THCudaBlas_gemm(void* state, char transa, char transb, size_t m, size_t n,
 
   if (err != CL_SUCCESS) {
     std::cout << "Error clblasSgemm failed: " << getErrorString(err);
-    assert(false);
+    RASSERT(false);
   }
 }
 

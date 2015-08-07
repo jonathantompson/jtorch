@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <assert.h>
+
 #include <memory>
 #include <sstream>
 #include <string>

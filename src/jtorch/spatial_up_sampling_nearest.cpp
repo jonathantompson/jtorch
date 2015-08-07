@@ -69,12 +69,12 @@ SpatialUpSamplingNearest::SpatialUpSamplingNearest(const int32_t scale)
 SpatialUpSamplingNearest::~SpatialUpSamplingNearest() {}
 
 void SpatialUpSamplingNearest::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
 
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
   Tensor<float>* out = TO_TENSOR_PTR(output.get());
 
-  assert(in->dim() >= 2);
+  RASSERT(in->dim() >= 2);
 
   if (output != nullptr && in->dim() != out->dim()) {
     output = nullptr;

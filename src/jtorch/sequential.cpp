@@ -33,7 +33,7 @@ std::unique_ptr<TorchStage> Sequential::loadFromFile(std::ifstream& file) {
 }
 
 void Sequential::forwardProp(std::shared_ptr<TorchData> input) {
-  assert(network_.size() > 0);
+  RASSERT(network_.size() > 0);
   network_[0]->forwardProp(input);
   for (uint32_t i = 1; i < network_.size(); i++) {
     std::shared_ptr<TorchData> cur_input = network_[i - 1]->output;

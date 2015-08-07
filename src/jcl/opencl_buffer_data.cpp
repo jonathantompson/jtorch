@@ -40,11 +40,11 @@ namespace jcl {
     default:
       std::cout << "OpenCLBufferData::OpenCLBufferData() - "
         "ERROR: Memory type not supported!" << std::endl;
-      assert(false);
+      RASSERT(false);
     }
 
     // Zero size buffer cannot be allocated!
-    assert(nelems > 0);
+    RASSERT(nelems > 0);
 
     buffer_.push_back(cl::Buffer(context, flags, sizeof(cl_float) * nelems));
     nelems_allocated_ += nelems;
@@ -70,14 +70,14 @@ namespace jcl {
   void OpenCLBufferData::addReference() {
     std::lock_guard<std::mutex> guard(lock_);
     // Check we're not trying to add reference to a released buffer!
-    assert(reference_count_ > 0 && buffer_.size() > 0);
+    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
     reference_count_++;
   }
 
   void OpenCLBufferData::releaseReference() {
     std::lock_guard<std::mutex> guard(lock_);
     // Check we're not trying to add reference to a released buffer!
-    assert(reference_count_ > 0 && buffer_.size() > 0);
+    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
     reference_count_--;
     if (reference_count_ <= 0) {
       buffer_.clear();
@@ -91,7 +91,7 @@ namespace jcl {
   cl::Buffer& OpenCLBufferData::buffer() {
     std::lock_guard<std::mutex> guard(lock_);
     // Check we're not trying to access a released buffer!
-    assert(reference_count_ > 0 && buffer_.size() > 0);
+    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
     return buffer_[0];
   }
 

@@ -1,5 +1,6 @@
-#include <assert.h>
+
 #include <iostream>
+#include "jcl/jcl.h"
 #include "jcl/cl_include.h"
 
 namespace cl {
@@ -9,7 +10,7 @@ void CheckError(const cl_int err_code) {
     std::cout << "OpenCLContext::CheckError() - ERROR: "
               << GetCLErrorEnumString(err_code) << std::endl;
   }
-  assert(err_code == CL_SUCCESS);  // Force runtime break.
+  RASSERT(err_code == CL_SUCCESS);  // Force runtime break.
 }
 
 std::string GetCLErrorEnumString(const int32_t err) {

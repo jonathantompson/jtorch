@@ -1,5 +1,5 @@
 #include <clBLAS.h>
-#include <assert.h>
+
 #include <iostream>
 #include <mutex>
 #include <sstream>
@@ -35,14 +35,14 @@ void InitJTorchInternal(const bool use_cpu) {
   if (err != CL_SUCCESS) {
     std::cout << "ERROR - InitJTorchInternal: clblasSetup returned error: "
               << jcl::JCL::getErrorString(err);
-    assert(false);
+    RASSERT(false);
   }
 }
 
 void InitJTorch(const bool use_cpu) {
   std::lock_guard<std::mutex> lck(cl_context_lock_);
   // Check we haven't already called init.
-  assert(cl_context == nullptr);
+  RASSERT(cl_context == nullptr);
   InitJTorchInternal(use_cpu);
 }
 

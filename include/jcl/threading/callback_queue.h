@@ -110,7 +110,7 @@ T CallbackQueue<T>::dequeue() {
 
 template <typename T>
 T CallbackQueue<T>::peak() {
-  assert(head_ != nullptr);  //  Trying to peak from an empty queue
+  RASSERT(head_ != nullptr);  //  Trying to peak from an empty queue
   return head_->data;
 }
 

@@ -45,11 +45,11 @@ void ParallelTable::initOutput() {
 }
 
 void ParallelTable::forwardProp(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TABLE_DATA);
+  RASSERT(input->type() == TorchDataType::TABLE_DATA);
 
   Table* in = (Table*)input.get();
   // Make sure table size matches the number of parallel stages:
-  assert(in->tableSize() == network_.size());
+  RASSERT(in->tableSize() == network_.size());
   for (uint32_t i = 0; i < network_.size(); i++) {
     network_[i]->forwardProp((*in)(i));
   }

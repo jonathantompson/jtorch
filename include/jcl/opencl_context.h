@@ -117,15 +117,15 @@ struct OpenCLContext {
 
 template <typename T>
 void OpenCLContext::setArg(const uint32_t index, const T& val) {
-  assert(cur_kernel_ != nullptr);  // You must call OpenCL::useKernel() first
+  RASSERT(cur_kernel_ != nullptr);  // You must call OpenCL::useKernel() first
   cur_kernel_->setArg(index, val);
 }
 
 template <typename T>
 void OpenCLContext::writeToBuffer(const T* data, const uint32_t device_index,
                                   const JCLBuffer buffer, const bool blocking) {
-  assert(device_index < devices.size());
-  assert(static_cast<uint32_t>(buffer) < buffers.size());
+  RASSERT(device_index < devices.size());
+  RASSERT(static_cast<uint32_t>(buffer) < buffers.size());
   OpenCLBufferData* buf = buffers[(uint32_t)buffer].get();
   cl::Event cur_event;
   cl::CheckError(queues[device_index].enqueueWriteBuffer(
@@ -140,8 +140,8 @@ template <typename T>
 void OpenCLContext::readFromBuffer(T* data, const uint32_t device_index,
                                    const JCLBuffer buffer,
                                    const bool blocking) {
-  assert(device_index < devices.size());
-  assert(static_cast<uint32_t>(buffer) < buffers.size());
+  RASSERT(device_index < devices.size());
+  RASSERT(static_cast<uint32_t>(buffer) < buffers.size());
   OpenCLBufferData* buf = buffers[(uint32_t)buffer].get();
   cl::Event cur_event;
   cl::CheckError(queues[device_index].enqueueReadBuffer(

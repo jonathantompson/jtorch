@@ -34,8 +34,8 @@ void OpenCLContext::createContext(const CLDevice device,
   cl::Platform platform;
 
   // TODO: We might want to fail more gracefully.
-  assert(getPlatform(device, vendor,
-                     platform));  // Otherwise no OpenCL platforms were found
+  RASSERT(getPlatform(device, vendor,
+                    platform));  // Otherwise no OpenCL platforms were found
 
   // Use the preferred platform and create a context
   cl_context_properties cps[] = {CL_CONTEXT_PLATFORM,
@@ -56,16 +56,15 @@ void OpenCLContext::InitDevices(const CLDevice device) {
   cl::CheckError(err);
 
   // Check that there are devices attadched to the current context
-  assert(devices.size() > 0);
+  RASSERT(devices.size() > 0);
 
   // Make sure all of the devices match what the user asked for
   cl_device_type device_cl = CLDevice2CLDeviceType(device);
   static_cast<void>(device_cl);
   for (uint32_t i = 0; i < devices.size(); i++) {
     cl_device_type cur_device_cl = devices[i].getInfo<CL_DEVICE_TYPE>(&err);
-    static_cast<void>(cur_device_cl);
     cl::CheckError(err);
-    assert(cur_device_cl == device_cl);
+    RASSERT(cur_device_cl == device_cl);
   }
 
   for (uint32_t i = 0; i < devices.size(); i++) {
@@ -236,17 +235,17 @@ JCLBuffer OpenCLContext::allocateBuffer(const CLBufferType type,
 }
 
 cl_mem OpenCLContext::getCLMem(const JCLBuffer buffer) {
-  assert(buffer < buffers.size());
+  RASSERT(buffer < buffers.size());
   return buffers[buffer]->buffer()();
 }
 
 void OpenCLContext::releaseReference(const JCLBuffer buffer) {
-  assert(buffer < buffers.size());
+  RASSERT(buffer < buffers.size());
   buffers[buffer]->releaseReference();
 }
 
 void OpenCLContext::addReference(const JCLBuffer buffer) {
-  assert(buffer < buffers.size());
+  RASSERT(buffer < buffers.size());
   buffers[buffer]->addReference();
 }
 
@@ -305,33 +304,32 @@ void OpenCLContext::useKernelCStr(const char* kernel_c_str,
 
 void OpenCLContext::setArg(const uint32_t index, const JCLBuffer& val) {
   // You must call OpenCL::useKernel() first.
-  assert(cur_kernel_ != nullptr);
+  RASSERT(cur_kernel_ != nullptr);
   cur_kernel_->setArg(index, buffers[(uint32_t)val]->buffer());
 }
 
 void OpenCLContext::setArg(const uint32_t index, const uint32_t size,
                            void* data) {
   // You must call OpenCL::useKernel() first.
-  assert(cur_kernel_ != nullptr);
+  RASSERT(cur_kernel_ != nullptr);
   cur_kernel_->setArg(index, size, data);
 }
 
 void OpenCLContext::sync(const uint32_t device_index) {
-  assert(device_index < devices.size());
+  RASSERT(device_index < devices.size());
   cl::CheckError(queues[device_index].finish());
 }
 
 uint32_t OpenCLContext::queryMaxWorkgroupSizeForCurKernel(
     const uint32_t device_index) {
   // You must call OpenCL::useKernel() first.
-  assert(cur_kernel_ != nullptr);
-  assert(device_index < devices.size());
+  RASSERT(cur_kernel_ != nullptr);
+  RASSERT(device_index < devices.size());
 
   size_t max_workgroup_size;
   cl_int rc = cur_kernel_->kernel().getWorkGroupInfo<size_t>(
       devices[device_index], CL_KERNEL_WORK_GROUP_SIZE, &max_workgroup_size);
-  static_cast<void>(rc);
-  assert(rc == CL_SUCCESS);
+  RASSERT(rc == CL_SUCCESS);
   return (uint32_t)max_workgroup_size;
 }
 
@@ -340,29 +338,28 @@ void OpenCLContext::runKernel(const uint32_t device_index, const uint32_t dim,
                               const uint32_t* local_work_size,
                               const bool blocking) {
   // You must call OpenCL::useKernel() first.
-  assert(cur_kernel_ != nullptr);
-  assert(device_index < devices.size());
-  assert(dim <= 3);  // OpenCL doesn't support greater than 3 dims!
+  RASSERT(cur_kernel_ != nullptr);
+  RASSERT(device_index < devices.size());
+  RASSERT(dim <= 3);  // OpenCL doesn't support greater than 3 dims!
 
   uint32_t total_worksize = 1;
   for (uint32_t i = 0; i < dim; i++) {
     // Check that: Global workgroup size is evenly divisible by the local work
     // group size!
-    assert((global_work_size[i] % local_work_size[i]) == 0);
+    RASSERT((global_work_size[i] % local_work_size[i]) == 0);
     total_worksize *= local_work_size[i];
     // Check that: Local workgroup size is not greater than
     // devices_max_workitem_size_
-    assert(local_work_size[i] <=
+    RASSERT(local_work_size[i] <=
            (int)devices_max_workitem_size_[device_index][i]);
   }
   // Check that: Local workgroup size is not greater than
   // CL_DEVICE_MAX_WORK_GROUP_SIZE!
-  assert(total_worksize <= (uint32_t)devices_max_workgroup_size_[device_index]);
+  RASSERT(total_worksize <= (uint32_t)devices_max_workgroup_size_[device_index]);
   uint32_t max_size = queryMaxWorkgroupSizeForCurKernel(device_index);
-  static_cast<void>(max_size);
   // Check that: Local workgroup size is not greater than
   // CL_KERNEL_WORK_GROUP_SIZE!
-  assert(total_worksize <= (uint32_t)max_size);
+  RASSERT(total_worksize <= (uint32_t)max_size);
 
   cl::NDRange offset = cl::NullRange;
   cl::NDRange global_work;
@@ -397,9 +394,9 @@ void OpenCLContext::runKernel(const uint32_t device_index, const uint32_t dim,
                               const uint32_t* global_work_size,
                               const bool blocking) {
   // You must call OpenCL::useKernel() first.
-  assert(cur_kernel_ != nullptr);
-  assert(device_index < devices.size());
-  assert(dim <= 3);  // OpenCL doesn't support greater than 3 dims!
+  RASSERT(cur_kernel_ != nullptr);
+  RASSERT(device_index < devices.size());
+  RASSERT(dim <= 3);  // OpenCL doesn't support greater than 3 dims!
 
   cl::NDRange offset = cl::NullRange;
   cl::NDRange global_work;
@@ -443,7 +440,7 @@ std::string OpenCLContext::CLVendor2String(const CLVendor vendor) {
       break;
     default:
       std::cout << "Invalid vendor specified" << std::endl;
-      assert(false);
+      RASSERT(false);
       break;
   }
   return str;
@@ -469,7 +466,7 @@ cl_device_type OpenCLContext::CLDevice2CLDeviceType(const CLDevice device) {
       break;
     default:
       std::cout << "Invalid enumerant" << std::endl;
-      assert(false);
+      RASSERT(false);
   }
   return ret;
 }
@@ -494,7 +491,7 @@ CLDevice OpenCLContext::CLDeviceType2CLDevice(const cl_device_type device) {
       break;
     default:
       std::cout << "Invalid enumerant" << std::endl;
-      assert(false);
+      RASSERT(false);
       ret  = CLDeviceDefault;
       break;
   }

@@ -150,11 +150,11 @@ void SpatialConvolution::setBiases(const float* biases) {
 }
 
 void SpatialConvolution::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
 
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
-  assert(in->dim() == 3);
-  assert(in->size()[2] == feats_in_);
+  RASSERT(in->dim() == 3);
+  RASSERT(in->size()[2] == feats_in_);
 
   if (output != nullptr) {
     uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padding_;

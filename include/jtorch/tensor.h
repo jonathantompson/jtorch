@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <assert.h>
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -174,7 +174,7 @@ Tensor<T>::~Tensor() {
   // Note: If the following assertions are breaking, it means
   // that you are not cleaning up your allocated tensors
   // before shutting down jtorch.
-  assert(jtorch::cl_context);
+  RASSERT(jtorch::cl_context);
   jtorch::cl_context->releaseReference(storage_);
 }
 
@@ -213,13 +213,13 @@ const bool Tensor<T>::isSameSizeAs(const Tensor<T>& src) const {
 template <typename T>
 std::shared_ptr<Tensor<T>> Tensor<T>::view(const uint32_t dim,
                                            const uint32_t* size) {
-  assert(dim != 0);
+  RASSERT(dim != 0);
   int32_t view_nelem = 1;
   for (uint32_t i = 0; i < dim; i++) {
     view_nelem *= size[i];
   }
 
-  assert(view_nelem == nelems());  // Otherwise size mismatch
+  RASSERT(view_nelem == nelems());  // Otherwise size mismatch
 
   std::shared_ptr<Tensor<T>> return_header(new Tensor<T>());
   return_header->dim_ = dim;
@@ -515,7 +515,7 @@ Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
   } else {
     std::cout << "Tensor<T>::loadFromFile() - ERROR: Could not open file ";
     std::cout << file << std::endl;
-    assert(false);
+    RASSERT(false);
     return nullptr;
   }
   return new_tensor;
@@ -540,7 +540,7 @@ void Tensor<T>::saveToFile(const Tensor<T>* tensor, const std::string& file) {
   } else {
     std::cout << "Tensor<T>::saveToFile() - ERROR: Could not open file ";
     std::cout << file << std::endl;
-    assert(false);
+    RASSERT(false);
   }
 }
 

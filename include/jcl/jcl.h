@@ -16,11 +16,25 @@
 
 #pragma once
 
+#include <assert.h>
 #include <memory>
 #include <mutex>
 #include <string>
 
 #include "jcl/math/math_types.h"
+
+// RASSERT is a pretty hacky macro that will assert
+// on debug and crash on release. Used all throughout
+// jcl and jtorch.
+#define RASSERT(x) \
+  do { \
+    const bool result = (x); \
+    assert(result); \
+    if (!result) { \
+      std::cerr << "RASSERT failed" << std::endl; \
+      exit(1); \
+    }; \
+  } while(0);
 
 namespace jcl {
 

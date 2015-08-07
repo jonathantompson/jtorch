@@ -19,7 +19,7 @@ SpatialDropout::SpatialDropout(const float p) : TorchStage() {
 SpatialDropout::~SpatialDropout() {}
 
 void SpatialDropout::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
 
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
   if (output != nullptr) {

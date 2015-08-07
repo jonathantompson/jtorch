@@ -1,4 +1,4 @@
-#include <assert.h>
+
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
@@ -44,7 +44,7 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(const std::string& file) {
   } else {
     std::cout << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
     std::cout << " file " << file << std::endl;
-    assert(false);
+    RASSERT(false);
   }
   return ret;
 }
@@ -125,7 +125,7 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
       std::cout << "TorchStage::loadFromFile() - ERROR: "
                    "Node type not recognized!"
                 << std::endl;
-      assert(false);
+      RASSERT(false);
   }
 
 #if defined(DEBUG) || defined(_DEBUG)

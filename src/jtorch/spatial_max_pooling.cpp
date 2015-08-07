@@ -115,9 +115,9 @@ static const char* kSpatialMaxPoolingKernel =
 SpatialMaxPooling::~SpatialMaxPooling() {}
 
 void SpatialMaxPooling::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
-  assert(in->dim() == 2 || in->dim() == 3);
+  RASSERT(in->dim() == 2 || in->dim() == 3);
 
   // We'll escentially do ceil_mode = false from torch
   const uint32_t iwidth = in->size()[0];

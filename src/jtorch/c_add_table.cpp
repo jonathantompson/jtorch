@@ -21,20 +21,20 @@ std::unique_ptr<TorchStage> CAddTable::loadFromFile(std::ifstream& file) {
 }
 
 void CAddTable::forwardProp(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TABLE_DATA);
+  RASSERT(input->type() == TorchDataType::TABLE_DATA);
 
   Table* in = reinterpret_cast<Table*>(input.get());
-  assert(in->tableSize() != 0);
+  RASSERT(in->tableSize() != 0);
 
   // Make sure all the elements are of type TENSOR
   for (uint32_t i = 0; i < in->tableSize(); i++) {
     // Table of Tensors expected.
-    assert((*in)(i)->type() == TorchDataType::TENSOR_DATA);
+    RASSERT((*in)(i)->type() == TorchDataType::TENSOR_DATA);
   }
 
   for (uint32_t i = 1; i < in->tableSize(); i++) {
     // Table of equal size tensors expected.
-    assert(TO_TENSOR_PTR((*in)(0).get())
+    RASSERT(TO_TENSOR_PTR((*in)(0).get())
                ->isSameSizeAs(*TO_TENSOR_PTR((*in)(i).get())));
   }
 

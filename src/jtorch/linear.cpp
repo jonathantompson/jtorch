@@ -93,11 +93,11 @@ void Linear::setBiases(const float* biases) { biases_->setData(biases); }
 
 void Linear::init(std::shared_ptr<TorchData> input) {
   // FloatTensor expected
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
   static_cast<void>(in);
   // Check input size
-  assert(in->dim() == 1 && in->size()[0] == n_inputs_);
+  RASSERT(in->dim() == 1 && in->size()[0] == n_inputs_);
 }
 
 void Linear::forwardProp(std::shared_ptr<TorchData> input) {

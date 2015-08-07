@@ -51,7 +51,7 @@ Threshold::Threshold() : TorchStage() {
 Threshold::~Threshold() {}
 
 void Threshold::init(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TENSOR_DATA);
+  RASSERT(input->type() == TorchDataType::TENSOR_DATA);
   Tensor<float>* in = TO_TENSOR_PTR(input.get());
   if (output != nullptr) {
     if (!in->isSameSizeAs(*TO_TENSOR_PTR(output.get()))) {

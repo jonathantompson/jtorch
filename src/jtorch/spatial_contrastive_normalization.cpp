@@ -19,10 +19,10 @@ SpatialContrastiveNormalization::SpatialContrastiveNormalization(
     : TorchStage() {
   if (kernel) {
     // Averaging kernel must be 1D or 2D.
-    assert(kernel->dim() <= 2);
+    RASSERT(kernel->dim() <= 2);
 
     // Averaging kernel must have odd size.
-    assert(kernel->size()[0] % 2 != 0 &&
+    RASSERT(kernel->size()[0] % 2 != 0 &&
            !(kernel->dim() == 2 && kernel->size()[1] % 2 == 0));
   } else {
     uint32_t dim = 1;

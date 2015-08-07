@@ -37,7 +37,7 @@ namespace jcl {
     if (!fptr) {
       std::cout << "Renderer::readFileToBuffer() - ERROR: could not"
         " open file (" << filename << ") for reading" << std::endl;
-      assert(false);
+      RASSERT(false);
     }
     fseek(fptr, 0, SEEK_END);  // Seek to the end of the file
     length = ftell(fptr);  // Find out how many bytes into the file we are

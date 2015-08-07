@@ -233,7 +233,7 @@ namespace jcl {
       return "CLDeviceDefault";
     default:
       std::cout << "Bad CLDevice" << std::endl;
-      assert(false);
+      RASSERT(false);
       return "Bad CLDevice";
     }
   }
@@ -250,7 +250,7 @@ namespace jcl {
       return "CLDeviceIntel";
     default:
       std::cout << "Bad CLVendor" << std::endl;
-      assert(false);
+      RASSERT(false);
       return "Bad CLVendor";
     }
   }

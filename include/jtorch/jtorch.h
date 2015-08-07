@@ -24,7 +24,7 @@ class JCL;
 
 namespace jtorch {
 
-// InitJTorch - an assert will break on multile inits
+// InitJTorch - will break on multile inits
 void InitJTorch(const bool use_cpu = false);  // Thread safe
 // InitJTorchSafe - Multiple init OK
 void InitJTorchSafe(const bool use_cpu = false);  // Thread safe

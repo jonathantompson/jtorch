@@ -28,12 +28,12 @@ std::unique_ptr<TorchStage> SelectTable::loadFromFile(std::ifstream& file) {
 }
 
 void SelectTable::forwardProp(std::shared_ptr<TorchData> input) {
-  assert(input->type() == TorchDataType::TABLE_DATA);
+  RASSERT(input->type() == TorchDataType::TABLE_DATA);
 
   Table* in = (Table*)input.get();
 
   // Check that the input table isn't too small.
-  assert(in->tableSize() > index_);
+  RASSERT(in->tableSize() > index_);
 
   output = (*in)(index_);
 }

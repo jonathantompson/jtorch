@@ -5,7 +5,7 @@
 #include <thread>
 #include <iostream>
 #include <limits>
-#include <assert.h>
+
 #include "jtorch/torch_stage.h"
 #include "jtorch/jtorch.h"
 #include "jtorch/tensor.h"
@@ -509,7 +509,7 @@ int main(int argc, char* argv[]) {
       model->forwardProp(data_in);
 
       // Some debugging if things go wrong:
-      assert(model->type() == SEQUENTIAL_STAGE);
+      RASSERT(model->type() == SEQUENTIAL_STAGE);
       const TorchStageType stages[] = {SPATIAL_CONVOLUTION_STAGE,
                                        TANH_STAGE,
                                        THRESHOLD_STAGE,
@@ -518,13 +518,13 @@ int main(int argc, char* argv[]) {
                                        RESHAPE_STAGE,
                                        LINEAR_STAGE};
 
-      assert(((Sequential*)model.get())->size() ==
+      RASSERT(((Sequential*)model.get())->size() ==
              sizeof(stages) / sizeof(stages[0]));
 
       for (uint32_t i = 0; i < sizeof(stages) / sizeof(stages[0]); i++) {
         TorchStage* stage = ((Sequential*)model.get())->get(i);
         static_cast<void>(stage);
-        assert(stage->type() == stages[i]);
+        RASSERT(stage->type() == stages[i]);
       }
 
       testJTorchValue(model->output, "test_model_result.bin");

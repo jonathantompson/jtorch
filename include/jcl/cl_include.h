@@ -26,3 +26,4 @@ namespace cl {
 void CheckError(const cl_int err_code);
 std::string GetCLErrorEnumString(const cl_int err_code);
 }  // namespace cl
+
