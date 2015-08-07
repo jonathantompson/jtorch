@@ -84,6 +84,11 @@ void testJTorchValue(std::shared_ptr<TorchData> t_data,
 
   if (!correct_data_tensor->isSameSizeAs(*data)) {
     std::cout << "Test FAILED (size mismatch)!: " << filename << std::endl;
+#if defined(WIN32) || defined(_WIN32)
+    cout << endl;
+    system("PAUSE");
+#endif
+    exit(1);
   } else {
     correct_data_tensor->getData(correct_data.get());
     data->getData(model_data.get());
@@ -296,10 +301,31 @@ int main(int argc, char* argv[]) {
     {
       const uint32_t pool_u = 2;
       const uint32_t pool_v = 2;
-      SpatialMaxPooling max_pool_stage(pool_v, pool_u);
+      const uint32_t du = pool_u;
+      const uint32_t dv = pool_v;
+      const uint32_t padu = 0;
+      const uint32_t padv = 0;
+      SpatialMaxPooling max_pool_stage(pool_u, pool_v, du, dv, 
+        padu, padv);
       max_pool_stage.forwardProp(data_in);
       testJTorchValue(max_pool_stage.output,
                       "spatial_max_pooling.bin");
+    }
+
+    // ***********************************************
+    // Test SpatialMaxPooling with padding and stride
+    {
+      const uint32_t pool_u = 4;
+      const uint32_t pool_v = 5;
+      const uint32_t pool_dh = 3;
+      const uint32_t pool_dw = 1;
+      const uint32_t pool_padh = 0;
+      const uint32_t pool_padw = 2;
+      SpatialMaxPooling max_pool_stage(pool_u, pool_v, pool_dw, 
+        pool_dh, pool_padw, pool_padh);
+      max_pool_stage.forwardProp(data_in);
+      testJTorchValue(max_pool_stage.output,
+                      "spatial_max_pooling_pad_stride.bin");
     }
 
     // ***********************************************

@@ -20,7 +20,8 @@ namespace jtorch {
 class SpatialMaxPooling : public TorchStage {
  public:
   // Constructor / Destructor
-  SpatialMaxPooling(const uint32_t poolsize_v, const uint32_t poolsize_u);
+  SpatialMaxPooling(const uint32_t kw, const uint32_t kh, const uint32_t dw,
+    const uint32_t dh, const uint32_t padw, const uint32_t padh);
   ~SpatialMaxPooling() override;
 
   TorchStageType type() const override { return SPATIAL_MAX_POOLING_STAGE; }
@@ -29,12 +30,16 @@ class SpatialMaxPooling : public TorchStage {
 
   static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
-  inline uint32_t poolsize_u() const { return poolsize_u_; }
-  inline uint32_t poolsize_v() const { return poolsize_v_; }
+  inline uint32_t kw() const { return kw_; }
+  inline uint32_t kh() const { return kh_; }
 
  protected:
-  uint32_t poolsize_v_;
-  uint32_t poolsize_u_;
+  uint32_t kh_;
+  uint32_t kw_;
+  uint32_t dh_;
+  uint32_t dw_;
+  uint32_t padh_;
+  uint32_t padw_;
 
   void init(std::shared_ptr<TorchData> input);
 
