@@ -514,7 +514,7 @@ int main(int argc, char* argv[]) {
                                        TANH_STAGE,
                                        THRESHOLD_STAGE,
                                        SPATIAL_MAX_POOLING_STAGE,
-                                       SPATIAL_CONVOLUTION_STAGE,
+                                       SPATIAL_CONVOLUTION_MM_STAGE,
                                        RESHAPE_STAGE,
                                        LINEAR_STAGE};
 
