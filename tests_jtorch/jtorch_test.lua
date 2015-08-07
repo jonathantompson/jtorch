@@ -165,8 +165,16 @@ print('Spatial Max Pooling result saved to test_data/spatial_max_pooling.bin')
 
 -- Test SpatialMaxPooling with padding and stride
 model3_1 = nn.Sequential()
-max_pool_stage_1 = nn.SpatialMaxPooling(poolsize_u, poolsize_v, pooldw, pooldh, poolpadw, poolpadh)
-model3_1:add(max_pool_stage_1)
+do
+  local kw = 4
+  local kh = 5;
+  local dw = 1;
+  local dh = 3;
+  local padw = 2;
+  local padh = 0;
+  max_pool_stage_1 = nn.SpatialMaxPooling(kw, kh, dw, dh, padw, padh)
+  model3_1:add(max_pool_stage_1)
+end
 res = model3_1:forward(data_in)
 saveTensor(res, "test_data/spatial_max_pooling_pad_stride.bin")
 print('Spatial Max Pooling result saved to test_data/spatial_max_pooling_pad_stride.bin')
