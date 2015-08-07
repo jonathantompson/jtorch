@@ -523,6 +523,7 @@ int main(int argc, char* argv[]) {
 
       for (uint32_t i = 0; i < sizeof(stages) / sizeof(stages[0]); i++) {
         TorchStage* stage = ((Sequential*)model.get())->get(i);
+        static_cast<void>(stage);
         assert(stage->type() == stages[i]);
       }
 
