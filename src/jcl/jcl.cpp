@@ -14,7 +14,9 @@ namespace jcl {
     vendor_ = vendor;
     strict_float_ = strict_float;
 
-    std::cout << "\tCreating OpenCL Context..." << std::endl;
+#if defined(DEBUG) || defined(_DEBUG)
+    std::cout << "\tCreating OpenCL Context..." << std::endl
+#endif
 
     // Aquire lock to prevent multiple initilizations:
     std::lock_guard<std::mutex> lock(context_lock_);
@@ -26,7 +28,9 @@ namespace jcl {
   }
 
   JCL::~JCL() {
+#if defined(DEBUG) || defined(_DEBUG)
     std::cout << "\tShutting down OpenCL Context..." << std::endl;
+#endif
   }
   
   bool JCL::queryDeviceExists(const CLDevice device, const CLVendor vendor) {

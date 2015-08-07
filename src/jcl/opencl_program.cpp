@@ -61,7 +61,9 @@ namespace jcl {
     program_ = cl::Program(context, source, &err);
     cl::CheckError(err);
 
+#if defined(DEBUG) || defined(_DEBUG)
     std::cout << "\tBuilding program: " << filename_ << std::endl;
+#endif
 #if !defined(__APPLE__)
     const char* options = "-Werror";  // Make warnings into errors"
 #else
