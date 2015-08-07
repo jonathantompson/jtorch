@@ -70,13 +70,15 @@ SpatialConvolutionMM::SpatialConvolutionMM(const uint32_t feats_in,
                                            const uint32_t feats_out,
                                            const uint32_t filt_height,
                                            const uint32_t filt_width,
-                                           const uint32_t padding)
+                                           const uint32_t padw,
+                                           const uint32_t padh)
     : TorchStage() {
   filt_width_ = filt_width;
   filt_height_ = filt_height;
   feats_in_ = feats_in;
   feats_out_ = feats_out;
-  padding_ = padding;
+  padw_ = padw;
+  padh_ = padh;
 
   output = nullptr;
   ones_.reset(nullptr);
@@ -104,8 +106,8 @@ void SpatialConvolutionMM::init(std::shared_ptr<TorchData> input) {
   assert(in->dim() == 3);
   assert(in->size()[2] == feats_in_);
   if (output != nullptr) {
-    uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padding_;
-    uint32_t oheight = in->size()[1] - filt_height_ + 1 + 2 * padding_;
+    uint32_t owidth = in->size()[0] - filt_width_ + 1 + 2 * padw_;
+    uint32_t oheight = in->size()[1] - filt_height_ + 1 + 2 * padh_;
     const uint32_t* out_size = TO_TENSOR_PTR(output.get())->size();
     if (out_size[0] != owidth || out_size[1] != oheight ||
         out_size[2] != feats_out_) {
@@ -119,8 +121,8 @@ void SpatialConvolutionMM::init(std::shared_ptr<TorchData> input) {
   if (output == nullptr) {
     const uint32_t inputWidth = in->size()[0];
     const uint32_t inputHeight = in->size()[1];
-    const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padding_;
-    const uint32_t outputHeight = inputHeight - filt_height_ + 1 + 2 * padding_;
+    const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padw_;
+    const uint32_t outputHeight = inputHeight - filt_height_ + 1 + 2 * padh_;
 
     // Resize output
     uint32_t out_dim[3];
@@ -155,13 +157,14 @@ void SpatialConvolutionMM::forwardProp(std::shared_ptr<TorchData> input) {
 
   const uint32_t inputWidth = input_n->size()[0];
   const uint32_t inputHeight = input_n->size()[1];
-  const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padding_;
-  const uint32_t outputHeight = inputHeight - filt_height_ + 1 + 2 * padding_;
+  const uint32_t outputWidth = inputWidth - filt_width_ + 1 + 2 * padw_;
+  const uint32_t outputHeight = inputHeight - filt_height_ + 1 + 2 * padh_;
   const uint32_t nInputPlane = feats_in_;
   const uint32_t nOutputPlane = feats_out_;
   const uint32_t kH = filt_height_;
   const uint32_t kW = filt_width_;
-  const uint32_t padding = padding_;
+  const uint32_t padw = padw_;
+  const uint32_t padh = padh_;
   const uint32_t dH = 1;
   const uint32_t dW = 1;
 
@@ -178,8 +181,8 @@ void SpatialConvolutionMM::forwardProp(std::shared_ptr<TorchData> input) {
                   biases_.get(), k_, 0, output_n, n_);
 
   // Extract columns:
-  im2col(input_n, nInputPlane, inputHeight, inputWidth, kH, kW, padding,
-         padding, dH, dW, columns_.get());
+  im2col(input_n, nInputPlane, inputHeight, inputWidth, kH, kW, padh,
+         padw, dH, dW, columns_.get());
 
   // M,N,K are dims of matrix A and B
   // (see http://docs.nvidia.com/cuda/cublas/#cublas-lt-t-gt-gemm)
@@ -221,7 +224,7 @@ std::unique_ptr<TorchStage> SpatialConvolutionMM::loadFromFile(
 #endif
 
   std::unique_ptr<SpatialConvolutionMM> ret(new SpatialConvolutionMM(
-      n_input_features, n_output_features, filt_height, filt_width, padding));
+      n_input_features, n_output_features, filt_height, filt_width, padw, padh));
 
   int32_t filt_dim = filt_width * filt_height;
   std::unique_ptr<float[]> weights(

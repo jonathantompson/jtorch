@@ -23,7 +23,7 @@ class SpatialConvolution : public TorchStage {
   // Constructor / Destructor
   SpatialConvolution(const uint32_t feats_in, const uint32_t feats_out,
                      const uint32_t filt_height, const uint32_t filt_width,
-                     const uint32_t padding = 0);
+                     const uint32_t padding);
   ~SpatialConvolution() override;
 
   TorchStageType type() const override { return SPATIAL_CONVOLUTION_STAGE; }

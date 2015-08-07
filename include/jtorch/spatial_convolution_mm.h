@@ -23,7 +23,7 @@ class SpatialConvolutionMM : public TorchStage {
   // Constructor / Destructor
   SpatialConvolutionMM(const uint32_t feats_in, const uint32_t feats_out,
                        const uint32_t filt_height, const uint32_t filt_width,
-                       const uint32_t padding = 0);
+                       const uint32_t padw, const uint32_t padh);
   ~SpatialConvolutionMM() override;
 
   TorchStageType type() const override { return SPATIAL_CONVOLUTION_MM_STAGE; }
@@ -42,7 +42,8 @@ class SpatialConvolutionMM : public TorchStage {
   uint32_t filt_height_;
   uint32_t feats_in_;
   uint32_t feats_out_;
-  uint32_t padding_;
+  uint32_t padw_;
+  uint32_t padh_;
 
   std::unique_ptr<Tensor<float>> weights_;
   std::unique_ptr<Tensor<float>> biases_;

@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
     // Test SpatialConvolution
     {
       SpatialConvolution conv(num_feats_in, num_feats_out, filt_height,
-                              filt_width);
+                              filt_width, 0);
       for (int32_t i = 0; i < static_cast<int32_t>(num_feats_out); i++) {
         cbiases[i] = (float)(i + 1) / (float)num_feats_out - 0.5f;
       }
@@ -268,9 +268,10 @@ int main(int argc, char* argv[]) {
       conv.forwardProp(stages.get(1)->output);
       testJTorchValue(conv.output, "spatial_convolution.bin");
 
-      const uint32_t padding = 6;
+      const uint32_t padw = 6;
+      const uint32_t padh = 3;
       SpatialConvolutionMM convmm(num_feats_in, num_feats_out, filt_height,
-                                  filt_width, padding);
+                                  filt_width, padw, padh);
       Tensor<float>::copy(*convmm.weights(), *conv.weights());
       Tensor<float>::copy(*convmm.biases(), *conv.biases());
       convmm.forwardProp(stages.get(1)->output);
@@ -511,7 +512,7 @@ int main(int argc, char* argv[]) {
       double t_start, t_end;
       uint64_t niters;
       SpatialConvolution conv(fin, fout, kh, kw, pad);
-      SpatialConvolutionMM conv_mm(fin, fout, kh, kw, pad);
+      SpatialConvolutionMM conv_mm(fin, fout, kh, kw, pad, pad);
       uint32_t size[3] = {imw, imh, fin};
       std::shared_ptr<Tensor<float>> input(new Tensor<float>(3, size));
       clk::Clk clk;
