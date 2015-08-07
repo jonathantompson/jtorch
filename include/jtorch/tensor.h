@@ -174,7 +174,7 @@ Tensor<T>::~Tensor() {
   // Note: If the following assertions are breaking, it means
   // that you are not cleaning up your allocated tensors
   // before shutting down jtorch.
-  RASSERT(jtorch::cl_context);
+  RASSERT(jtorch::cl_context != nullptr);
   jtorch::cl_context->releaseReference(storage_);
 }
 
