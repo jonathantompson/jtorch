@@ -1,4 +1,4 @@
-function loadTensor(filename)
+function jtorch.loadTensor(filename)
   ifile = torch.DiskFile(filename, 'r')
   ifile:binary()
 

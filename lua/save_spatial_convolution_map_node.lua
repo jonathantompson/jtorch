@@ -1,4 +1,4 @@
-function saveSpatialConvolutionMapNode(node, ofile)
+function jtorch._saveSpatialConvolutionMapNode(node, ofile)
 
   -- The layout is as follows:
   -- 1. filter width (int)
@@ -36,6 +36,6 @@ function saveSpatialConvolutionMapNode(node, ofile)
   end
 
   assert(node.bias:dim() == 1, 'bias vector is not 1D!')
-  saveFloatTensorSafe(ofile, node.bias)
+  jtorch._saveFloatTensorSafe(ofile, node.bias)
 
 end

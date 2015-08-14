@@ -1,4 +1,4 @@
-function saveSpatialSubtractiveNormalizationNode(node, ofile)
+function jtorch._saveSpatialSubtractiveNormalizationNode(node, ofile)
 
   if (node.kernel:dim() > 2) then
     error("saveSpatialSubtractiveNormalizationNode() - ERROR: Only 1D and 2D kernels are supported for now!")
@@ -16,5 +16,5 @@ function saveSpatialSubtractiveNormalizationNode(node, ofile)
     ofile:writeInt(node.kernel:size(1))
     ofile:writeInt(node.kernel:size(2))
   end
-  saveFloatTensorSafe(ofile, node.kernel)
+  jtorch._saveFloatTensorSafe(ofile, node.kernel)
 end

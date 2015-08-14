@@ -15,9 +15,9 @@ The library consists of a simple lua codebase for recursively saving a torch mod
 -- TORCH USAGE:
 model = nn.Sequential()
 model.add(x)  -- Add all the model components here
-jtorch_root = "path_to/jtorch/"
-dofile(jtorch_root .. "/jtorch.lua")
-saveModel(model, "my_model.bin")
+local jtorch = dofile("path/to/jtorch/jtorch.lua")
+jtorch.init("path/to/jtorch/")
+jtorch.saveModel(model, "my_model.bin")
 ```
 
 The library also contains a CPP framework for loading it and doing the forward prop. See jtorch_test for more details of usage. It uses OpenCL for all GPU computing. The following stages have full implementations (without batch support):

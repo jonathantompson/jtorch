@@ -1,4 +1,4 @@
-function saveSpatialConvolutionMMNode(node, ofile)
+function jtorch._saveSpatialConvolutionMMNode(node, ofile)
   -- The layout is as follows:
   -- 1. filter width (int)
   -- 2. filter height (int)
@@ -28,10 +28,10 @@ function saveSpatialConvolutionMMNode(node, ofile)
     'bad weight tensor size!')
   -- Resize to 4D
   node.weight:resize(node.nOutputPlane, node.nInputPlane, node.kH, node.kW)
-  saveFloatTensorSafe(ofile, node.weight)
+  jtorch._saveFloatTensorSafe(ofile, node.weight)
   -- Now Resize back to 2D
   node.weight:resize(node.nOutputPlane, node.nInputPlane * node.kH * node.kW)
   assert(node.bias:dim() == 1, 'bias vector is not 1D!')
-  saveFloatTensorSafe(ofile, node.bias)
+  jtorch._saveFloatTensorSafe(ofile, node.bias)
 
 end

@@ -9,8 +9,8 @@ torch.setnumthreads(3)
 torch.manualSeed(1)
 math.randomseed(1)
 
-jtorch_root = "../"
-dofile(jtorch_root .. "jtorch.lua")
+jtorch = dofile("../jtorch.lua")
+jtorch.init("../")
 
 num_feats_in = 5
 num_feats_out = 10
@@ -30,7 +30,7 @@ for f=1,num_feats_in do
   end
 end
 
-saveTensor(data_in, "test_data/data_in.bin")
+jtorch.saveTensor(data_in, "test_data/data_in.bin")
 print('Data In: saved to test_data/data_in.bin')
 
 model = nn.Sequential()
@@ -38,7 +38,7 @@ model = nn.Sequential()
 -- Test tanh
 model:add(nn.Tanh())
 res = model:forward(data_in)
-saveTensor(res, "test_data/tanh_result.bin")
+jtorch.saveTensor(res, "test_data/tanh_result.bin")
 print('Tanh result saved to test_data/tanh_result.bin')
 
 -- Test Threshold
@@ -46,7 +46,7 @@ threshold = 0.5
 val = 0.1
 model:add(nn.Threshold(threshold, val))
 res = model:forward(data_in)
-saveTensor(res, "test_data/threshold.bin")
+jtorch.saveTensor(res, "test_data/threshold.bin")
 print('Threshold result saved to test_data/threshold.bin')
 
 -- Test SpatialConvolutionMap
@@ -90,7 +90,7 @@ end
 -- print(spat_conv_map.weight)
 model:add(spat_conv_map)
 res = model:forward(data_in)
-saveTensor(res, "test_data/spatial_convolution_map.bin")
+jtorch.saveTensor(res, "test_data/spatial_convolution_map.bin")
 print('Spatial Convolution Map result saved to test_data/spatial_convolution_map.bin')
 
 -- Test SpatialConvolution
@@ -124,7 +124,7 @@ end
 -- print('Spatial Convolution Weights')
 -- print(spat_conv.weight)
 res = spat_conv:forward(model:get(2).output)
-saveTensor(res, "test_data/spatial_convolution.bin")
+jtorch.saveTensor(res, "test_data/spatial_convolution.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
 
 -- Test SpatialConvolutionMM with padding
@@ -136,7 +136,7 @@ spat_conv_mm.weight:copy(spat_conv.weight)
 -- print('Spatial Convolution Weights')
 -- print(spat_conv.weight)
 res = spat_conv_mm:forward(model:get(2).output)
-saveTensor(res, "test_data/spatial_convolution_mm_padding.bin")
+jtorch.saveTensor(res, "test_data/spatial_convolution_mm_padding.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution_mm_padding.bin')
 
 
@@ -152,7 +152,7 @@ poolpadh = 1
 pool_stage = nn.SpatialLPPooling(nstates, poolsize_u, poolsize_v, poolsize_u, poolsize_v)
 model:add(pool_stage)
 res = model:forward(data_in)
-saveTensor(res, "test_data/spatial_lp_pooling.bin")
+jtorch.saveTensor(res, "test_data/spatial_lp_pooling.bin")
 print('Spatial LP Pooling result saved to test_data/spatial_lp_pooling.bin')
 
 -- Test SpatialMaxPooling
@@ -160,7 +160,7 @@ model3 = nn.Sequential()
 max_pool_stage = nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsize_v)
 model3:add(max_pool_stage)
 res = model3:forward(data_in)
-saveTensor(res, "test_data/spatial_max_pooling.bin")
+jtorch.saveTensor(res, "test_data/spatial_max_pooling.bin")
 print('Spatial Max Pooling result saved to test_data/spatial_max_pooling.bin')
 
 -- Test SpatialMaxPooling with padding and stride
@@ -176,7 +176,7 @@ do
   model3_1:add(max_pool_stage_1)
 end
 res = model3_1:forward(data_in)
-saveTensor(res, "test_data/spatial_max_pooling_pad_stride.bin")
+jtorch.saveTensor(res, "test_data/spatial_max_pooling_pad_stride.bin")
 print('Spatial Max Pooling result saved to test_data/spatial_max_pooling_pad_stride.bin')
 
 -- Test SpatialSubtractiveNormalization
@@ -187,7 +187,7 @@ print(normkernel)
 norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
 model4:add(norm)
 res = model4:forward(data_in)
-saveTensor(res, "test_data/spatial_subtractive_normalization.bin")
+jtorch.saveTensor(res, "test_data/spatial_subtractive_normalization.bin")
 print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization.bin')
 
 model4 = nn.Sequential()
@@ -197,7 +197,7 @@ print(normkernel)
 norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
 model4:add(norm)
 res = model4:forward(data_in)
-saveTensor(res, "test_data/spatial_subtractive_normalization_2d.bin")
+jtorch.saveTensor(res, "test_data/spatial_subtractive_normalization_2d.bin")
 print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization_2d.bin')
 
 -- Test SpatialDivisiveNormalization
@@ -208,7 +208,7 @@ print(normkernel)
 spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
 model5:add(spatial_div_norm)
 res = model5:forward(data_in)
-saveTensor(res, "test_data/spatial_divisive_normalization.bin")
+jtorch.saveTensor(res, "test_data/spatial_divisive_normalization.bin")
 print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization.bin')
 
 model5 = nn.Sequential()
@@ -218,7 +218,7 @@ print(normkernel)
 spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
 model5:add(spatial_div_norm)
 res = model5:forward(data_in)
-saveTensor(res, "test_data/spatial_divisive_normalization_2d.bin")
+jtorch.saveTensor(res, "test_data/spatial_divisive_normalization_2d.bin")
 print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization_2d.bin')
 
 -- return spatial_div_norm.localstds
@@ -226,14 +226,14 @@ print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_n
 -- Test SpatialContrastiveNormalization  --> Doesn't work on blackbox (works on my PC)
 model6 = nn.Sequential()
 lena = image.scale(image.lena():float(), 32, 32)
-saveTensor(lena, 'test_data/lena_image.bin')
+jtorch.saveTensor(lena, 'test_data/lena_image.bin')
 print('Saved lena to test_data/lena_image.bin')
 
 normkernel = torch.Tensor(7):fill(1)
 spatial_contrast_norm = nn.SpatialContrastiveNormalization(3, normkernel)
 model6:add(spatial_contrast_norm)
 res = model6:forward(lena)
-saveTensor(res, 'test_data/spatial_contrastive_normalization.bin')
+jtorch.saveTensor(res, 'test_data/spatial_contrastive_normalization.bin')
 print('Saved SpatialContrastiveNormalization result to test_data/spatial_contrastive_normalization.bin')
 
 -- Test Linear
@@ -253,7 +253,7 @@ for i=1,lin_size_out do
 end
 model2:add(lin_stage)
 res = model2:forward(data_in)
-saveTensor(res, "test_data/linear.bin")
+jtorch.saveTensor(res, "test_data/linear.bin")
 print('Linear result saved to test_data/linear.bin')
 
 -- Test model
@@ -275,17 +275,17 @@ test_model:add(nn.Reshape(lin_size_in))
 test_model:add(nn.Linear(lin_size_in, 6))
 
 res = test_model:forward(data_in)
-saveTensor(res, "test_data/test_model_result.bin")
+jtorch.saveTensor(res, "test_data/test_model_result.bin")
 print('Test model result saved to test_data/test_model_result.bin')
 
 -- Save the Test model
-saveModel(test_model, "test_data/testmodel.bin")
+jtorch.saveModel(test_model, "test_data/testmodel.bin")
 
 -- test SpatialUpSamplingNearest
 do
   local model = nn.SpatialUpSamplingNearest(4)
   local res = model:forward(data_in)
-  saveTensor(res, "test_data/spatial_up_sampling_nearest.bin")
+  jtorch.saveTensor(res, "test_data/spatial_up_sampling_nearest.bin")
   print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
 end
 

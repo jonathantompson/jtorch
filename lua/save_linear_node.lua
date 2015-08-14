@@ -1,4 +1,4 @@
-function saveLinearNode(node, ofile)
+function jtorch._saveLinearNode(node, ofile)
   local noutputs = node.weight:size()[1]
   local ninputs = node.weight:size()[2]
   ofile:writeInt(noutputs)
@@ -14,8 +14,8 @@ function saveLinearNode(node, ofile)
       ofile:writeFloat(node.weight[{v, i}])  
     end
   end
-  -- saveFloatTensorSafe(ofile, node.weight)  -- DOESN'T WORK! (even if I transpose it)
+  -- jtorch._saveFloatTensorSafe(ofile, node.weight)  -- DOESN'T WORK! (even if I transpose it)
   
   assert(node.bias:dim() == 1, 'bias vector is not 1D!')
-  saveFloatTensorSafe(ofile, node.bias)
+  jtorch._saveFloatTensorSafe(ofile, node.bias)
 end

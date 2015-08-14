@@ -1,4 +1,4 @@
-function saveSpatialConvolutionCUDANode(node, ofile)
+function jtorch._saveSpatialConvolutionCUDANode(node, ofile)
   -- The layout is as follows:
   -- 1. filter width (int)
   -- 2. filter height (int)
@@ -29,5 +29,5 @@ function saveSpatialConvolutionCUDANode(node, ofile)
   end
   
   assert(node.bias:dim() == 1, 'bias vector is not 1D!')
-  saveFloatTensorSafe(ofile, node.bias)
+  jtorch._saveFloatTensorSafe(ofile, node.bias)
 end

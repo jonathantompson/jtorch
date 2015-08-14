@@ -1,4 +1,4 @@
-function saveSpatialLPPoolingNode(node, ofile)
+function jtorch._saveSpatialLPPoolingNode(node, ofile)
 
   -- The layout is as follows:
   -- 1. filter width (int)

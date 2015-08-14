@@ -1,7 +1,10 @@
-if (jtorch_root == nil) then
-  jtorch_root = "./"
+jtorch = {}
+
+function jtorch.init(jtorchRoot)
+  jtorch.jtorchRoot = jtorchRoot
+  dofile(jtorchRoot .. "/lua/save_tensor.lua")
+  dofile(jtorchRoot .. "/lua/load_tensor.lua")
+  dofile(jtorchRoot .. "/lua/save_model.lua")
 end
 
-dofile(jtorch_root.."/lua/save_tensor.lua")
-dofile(jtorch_root.."/lua/load_tensor.lua")
-dofile(jtorch_root.."/lua/save_model.lua")
+return jtorch

@@ -1,4 +1,4 @@
-function saveSpatialMaxPoolingNode(node, ofile)
+function jtorch._saveSpatialMaxPoolingNode(node, ofile)
 
   -- The layout is as follows:
   -- 1. filter width (int)

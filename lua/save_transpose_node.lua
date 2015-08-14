@@ -1,4 +1,4 @@
-function saveTransposeNode(node, ofile)
+function jtorch._saveTransposeNode(node, ofile)
   -- The CPP framework wont use transposes, but we'll save the
   -- permutations anyway
 

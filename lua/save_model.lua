@@ -3,9 +3,9 @@
 -- This script turns the serialized neural network file into a file that is
 -- readable by my c++ code.
 
-dofile(jtorch_root.."/lua/save_nn_node.lua")
+dofile(jtorch.jtorchRoot .. "/lua/save_nn_node.lua")
 
-function saveModel(model, model_filename)
+function jtorch.saveModel(model, model_filename)
   model = model:float()
 
   -- Open an output file
@@ -13,7 +13,7 @@ function saveModel(model, model_filename)
   ofile:binary()
 
   -- Now recursively save the network
-  saveNNNode(model, ofile)
+  jtorch._saveNNNode(model, ofile)
 
   ofile:close()
 

@@ -1,4 +1,4 @@
-function saveSpatialContrastiveNormalizationNode(node, ofile)
+function jtorch._saveSpatialContrastiveNormalizationNode(node, ofile)
 
   if (node.kernel:dim() > 2) then
     error("saveSpatialContrastiveNormalizationNode() - ERROR: Only 1D and 2D kernels are supported for now!")
@@ -17,7 +17,7 @@ function saveSpatialContrastiveNormalizationNode(node, ofile)
     ofile:writeInt(node.kernel:size(1))
     ofile:writeInt(node.kernel:size(2))
   end
-  saveFloatTensorSafe(ofile, node.kernel)
+  jtorch._saveFloatTensorSafe(ofile, node.kernel)
   ofile:writeFloat(node.threshold)
 
 end

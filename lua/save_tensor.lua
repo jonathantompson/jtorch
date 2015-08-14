@@ -1,4 +1,4 @@
-function saveTensor(tensor, filename)
+function jtorch.saveTensor(tensor, filename)
   ofile = torch.DiskFile(filename, 'w')
   ofile:binary()
 

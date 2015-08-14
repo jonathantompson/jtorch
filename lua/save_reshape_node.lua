@@ -1,4 +1,4 @@
-function saveReshapeNode(node, ofile)
+function jtorch._saveReshapeNode(node, ofile)
   local sz = node.size:totable()
   if #sz <= 0 then
     error('Bad module')
