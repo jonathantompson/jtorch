@@ -10,6 +10,9 @@ dofile(jtorch.jtorchRoot .. '/lua/save_spatial_convolution_mm_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_spatial_convolution_map_node.lua')
 
 function jtorch._saveFloatTensorSafe(ofile, tensor)
+  if torch.type(tensor) ~= 'torch.FloatTensor' then
+    tensor = tensor:float()
+  end
   -- We need to make sure that the underlining storage is the same size as the
   -- tensor header before saving to file
   local sz = 1
@@ -40,8 +43,7 @@ function jtorch._saveNNNode(node, ofile)
   -- Just send the node off to the correct routine depending on it's type
   -- Note that the type enum must match 
   -- jtorch/torch_stage.h
-  class_str = torch.typename(node)
-  print("saving " .. class_str .. "...")
+  local class_str = torch.typename(node)
   if (class_str == "nn.Sequential") then
      ofile:writeInt(1)
      jtorch._saveSequentialNode(node, ofile)

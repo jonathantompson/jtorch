@@ -6,17 +6,13 @@
 dofile(jtorch.jtorchRoot .. "/lua/save_nn_node.lua")
 
 function jtorch.saveModel(model, model_filename)
-  model = model:float()
-
   -- Open an output file
-  ofile = torch.DiskFile(model_filename, 'w')
+  local ofile = torch.DiskFile(model_filename, 'w')
   ofile:binary()
 
   -- Now recursively save the network
   jtorch._saveNNNode(model, ofile)
 
   ofile:close()
-
-  print("All done saving convnet")
 
 end
