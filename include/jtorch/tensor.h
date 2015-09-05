@@ -72,6 +72,25 @@ static const char* kAddKernel =
 "      output[x_out] = input1[x_out] + input2[x_out];"
 "    }";
 
+static const char* kSubKernel =
+"    /* output = input1 - input2 */"
+"    __kernel void Sub("
+"      const __global  float* input1,  /* 0 */"
+"      const __global  float* input2,  /* 1 */"
+"      __global  float* output) {      /* 2 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] = input1[x_out] - input2[x_out];"
+"    }";
+
+static const char* kAbsKernel =
+"    /* output = |input1| */"
+"    __kernel void Abs("
+"      const __global  float* input1,  /* 0 */"
+"      __global  float* output) {     /* 1 */"
+"      const int x_out = get_global_id(0);"
+"      output[x_out] = fabs(input1[x_out]);"
+"    }";
+
 static const char* kCopyKernel =
 "    __kernel void Copy("
 "      const __global float* input,  /* 0 */"
@@ -113,16 +132,33 @@ class Tensor : public TorchData {
   void print() override;  // print to std::cout
 
   // Some simple tensor math operations
+  // copy: dst = src
   static void copy(Tensor<T>& dst, const Tensor<T>& src);
+  // add: dst = x + y
   static void add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y);
+  // sub: dst = x - y
+  static void sub(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y);
+  // abs: x = |x|
+  static void abs(Tensor<T>& x);
+  // mul: x = x * mul_value
   static void mul(Tensor<T>& x, float mul_value);
+  // div: x = x / div_value
   static void div(Tensor<T>& x, float div_value);
+  // accumulate: dst += src
   static void accumulate(Tensor<T>& dst, const Tensor<T>& src);
+  // zero: x = vec(0)
   static void zero(Tensor<T>& x);
+  // fill: x = vec(value)
   static void fill(Tensor<T>& x, float value);
   // slowSum - This does a CPU copy because I haven't written a reduction
   // operator yet
   static float slowSum(const Tensor<T>& x);
+  // slowMax - This does a CPU copy because I haven't written a reduction
+  // operator yet
+  static float slowMax(const Tensor<T>& x);
+  // slowMin - This does a CPU copy because I haven't written a reduction
+  // operator yet
+  static float slowMin(const Tensor<T>& x);
 
   // Some tensor math operations that return new tensors
   static Tensor<T>* clone(const Tensor<T>& x);
@@ -433,6 +469,26 @@ void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
 }
 
 template <typename T>
+void Tensor<T>::sub(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
+  cl_context->useKernelCStr(kSubKernel, "Sub");
+  cl_context->setArg(0, x.storage());
+  cl_context->setArg(1, y.storage());
+  cl_context->setArg(2, dst.storage());
+  uint32_t dim = 1;
+  uint32_t nelem = dst.nelems();
+  cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
+}
+
+template <typename T>
+void Tensor<T>::abs(Tensor<T>& x) {
+  cl_context->useKernelCStr(kAbsKernel, "Abs");
+  cl_context->setArg(0, x.storage());
+  uint32_t dim = 1;
+  uint32_t nelem = x.nelems();
+  cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
+}
+
+template <typename T>
 void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
   cl_context->useKernelCStr(kMulKernel, "Mul");
   cl_context->setArg(0, mul_val);
@@ -479,14 +535,39 @@ void Tensor<T>::fill(Tensor<T>& dst, float value) {
 
 template <typename T>
 float Tensor<T>::slowSum(const Tensor<T>& x) {
-  float* temp = new float[x.nelems()];
-  x.getData(temp);
+  std::unique_ptr<float[]> temp(new float[x.nelems()]);
+  x.getData(temp.get());
   float sum = 0.0f;
   for (uint32_t i = 0; i < x.nelems(); i++) {
     sum += temp[i];
   }
-  delete[] temp;
   return sum;
+}
+
+template <typename T>
+float Tensor<T>::slowMax(const Tensor<T>& x) {
+  std::unique_ptr<float[]> temp(new float[x.nelems()]);
+  x.getData(temp.get());
+  float max = -std::numeric_limits<float>::infinity();
+  for (uint32_t i = 0; i < x.nelems(); i++) {
+    if (max < temp[i]) {
+      max = temp[i];
+    }
+  }
+  return max;
+}
+
+template <typename T>
+float Tensor<T>::slowMin(const Tensor<T>& x) {
+  std::unique_ptr<float[]> temp(new float[x.nelems()]);
+  x.getData(temp.get());
+  float min = std::numeric_limits<float>::infinity();
+  for (uint32_t i = 0; i < x.nelems(); i++) {
+    if (min > temp[i]) {
+      min = temp[i];
+    }
+  }
+  return min;
 }
 
 template <typename T>
