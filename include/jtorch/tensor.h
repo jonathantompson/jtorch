@@ -85,10 +85,9 @@ static const char* kSubKernel =
 static const char* kAbsKernel =
 "    /* output = |input1| */"
 "    __kernel void Abs("
-"      const __global  float* input1,  /* 0 */"
-"      __global  float* output) {     /* 1 */"
+"      __global  float* output) {     /* 0 */"
 "      const int x_out = get_global_id(0);"
-"      output[x_out] = fabs(input1[x_out]);"
+"      output[x_out] = fabs(output[x_out]);"
 "    }";
 
 static const char* kCopyKernel =
