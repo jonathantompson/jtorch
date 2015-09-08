@@ -1,5 +1,5 @@
 function jtorch.loadTensor(filename)
-  ifile = torch.DiskFile(filename, 'r')
+  local ifile = torch.DiskFile(filename, 'r')
   ifile:binary()
 
   local dim = ifile:readInt()

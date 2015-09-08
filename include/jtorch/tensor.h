@@ -158,6 +158,9 @@ class Tensor : public TorchData {
   // slowMin - This does a CPU copy because I haven't written a reduction
   // operator yet
   static float slowMin(const Tensor<T>& x);
+  // slowMean - This does a CPU copy because I haven't written a reduction
+  // operator yet
+  static float slowMean(const Tensor<T>& x);
 
   // Some tensor math operations that return new tensors
   static Tensor<T>* clone(const Tensor<T>& x);
@@ -346,7 +349,11 @@ void Tensor<T>::print() {
     for (int32_t i = 0; i < odim; i++) {
       std::cout << "  tensor[";
       for (uint32_t cur_dim = dim_ - 1; cur_dim >= 2; cur_dim--) {
-        std::cout << (i % stride[cur_dim]) << ",";
+        if (size_[cur_dim] == 1) {
+          std::cout << "1,";
+        } else {
+          std::cout << (i % stride[cur_dim]) << ",";
+        }
       }
 
       std::cout << "*,*] =";
@@ -567,6 +574,17 @@ float Tensor<T>::slowMin(const Tensor<T>& x) {
     }
   }
   return min;
+}
+
+template <typename T>
+float Tensor<T>::slowMean(const Tensor<T>& x) {
+  std::unique_ptr<float[]> temp(new float[x.nelems()]);
+  x.getData(temp.get());
+  float mean = 0;
+  for (uint32_t i = 0; i < x.nelems(); i++) {
+    mean += temp[i];
+  }
+  return mean / static_cast<float>(x.nelems());
 }
 
 template <typename T>

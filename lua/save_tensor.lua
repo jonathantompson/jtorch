@@ -1,5 +1,5 @@
 function jtorch.saveTensor(tensor, filename)
-  ofile = torch.DiskFile(filename, 'w')
+  local ofile = torch.DiskFile(filename, 'w')
   ofile:binary()
 
   local sz = 1

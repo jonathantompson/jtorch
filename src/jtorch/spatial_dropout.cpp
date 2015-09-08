@@ -37,7 +37,7 @@ void SpatialDropout::forwardProp(std::shared_ptr<TorchData> input) {
 
   Tensor<float>::copy(*TO_TENSOR_PTR(output.get()),
                       *TO_TENSOR_PTR(input.get()));
-  Tensor<float>::mul(*TO_TENSOR_PTR(output.get()), p_);
+  Tensor<float>::mul(*TO_TENSOR_PTR(output.get()), 1 - p_);
 }
 
 std::unique_ptr<TorchStage> SpatialDropout::loadFromFile(std::ifstream& file) {
