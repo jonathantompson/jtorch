@@ -18,6 +18,7 @@
 #include "jtorch/spatial_divisive_normalization.h"
 #include "jtorch/spatial_contrastive_normalization.h"
 #include "jtorch/spatial_up_sampling_nearest.h"
+#include "jtorch/spatial_batch_normalization.h"
 #include "jtorch/identity.h"
 #include "jtorch/linear.h"
 #include "jtorch/reshape.h"
@@ -54,6 +55,7 @@ const uint32_t width = 10;
 const uint32_t height = 10;
 const uint32_t filt_height = 5;
 const uint32_t filt_width = 5;
+const uint32_t nfeats_bn = 32;
 float din[width * height * num_feats_in];
 float dout[width * height * num_feats_out];
 
@@ -498,6 +500,26 @@ int main(int argc, char* argv[]) {
       module.forwardProp(data_in);
       testJTorchValue(module.output,
                       "spatial_up_sampling_nearest.bin");
+    }
+
+    // ***********************************************
+    // Test SpatialBatchNormalization
+    {
+      // Test Affine:
+      std::unique_ptr<TorchStage> model_affine =
+        TorchStage::loadFromFile(test_path + "batch_norm_affine.bin");
+      std::shared_ptr<Tensor<float>> batch_norm_in(
+          Tensor<float>::loadFromFile(test_path + "batch_norm_in.bin")); 
+      model_affine->forwardProp(batch_norm_in);
+      testJTorchValue(model_affine->output,
+                      "batch_norm_affine_out.bin");
+      
+      // Test Non-Affine:
+      std::unique_ptr<TorchStage> model =
+        TorchStage::loadFromFile(test_path + "batch_norm.bin");
+      model->forwardProp(batch_norm_in);
+      testJTorchValue(model->output,
+                      "batch_norm_out.bin");
     }
 
     // ***********************************************

@@ -139,7 +139,6 @@ res = spat_conv_mm:forward(model:get(2).output)
 jtorch.saveTensor(res, "test_data/spatial_convolution_mm_padding.bin")
 print('Spatial Convolution result saved to test_data/spatial_convolution_mm_padding.bin')
 
-
 -- Test SpatialLPPooling
 pnorm = 2.0
 nstates = num_feats_out
@@ -255,6 +254,28 @@ model2:add(lin_stage)
 res = model2:forward(data_in)
 jtorch.saveTensor(res, "test_data/linear.bin")
 print('Linear result saved to test_data/linear.bin')
+
+-- Test SpatialBatchNormalization
+nfeats_bn = 32
+eps = 1e-5
+momentum = 0.1
+affine = true
+batchNorm = nn.SpatialBatchNormalization(nfeats_bn, eps, momentum, affine)
+batchNorm.train = false
+batchNorm.bias:copy(torch.rand(nfeats_bn))
+batchNorm.weight:copy(torch.rand(nfeats_bn))
+batchNorm.running_mean:copy(torch.rand(nfeats_bn))
+batchNorm.running_std:copy(torch.rand(nfeats_bn))
+batchNormIn = torch.rand(1, nfeats_bn, 16, 8)
+batchNormOutAffine = batchNorm:forward(batchNormIn)
+jtorch.saveModel(batchNorm, 'test_data/batch_norm_affine.bin')
+jtorch.saveTensor(batchNormIn[1], 'test_data/batch_norm_in.bin')
+jtorch.saveTensor(batchNormOutAffine[1], 'test_data/batch_norm_affine_out.bin')
+batchNorm.affine = false
+batchNormOut = batchNorm:forward(batchNormIn)
+jtorch.saveModel(batchNorm, 'test_data/batch_norm.bin')
+jtorch.saveTensor(batchNormOut[1], 'test_data/batch_norm_out.bin')
+print('SpatialBatchNormalization results save to test_data (model and tensors)')
 
 -- Test model
 test_model = nn.Sequential()

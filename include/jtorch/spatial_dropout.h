@@ -27,7 +27,7 @@ class SpatialDropout : public TorchStage {
   SpatialDropout(const float p);
   ~SpatialDropout() override;
 
-  TorchStageType type() const override { return SPATIAL_DROPOUT; }
+  TorchStageType type() const override { return SPATIAL_DROPOUT_STAGE; }
   std::string name() const override { return "SpatialDropout"; }
   void forwardProp(std::shared_ptr<TorchData> input) override;
 

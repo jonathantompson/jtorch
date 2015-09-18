@@ -25,6 +25,7 @@
 #include "jtorch/spatial_up_sampling_nearest.h"
 #include "jtorch/spatial_convolution_mm.h"
 #include "jtorch/spatial_dropout.h"
+#include "jtorch/spatial_batch_normalization.h"
 
 namespace jtorch {
 
@@ -118,8 +119,11 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
     case SPATIAL_CONVOLUTION_MM_STAGE:
       node = SpatialConvolutionMM::loadFromFile(ifile);
       break;
-    case SPATIAL_DROPOUT:
+    case SPATIAL_DROPOUT_STAGE:
       node = SpatialDropout::loadFromFile(ifile);
+      break;
+    case SPATIAL_BATCH_NORMALIZATION_STAGE:
+      node = SpatialBatchNormalization::loadFromFile(ifile);
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "
