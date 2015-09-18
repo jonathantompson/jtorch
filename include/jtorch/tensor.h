@@ -37,74 +37,74 @@ class ThreadPool;
 namespace jtorch {
 
 static const char* kFillKernel =
-"    __kernel void Fill("
-"      __global float* output,  /* 0 */"
-"      const float value) {     /* 1 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] = value;"
+"    __kernel void Fill(\n"
+"      __global float* output,  /* 0 */\n"
+"      const float value) {     /* 1 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] = value;\n"
 "    }";
 
 static const char* kDivKernel =
-"    /* output = output / div_val */"
-"    __kernel void Div("
-"      const  float div_val,  /* 0 */"
-"      __global  float* output) {      /* 1 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] /= div_val;"
+"    /* output = output / div_val */\n"
+"    __kernel void Div(\n"
+"      const  float div_val,  /* 0 */\n"
+"      __global  float* output) {      /* 1 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] /= div_val;\n"
 "    }";
 
 static const char* kAccumulateKernel =
-"    /* output += input1 */"
-"    __kernel void Accumulate("
-"      const __global  float* input1,  /* 0 */"
-"      __global  float* output) {      /* 2 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] += input1[x_out];"
+"    /* output += input1 */\n"
+"    __kernel void Accumulate(\n"
+"      const __global  float* input1,  /* 0 */\n"
+"      __global  float* output) {      /* 2 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] += input1[x_out];\n"
 "    }";
 
 static const char* kAddKernel =
-"    /* output = input1 + input2 */"
-"    __kernel void Add("
-"      const __global  float* input1,  /* 0 */"
-"      const __global  float* input2,  /* 1 */"
-"      __global  float* output) {      /* 2 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] = input1[x_out] + input2[x_out];"
+"    /* output = input1 + input2 */\n"
+"    __kernel void Add(\n"
+"      const __global  float* input1,  /* 0 */\n"
+"      const __global  float* input2,  /* 1 */\n"
+"      __global  float* output) {      /* 2 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] = input1[x_out] + input2[x_out];\n"
 "    }";
 
 static const char* kSubKernel =
-"    /* output = input1 - input2 */"
-"    __kernel void Sub("
-"      const __global  float* input1,  /* 0 */"
-"      const __global  float* input2,  /* 1 */"
-"      __global  float* output) {      /* 2 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] = input1[x_out] - input2[x_out];"
+"    /* output = input1 - input2 */\n"
+"    __kernel void Sub(\n"
+"      const __global  float* input1,  /* 0 */\n"
+"      const __global  float* input2,  /* 1 */\n"
+"      __global  float* output) {      /* 2 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] = input1[x_out] - input2[x_out];\n"
 "    }";
 
 static const char* kAbsKernel =
-"    /* output = |input1| */"
-"    __kernel void Abs("
-"      __global  float* output) {     /* 0 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] = fabs(output[x_out]);"
+"    /* output = |input1| */\n"
+"    __kernel void Abs(\n"
+"      __global  float* output) {     /* 0 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] = fabs(output[x_out]);\n"
 "    }";
 
 static const char* kCopyKernel =
-"    __kernel void Copy("
-"      const __global float* input,  /* 0 */"
-"      __global float* output) {     /* 1 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] = input[x_out];"
+"    __kernel void Copy(\n"
+"      const __global float* input,  /* 0 */\n"
+"      __global float* output) {     /* 1 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] = input[x_out];\n"
 "    }";
 
 static const char* kMulKernel =
-"    /* output = mul_val * output */"
-"    __kernel void Mul("
-"      const  float mul_val,  /* 0 */"
-"      __global  float* output) {      /* 1 */"
-"      const int x_out = get_global_id(0);"
-"      output[x_out] *= mul_val;"
+"    /* output = mul_val * output */\n"
+"    __kernel void Mul(\n"
+"      const  float mul_val,  /* 0 */\n"
+"      __global  float* output) {      /* 1 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] *= mul_val;\n"
 "    }";
 
 template <typename T>
