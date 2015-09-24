@@ -15,7 +15,7 @@ namespace jcl {
     strict_float_ = strict_float;
 
 #if defined(DEBUG) || defined(_DEBUG)
-    std::cout << "\tCreating OpenCL Context..." << std::endl
+    std::cout << "\tCreating OpenCL Context..." << std::endl;
 #endif
 
     // Aquire lock to prevent multiple initilizations:
