@@ -14,11 +14,12 @@
 
 #include <memory>
 #include <string>
+
 #include "jcl/cl_include.h"
 
 namespace jcl {
 
-struct OpenCLProgram {
+class OpenCLProgram {
  public:
   // This version loads the kernel code from file
   OpenCLProgram(const std::string& kernel_filename, cl::Context& context,
@@ -43,8 +44,8 @@ struct OpenCLProgram {
   char* readFileToBuffer(const std::string& filename);
 
   // Non-copyable, non-assignable.
-  OpenCLProgram(OpenCLProgram&);
-  OpenCLProgram& operator=(const OpenCLProgram&);
+  OpenCLProgram(const OpenCLProgram&) = delete;
+  OpenCLProgram& operator=(const OpenCLProgram&) = delete;
 };
 
 };  // namespace jcl

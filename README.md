@@ -25,15 +25,19 @@ The library also contains a CPP framework for loading it and doing the forward p
 - CAddTable
 - Identity
 - Linear
+- MulConstant
 - Parallel
+- ParallelTable
 - Reshape
 - SelectTable
 - Sequential
+- SpatialBatchNormalization
 - SpatialContrastiveNormalization
 - SpatialConvolution
 - SpatialConvolutionMM --> (using clBLAS)
 - SpatialConvolutionMap   --> (only on CPU)
 - SpatialDivisiveNormalization
+- SpatialDropout
 - SpatialLPPooling  --> (only on CPU)
 - SpatialMaxPooling
 - SpatialSubtractiveNormalization
@@ -44,20 +48,22 @@ The library also contains a CPP framework for loading it and doing the forward p
 The following stages have partial implementations:
 - JoinTable --> Only joins along the top most dimension are allowed for now
 - Transpose --> Just a pass through stage. Again, it just points to the previous stage's output.
+- Concat --> We can only concatenate along the outer dimension for now.
+- Narrow --> We can only narrow along the outer dimension for now.
 
 **Compilation Overview**
 ------------------------
 
-Building jtorch uses Visual Studio 2012 on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X (note: the CMakeLists need updating, but shouldn't be too hard). I have also built on clang and gcc on Ubuntu 14.04, but I don't supply the build files. The only dependencies are the OpenCL drivers / SDKs for your desired OpenCL compute plateform and clBLAS. See <https://github.com/clMathLibraries/clBLAS> for more details (also for clBLAS I have a "Compiling_clBLAS.txt" helper if you get stuck).
+Building jtorch uses cmake + Visual Studio on Windows, and cmake + gcc 4.7 (or greater) on Mac OS X (not tested recently) and Linux (tested recently). The only dependencies are the OpenCL drivers / SDKs for your desired OpenCL compute plateform and clBLAS. See <https://github.com/clMathLibraries/clBLAS> for more details (also for clBLAS I have a "Compiling_clBLAS.txt" helper if you get stuck).
 
-VS2012 and cmake expect a specific directory structure:
+On windows, the cmake scripts expect a specific directory structure:
 
 - \\jtorch\\
 - \\clBLAS\\
 
 So jtorch and clBLAS must exist at the same directory level.
 
-** Build and run jcl (an internal project) **
+** Build and run jcl and the tests **
 ---------------
 
 ### Windows:
@@ -68,22 +74,32 @@ So jtorch and clBLAS must exist at the same directory level.
     - Create windows environment variables (right click My Computer -> Properties -> Advanced System Settings -> Environment Variables -> System Variables -> New)
         - Name = `OPENCL_INC_DIR`, Value = C:\Program Files (x86)\AMD APP\include
         - Name = `OPENCL_LIB_DIR`, Value = C:\Program Files (x86)\AMD APP\lib\x86_64
+	- Also define the environment variable AMDAPPSDKROOT.
 - **FOR NVIDIA CARDS:**
     - Download the CUDA Toolkit 7 - https://developer.nvidia.com/cuda-downloads and install it. Note, this has also been tested with V5.5 and I'm sure there won't be too many issues (if any) with versions newer than 7 since I don't use any late version OpenCL features.
     - Create windows environment variables (right click My Computer -> Properties -> Advanced System Settings -> Environment Variables -> System Variables -> New): 
         - Name = `OPENCL_INC_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include
         - Name = `OPENCL_LIB_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64
+	- Also define the environment variables 'CUDA_INC_PATH' and 'CUDA_LIB_PATH' using the same values above.
     - Now download the hpp header from http://www.khronos.org/registry/cl/api/1.2/cl.hpp and put it in C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\CL
 	- You may need to follow the instructions here: https://github.com/clMathLibraries/clBLAS/issues/117 (you need all the headers)
 - **Compiling the library:**
-    - open jtorch.sln
+    - Open the cmake gui.
+	- In "Where is the source code:" put "C:/path/to/jtorch"
+	- In "Where to build the binaries:" put "C:/path/to/jtorch/build"
+	- Click "Configure twice", then "Generate"
+    - open build/jtorch.sln
     - right click "test_jcl" in the Solution Explorer -> "Set as StartUp Project"
     - From the file menu: DEBUG -> Start Debugging... (or press F5)
-    - TWO tests should run and at the end of each test there should be a "PASSED" printout.
+    - The tests should run and at the end of each test there should be a "PASSED" printout.
 
-### MAC OS X:
- - Just run cmake and then build (all frameworks should be included).  
+### MAC OS X / LINUX:
+ - Just run cmake and then build (all frameworks should be included):
+>> git clone git@github.com:jonathantompson/jtorch.git
+>> cd jtorch; mkdir build; cd build
+>> cmake ..
  - cl.hpp doesn't exist by default but there is a copy of it in the local directory opencl_cpp_header.
+>> make -j 8
 
 ** Build and run jtorch **
 ---------------
@@ -92,13 +108,15 @@ So jtorch and clBLAS must exist at the same directory level.
 - **Follow all the compilation steps above ('Build and run jcl')**
 - **Follow all the compilation steps in Compiling_clBLAS.txt**
 - **Compiling the library:**
-    - open jtorch.sln
-    - right click "jtorch_test" in the Solution Explorer -> "Set as StartUp Project"
-    - From the file menu: DEBUG -> Start Debugging... (or press F5)
-    - The tests should run and at the end of each test there should be a "PASSED" printout (otherwise it will print FAILED).
+    - The make target should be defined in the cmake above.
+	- Note: the tests_jtorch target requres the path/to/test_data as the first argement to the executable.
 
-### MAC OS X:
-- Before integration of clBLAS everything compiled and ran correctly. However, post clBLAS I have not tested it on Mac OS X or Linux.
+### MAC OS X / LINUX:
+- **Follow all the compilation steps in Compiling_clBLAS.txt**
+- Again, just run cmake from this directory.
+- Then run the test using:
+>> cd build/tests_jtorch
+>> ./tests_jtorch ../../tests_jtorch/test_data/
 
 **Style**
 ---------

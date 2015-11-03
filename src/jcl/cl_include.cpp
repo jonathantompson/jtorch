@@ -1,17 +1,8 @@
-
-#include <iostream>
-#include "jcl/jcl.h"
 #include "jcl/cl_include.h"
 
-namespace cl {
+#include <iostream>
 
-void CheckError(const cl_int err_code) {
-  if (err_code != CL_SUCCESS) {
-    std::cout << "OpenCLContext::CheckError() - ERROR: "
-              << GetCLErrorEnumString(err_code) << std::endl;
-  }
-  RASSERT(err_code == CL_SUCCESS);  // Force runtime break.
-}
+namespace cl {
 
 std::string GetCLErrorEnumString(const int32_t err) {
   switch (err) {

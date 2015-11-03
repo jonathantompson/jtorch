@@ -9,6 +9,7 @@
 #pragma once
 
 #include <thread>
+
 #include "jcl/threading/callback.h"
 
 namespace jcl {

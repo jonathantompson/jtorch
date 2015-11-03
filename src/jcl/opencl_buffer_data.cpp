@@ -1,33 +1,56 @@
-#include <sstream>
-#include <iostream>
-#include "jcl/opencl_context.h"
 #include "jcl/opencl_buffer_data.h"
+
+#include <iostream>
+#include <sstream>
+
+#include "jcl/opencl_context.h"
 
 namespace jcl {
 
-  uint64_t OpenCLBufferData::nelems_allocated_ = 0;
-  std::mutex OpenCLBufferData::lock_;
+OpenCLBufferData::OpenCLBufferData(const CLBufferType type,
+                                   const uint32_t nelems, cl::Context& context)
+    : nelems_(nelems), type_(type) {
+  // Zero size buffer cannot be allocated!
+  RASSERT(nelems_ > 0);
 
-  void OpenCLBufferData::printAllocations(int64_t allocated) {
-    float dummy;
-    static_cast<void>(dummy);
-    if (allocated < 0) {
-      std::cout << "\t\tOpenCL deallocation: ";
-      allocated *= -1;
-    } else {
-      std::cout << "\t\tOpenCL allocation: ";
-    }
-    std::cout << allocated << " elements (global " << 
-      ((double)(nelems_allocated_ * sizeof(dummy)) / 1048576.0) << "MB)" << std::endl;
-  }
+  cl_mem_flags flags = getFlagsFromBufferType(type_);
+  buffer_ = cl::Buffer(context, flags, sizeof(cl_float) * nelems_);
+}
 
-  OpenCLBufferData::OpenCLBufferData(const CLBufferType type, 
-    const uint32_t nelems, cl::Context& context) : nelems(nelems), type(type) {
-    std::lock_guard<std::mutex> guard(lock_);
+// Private constructor.
+OpenCLBufferData::OpenCLBufferData(const CLBufferType type,
+                                   const uint32_t nelems, cl::Buffer buffer)
+    : nelems_(nelems), type_(type), buffer_(buffer) {}
 
-    //cl_mem_flags flags = CL_MEM_USE_HOST_PTR;
-    cl_mem_flags flags = 0;
-    switch (type) {
+OpenCLBufferData::~OpenCLBufferData() {}
+
+cl::Buffer& OpenCLBufferData::buffer() { return buffer_; }
+
+const cl::Buffer& OpenCLBufferData::buffer() const { return buffer_; }
+
+cl_mem& OpenCLBufferData::mem() { return buffer_(); }
+
+std::shared_ptr<OpenCLBufferData> OpenCLBufferData::createSubBuffer(
+    const uint32_t nelems, const uint32_t offset) {
+  // Make sure the requested memory fits in the current buffer.
+  RASSERT(nelems + offset <= nelems_);
+
+  cl_mem_flags flags = getFlagsFromBufferType(type_);
+  cl_buffer_region info;
+  info.origin = sizeof(cl_float) * offset;
+  info.size = sizeof(cl_float) * nelems;
+  cl_int err;
+  cl::Buffer new_buffer =
+      buffer_.createSubBuffer(flags, CL_BUFFER_CREATE_TYPE_REGION, &info, &err);
+  CHECK_ERROR(err);
+
+  return std::shared_ptr<OpenCLBufferData>(
+      new OpenCLBufferData(type_, nelems, new_buffer));
+}
+
+cl_mem_flags OpenCLBufferData::getFlagsFromBufferType(CLBufferType type) {
+  cl_mem_flags flags = 0;
+  switch (type) {
     case CLBufferTypeRead:
       flags |= CL_MEM_READ_ONLY;
       break;
@@ -38,61 +61,12 @@ namespace jcl {
       flags |= CL_MEM_READ_WRITE;
       break;
     default:
-      std::cout << "OpenCLBufferData::OpenCLBufferData() - "
-        "ERROR: Memory type not supported!" << std::endl;
+      std::cout << "OpenCLBufferData::getFlagsFromBufferType() - "
+                   "ERROR: Memory type not supported!"
+                << std::endl;
       RASSERT(false);
-    }
-
-    // Zero size buffer cannot be allocated!
-    RASSERT(nelems > 0);
-
-    buffer_.push_back(cl::Buffer(context, flags, sizeof(cl_float) * nelems));
-    nelems_allocated_ += nelems;
-    reference_count_ = 1;
-#if defined(TRACK_ALLOCATIONS)
-    printAllocations(nelems);
-#endif
   }
-
-  OpenCLBufferData::~OpenCLBufferData() {
-    std::lock_guard<std::mutex> guard(lock_);
-    size_t sz = buffer_.size();
-    static_cast<void>(sz);
-    buffer_.clear();
-    nelems_allocated_ -= nelems;
-#if defined(TRACK_ALLOCATIONS)
-    if (sz > 0) {
-      printAllocations(-((int64_t)nelems));
-    }
-#endif
-  }
-
-  void OpenCLBufferData::addReference() {
-    std::lock_guard<std::mutex> guard(lock_);
-    // Check we're not trying to add reference to a released buffer!
-    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
-    reference_count_++;
-  }
-
-  void OpenCLBufferData::releaseReference() {
-    std::lock_guard<std::mutex> guard(lock_);
-    // Check we're not trying to add reference to a released buffer!
-    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
-    reference_count_--;
-    if (reference_count_ <= 0) {
-      buffer_.clear();
-      nelems_allocated_ -= nelems;
-#if defined(TRACK_ALLOCATIONS)
-      printAllocations(-((int64_t)nelems));
-#endif
-    }
-  }
-
-  cl::Buffer& OpenCLBufferData::buffer() {
-    std::lock_guard<std::mutex> guard(lock_);
-    // Check we're not trying to access a released buffer!
-    RASSERT(reference_count_ > 0 && buffer_.size() > 0);
-    return buffer_[0];
-  }
+  return flags;
+}
 
 }  // namespace jcl

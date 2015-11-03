@@ -6,12 +6,9 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
-#include "jcl/jcl.h"  // For jcl::JCLBuffer
 
 namespace jtorch {
 
@@ -50,8 +47,8 @@ class SpatialConvolution : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialConvolution(SpatialConvolution&);
-  SpatialConvolution& operator=(const SpatialConvolution&);
+  SpatialConvolution(const SpatialConvolution&) = delete;
+  SpatialConvolution& operator=(const SpatialConvolution&) = delete;
 };
 
 };  // namespace jtorch

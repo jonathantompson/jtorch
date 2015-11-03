@@ -17,6 +17,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <vector>
+
 #include "jcl/math/int_types.h"
 #include "jcl/threading/callback.h"
 #include "jtorch/torch_stage.h"
@@ -39,16 +40,15 @@ class SpatialConvolutionMap : public TorchStage {
                         const uint32_t filt_width);
   ~SpatialConvolutionMap() override;
 
+  inline std::vector<std::unique_ptr<float[]>>& weights() { return weights_; }
+  inline std::unique_ptr<float[]>& biases() { return biases_; }
+  inline std::vector<std::unique_ptr<int16_t[]>>& conn_table() {
+    return conn_table_;
+  }
+
   TorchStageType type() const override { return SPATIAL_CONVOLUTION_MAP_STAGE; }
   std::string name() const override { return "SpatialConvolutionMap"; }
   void forwardProp(std::shared_ptr<TorchData> input) override;
-
-  std::vector<std::unique_ptr<float[]>> weights;
-  std::unique_ptr<float[]> biases;
-  // This is the same as conn_table_rev in Torch
-  // For each output: [0] is input feature and [1]
-  // is the weight matrix (filter) to use
-  std::vector<std::unique_ptr<int16_t[]>> conn_table;
 
   static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
@@ -60,6 +60,13 @@ class SpatialConvolutionMap : public TorchStage {
   uint32_t feats_in_;
   uint32_t feats_out_;
   uint32_t fan_in_;
+
+  std::vector<std::unique_ptr<float[]>> weights_;
+  std::unique_ptr<float[]> biases_;
+  // This is the same as conn_table_rev in Torch
+  // For each output: [0] is input feature and [1]
+  // is the weight matrix (filter) to use
+  std::vector<std::unique_ptr<int16_t[]>> conn_table_;
 
   // Multithreading primatives and functions
   std::unique_ptr<jcl::threading::ThreadPool> tp_;
@@ -77,8 +84,8 @@ class SpatialConvolutionMap : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialConvolutionMap(SpatialConvolutionMap&);
-  SpatialConvolutionMap& operator=(const SpatialConvolutionMap&);
+  SpatialConvolutionMap(const SpatialConvolutionMap&) = delete;
+  SpatialConvolutionMap& operator=(const SpatialConvolutionMap&) = delete;
 };
 
 };  // namespace jtorch

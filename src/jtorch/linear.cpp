@@ -1,9 +1,8 @@
 #include "jtorch/linear.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
-#include "jcl/jcl.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -11,65 +10,70 @@ using namespace jcl::math;
 namespace jtorch {
 
 static const char* kLinearKernel =
-"    __kernel void MatVecMultSimple(\n"
-"      /* Y = A * X (matrix-vector mulitply)*/\n"
-"      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored column major */\n"
-"      __global const float* X,  /* 1  --> Size N */\n"
-"      __global  float* Y,       /* 2  --> Size M */\n"
-"      const int M,              /* 3 */\n"
-"      const int N) {            /* 4 */\n"
-"      const int i = get_global_id(0);  /* row index */\n"
-"      float sum = 0;\n"
-"      /* Perform the linear accumulation */\n"
-"      for (int k = 0; k < N; k++) {\n"
-"        sum += A[i + M * k] * X[k];\n"
-"      }\n"
-"      Y[i] = sum;\n"
-"    }\n"
-"\n"
-"    #define ROW_DIM 0\n"
-"    #define COL_DIM 1\n"
-"\n"
-"    __kernel void MatVecMultThreads(\n"
-"      /* Y = A * X (matrix-vector mulitply) */\n"
-"      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored column major */\n"
-"      __global const float* X,  /* 1  --> Size N */\n"
-"      __global  float* Y,       /* 2  --> Size M */\n"
-"      __local float* work,      /* 3  --> Size M by p */\n"
-"      const int M,              /* 4 */\n"
-"      const int N) {            /* 5 */\n"
-"      /* Compute partial dot product */\n"
-"      float sum = 0;\n"
-"      for (int k = get_global_id(COL_DIM); k < N; k += get_global_size(COL_DIM)) {\n"
-"        sum += A[get_global_id(ROW_DIM) + M * k] * X[k];\n"
-"      }\n"
-"      /* Each thread stores its partial sum in WORK */\n"
-"      int rows = get_local_size(ROW_DIM); /* rows in group */\n"
-"      int cols = get_local_size(COL_DIM); /* initial cols in group */\n"
-"      int ii = get_local_id(ROW_DIM); /* local row index in group, 0<=ii<rows */\n"
-"      int jj = get_local_id(COL_DIM); /* block index in column, 0<=jj<cols */\n"
-"      work[ii+rows*jj] = sum;\n"
-"      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */\n"
-"      /* Reduce sums in log2(cols) steps */\n"
-"      while (cols > 1) {\n"
-"        cols >>= 1;\n"
-"      if (jj < cols) { \n"
-"        work[ii + rows * jj] += work[ii + rows * (jj + cols)];\n"
-"      }\n"
-"      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */\n"
-"      }\n"
-"      /* Write final result in Y */\n"
-"      if ( jj == 0 ) {\n"
-"        Y[ get_global_id(ROW_DIM) ] = work[ii];\n"
-"      }\n"
-"    }\n"
-"\n"
-"    __kernel void Accum (\n"
-"      __global  float* output,          /* 0 */\n"
-"      const __global float* biases) {   /* 1 */\n"
-"      const int x_out = get_global_id(0);\n"
-"      output[x_out] += biases[x_out];\n"
-"    }";
+    "    __kernel void MatVecMultSimple(\n"
+    "      /* Y = A * X (matrix-vector mulitply)*/\n"
+    "      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored "
+    "column major */\n"
+    "      __global const float* X,  /* 1  --> Size N */\n"
+    "      __global  float* Y,       /* 2  --> Size M */\n"
+    "      const int M,              /* 3 */\n"
+    "      const int N) {            /* 4 */\n"
+    "      const int i = get_global_id(0);  /* row index */\n"
+    "      float sum = 0;\n"
+    "      /* Perform the linear accumulation */\n"
+    "      for (int k = 0; k < N; k++) {\n"
+    "        sum += A[i + M * k] * X[k];\n"
+    "      }\n"
+    "      Y[i] = sum;\n"
+    "    }\n"
+    "\n"
+    "    #define ROW_DIM 0\n"
+    "    #define COL_DIM 1\n"
+    "\n"
+    "    __kernel void MatVecMultThreads(\n"
+    "      /* Y = A * X (matrix-vector mulitply) */\n"
+    "      __global const float* A,  /* 0  --> Size M (rows) x N (cols) stored "
+    "column major */\n"
+    "      __global const float* X,  /* 1  --> Size N */\n"
+    "      __global  float* Y,       /* 2  --> Size M */\n"
+    "      __local float* work,      /* 3  --> Size M by p */\n"
+    "      const int M,              /* 4 */\n"
+    "      const int N) {            /* 5 */\n"
+    "      /* Compute partial dot product */\n"
+    "      float sum = 0;\n"
+    "      for (int k = get_global_id(COL_DIM); k < N; k += "
+    "get_global_size(COL_DIM)) {\n"
+    "        sum += A[get_global_id(ROW_DIM) + M * k] * X[k];\n"
+    "      }\n"
+    "      /* Each thread stores its partial sum in WORK */\n"
+    "      int rows = get_local_size(ROW_DIM); /* rows in group */\n"
+    "      int cols = get_local_size(COL_DIM); /* initial cols in group */\n"
+    "      int ii = get_local_id(ROW_DIM); /* local row index in group, "
+    "0<=ii<rows */\n"
+    "      int jj = get_local_id(COL_DIM); /* block index in column, "
+    "0<=jj<cols */\n"
+    "      work[ii+rows*jj] = sum;\n"
+    "      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */\n"
+    "      /* Reduce sums in log2(cols) steps */\n"
+    "      while (cols > 1) {\n"
+    "        cols >>= 1;\n"
+    "      if (jj < cols) { \n"
+    "        work[ii + rows * jj] += work[ii + rows * (jj + cols)];\n"
+    "      }\n"
+    "      barrier(CLK_LOCAL_MEM_FENCE); /* sync group */\n"
+    "      }\n"
+    "      /* Write final result in Y */\n"
+    "      if ( jj == 0 ) {\n"
+    "        Y[ get_global_id(ROW_DIM) ] = work[ii];\n"
+    "      }\n"
+    "    }\n"
+    "\n"
+    "    __kernel void Accum (\n"
+    "      __global  float* output,          /* 0 */\n"
+    "      const __global float* biases) {   /* 1 */\n"
+    "      const int x_out = get_global_id(0);\n"
+    "      output[x_out] += biases[x_out];\n"
+    "    }";
 
 Linear::Linear(const uint32_t n_inputs, const uint32_t n_outputs)
     : TorchStage() {
@@ -87,9 +91,13 @@ Linear::Linear(const uint32_t n_inputs, const uint32_t n_outputs)
 
 Linear::~Linear() {}
 
-void Linear::setWeights(const float* weights) { weights_->setData(weights); }
+void Linear::setWeights(const float* weights) {
+  weights_->setData(weights);
+}
 
-void Linear::setBiases(const float* biases) { biases_->setData(biases); }
+void Linear::setBiases(const float* biases) {
+  biases_->setData(biases);
+}
 
 void Linear::init(std::shared_ptr<TorchData> input) {
   // FloatTensor expected

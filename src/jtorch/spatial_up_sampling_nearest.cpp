@@ -1,9 +1,9 @@
 #include "jtorch/spatial_up_sampling_nearest.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
 #include "jtorch/jtorch.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl;

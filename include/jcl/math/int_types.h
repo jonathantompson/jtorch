@@ -8,6 +8,6 @@
 
 #pragma once
 
-#include <stdint.h>  // For uint8_t, uint16_t, etc
-#include <float.h>
 #include <cmath>
+#include <float.h>
+#include <stdint.h>  // For uint8_t, uint16_t, etc

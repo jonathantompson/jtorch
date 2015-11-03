@@ -1,9 +1,9 @@
 #include "jtorch/threshold.h"
-#include "jtorch/jtorch.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
+#include "jtorch/jtorch.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -40,12 +40,16 @@ static const char* kThresholdKernel =
 "      output[x_out] = input[x_out] > threshold ? input[x_out] : val;\n"
 "    }";
 
-
+Threshold::Threshold(const float threshold, const float val) : TorchStage() {
+  output = nullptr;
+  threshold_ = threshold;
+  val_ = val;
+}
 
 Threshold::Threshold() : TorchStage() {
   output = nullptr;
-  threshold = 1e-6f;
-  val = 0;
+  threshold_ = 1e-6f;
+  val_ = 0;
 }
 
 Threshold::~Threshold() {}
@@ -69,8 +73,8 @@ void Threshold::forwardProp(std::shared_ptr<TorchData> input) {
   cl_context->useKernelCStr(kThresholdKernel, "Threshold1D");
   cl_context->setArg(0, TO_TENSOR_PTR(input.get())->storage());
   cl_context->setArg(1, TO_TENSOR_PTR(output.get())->storage());
-  cl_context->setArg(2, threshold);
-  cl_context->setArg(3, val);
+  cl_context->setArg(2, threshold_);
+  cl_context->setArg(3, val_);
   uint32_t dim = 1;
   uint32_t nelem = TO_TENSOR_PTR(output.get())->nelems();
   cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
@@ -78,8 +82,8 @@ void Threshold::forwardProp(std::shared_ptr<TorchData> input) {
 
 std::unique_ptr<TorchStage> Threshold::loadFromFile(std::ifstream& file) {
   std::unique_ptr<Threshold> ret(new Threshold());
-  file.read((char*)(&ret->threshold), sizeof(ret->threshold));
-  file.read((char*)(&ret->val), sizeof(ret->val));
+  file.read((char*)(&ret->threshold_), sizeof(ret->threshold_));
+  file.read((char*)(&ret->val_), sizeof(ret->val_));
   return std::unique_ptr<TorchStage>(std::move(ret));
 }
 

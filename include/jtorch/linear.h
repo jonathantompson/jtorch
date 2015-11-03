@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
@@ -46,8 +44,8 @@ class Linear : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  Linear(Linear&);
-  Linear& operator=(const Linear&);
+  Linear(const Linear&) = delete;
+  Linear& operator=(const Linear&) = delete;
 };
 
 };  // namespace jtorch

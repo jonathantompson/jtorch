@@ -14,28 +14,31 @@
 
 #include <memory>
 #include <string>
+
 #include "jcl/math/int_types.h"
+#include "jcl/opencl_context.h"
 
 #define USE_OPENCL_LOCAL_SIZES  // Let OpenCL choose worksizes
 
 namespace jcl {
-class JCL;
+class OpenCLContext;
 }
 
 namespace jtorch {
 
-// InitJTorch - will break on multile inits
-void InitJTorch(const bool use_cpu = false);  // Thread safe
-// InitJTorchSafe - Multiple init OK
-void InitJTorchSafe(const bool use_cpu = false);  // Thread safe
-void ShutdownJTorch();                            // Thread safe
-void Sync();                                      // NOT Thread safe
+// All these functions are thread-safe.
+void InitJTorch(const bool use_cpu = false,
+                const uint32_t requested_deviceid = 0,
+                const bool verbose_startup = true);
+void ShutdownJTorch();
+void Sync();
 
-// Some constants and globals for the jtorch instance
+// Some constants and globals for the jtorch instance.
 // Note: cl_context cannot be a unique_ptr because we need to
 // ensure that the context is shutdown last.
-extern std::unique_ptr<jcl::JCL> cl_context;
+// TODO(tompson): This is ugly, put these in a context class.
+extern std::unique_ptr<jcl::OpenCLContext> cl_context;
 extern std::string jtorch_path;
-const uint32_t deviceid = 0;
+extern uint32_t deviceid;
 
 };  // namespace jtorch

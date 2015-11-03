@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -29,8 +30,8 @@ class Transpose : public TorchStage {
 
  protected:
   // Non-copyable, non-assignable.
-  Transpose(Transpose&);
-  Transpose& operator=(const Transpose&);
+  Transpose(const Transpose&) = delete;
+  Transpose& operator=(const Transpose&) = delete;
 };
 
 };  // namespace jtorch

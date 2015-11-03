@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <stdint.h>
+
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -28,8 +29,8 @@ class CAddTable : public TorchStage {
 
  protected:
   // Non-copyable, non-assignable.
-  CAddTable(CAddTable&);
-  CAddTable& operator=(const CAddTable&);
+  CAddTable(const CAddTable&) = delete;
+  CAddTable& operator=(const CAddTable&) = delete;
 };
 
 };  // namespace jtorch

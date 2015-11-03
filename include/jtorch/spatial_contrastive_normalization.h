@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -45,9 +43,10 @@ class SpatialContrastiveNormalization : public TorchStage {
   std::unique_ptr<Sequential> network_;
 
   // Non-copyable, non-assignable.
-  SpatialContrastiveNormalization(SpatialContrastiveNormalization&);
+  SpatialContrastiveNormalization(const SpatialContrastiveNormalization&) =
+      delete;
   SpatialContrastiveNormalization& operator=(
-      const SpatialContrastiveNormalization&);
+      const SpatialContrastiveNormalization&) = delete;
 };
 
 };  // namespace jtorch

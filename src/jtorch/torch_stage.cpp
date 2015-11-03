@@ -1,31 +1,36 @@
-
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <fstream>
 #include "jtorch/torch_stage.h"
+
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+
+#include "jcl/opencl_context.h"
+#include "jtorch/c_add_table.h"
+#include "jtorch/concat.h"
+#include "jtorch/identity.h"
+#include "jtorch/join_table.h"
 #include "jtorch/linear.h"
+#include "jtorch/mul_constant.h"
+#include "jtorch/narrow.h"
 #include "jtorch/parallel_table.h"
 #include "jtorch/reshape.h"
+#include "jtorch/select_table.h"
 #include "jtorch/sequential.h"
+#include "jtorch/spatial_batch_normalization.h"
 #include "jtorch/spatial_contrastive_normalization.h"
-#include "jtorch/spatial_convolution.h"
 #include "jtorch/spatial_convolution_map.h"
+#include "jtorch/spatial_convolution_mm.h"
+#include "jtorch/spatial_convolution.h"
 #include "jtorch/spatial_divisive_normalization.h"
+#include "jtorch/spatial_dropout.h"
 #include "jtorch/spatial_lp_pooling.h"
 #include "jtorch/spatial_max_pooling.h"
 #include "jtorch/spatial_subtractive_normalization.h"
+#include "jtorch/spatial_up_sampling_nearest.h"
 #include "jtorch/tanh.h"
 #include "jtorch/threshold.h"
-#include "jtorch/join_table.h"
 #include "jtorch/transpose.h"
-#include "jtorch/identity.h"
-#include "jtorch/select_table.h"
-#include "jtorch/c_add_table.h"
-#include "jtorch/spatial_up_sampling_nearest.h"
-#include "jtorch/spatial_convolution_mm.h"
-#include "jtorch/spatial_dropout.h"
-#include "jtorch/spatial_batch_normalization.h"
 
 namespace jtorch {
 
@@ -39,8 +44,7 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(const std::string& file) {
   if (ifile.is_open()) {
     ifile.seekg(0, std::ios::beg);
     // Now recursively load the network
-    std::cout << "Loading torch model..." << std::endl;
-    ret = std::move(TorchStage::loadFromFile(ifile));
+    ret = TorchStage::loadFromFile(ifile);
     ifile.close();
   } else {
     std::cout << "TorchStage::loadFromFile() - ERROR: Could not open modelfile";
@@ -124,6 +128,15 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
       break;
     case SPATIAL_BATCH_NORMALIZATION_STAGE:
       node = SpatialBatchNormalization::loadFromFile(ifile);
+      break;
+    case CONCAT_STAGE:
+      node = Concat::loadFromFile(ifile);
+      break;
+    case NARROW_STAGE:
+      node = Narrow::loadFromFile(ifile);
+      break;
+    case MUL_CONSTANT_STAGE:
+      node = MulConstant::loadFromFile(ifile);
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "

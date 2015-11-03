@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -29,8 +30,8 @@ class Identity : public TorchStage {
 
  protected:
   // Non-copyable, non-assignable.
-  Identity(Identity&);
-  Identity& operator=(const Identity&);
+  Identity(const Identity&) = delete;
+  Identity& operator=(const Identity&) = delete;
 };
 
 };  // namespace jtorch

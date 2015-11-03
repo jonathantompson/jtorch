@@ -25,3 +25,13 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
 12. Right click clBLAS in the Solution Explorer, 
     -> change "Configuration Type" to "Static library"
     -> change "Target Extension" to "_d.lib"
+
+Instructions for compiling clBLAS on Ubuntu 14.04 (gcc):
+--------------------------------------------------------
+
+1. git clone git@github.com:clMathLibraries/clBLAS.git
+2. cd clBLAS/src
+3. mkdir build; cd build
+4. cmake .. -DBUILD_TEST=OFF
+4.1 (you may need to follow the instructions here: https://github.com/clMathLibraries/clBLAS/issues/117)
+5. make

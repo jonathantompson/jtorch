@@ -39,6 +39,9 @@ dofile(jtorch.jtorchRoot .. '/lua/save_spatial_up_sampling_nearest_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_c_add_table_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_spatial_dropout_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_spatial_batch_normalization_node.lua')
+dofile(jtorch.jtorchRoot .. '/lua/save_concat_node.lua')
+dofile(jtorch.jtorchRoot .. '/lua/save_narrow_node.lua')
+dofile(jtorch.jtorchRoot .. '/lua/save_mul_constant_node.lua')
 
 function jtorch._saveNNNode(node, ofile)
   -- Just send the node off to the correct routine depending on it's type
@@ -135,6 +138,15 @@ function jtorch._saveNNNode(node, ofile)
   elseif (class_str == 'nn.SpatialBatchNormalization') then
     ofile:writeInt(22)
     jtorch._saveSpatialBatchNormalizationNode(node, ofile)
+  elseif (class_str == 'nn.Concat') then
+    ofile:writeInt(23)
+    jtorch._saveConcatNode(node, ofile)
+  elseif (class_str == 'nn.Narrow') then
+    ofile:writeInt(24)
+    jtorch._saveNarrowNode(node, ofile)
+  elseif (class_str == 'nn.MulConstant') then
+    ofile:writeInt(25)
+    jtorch._saveMulConstantNode(node, ofile)
   else
      error('Node type ' .. class_str .. ' is not recognized.')
      return

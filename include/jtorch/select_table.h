@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <stdint.h>
+
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -30,8 +31,8 @@ class SelectTable : public TorchStage {
   uint32_t index_;
 
   // Non-copyable, non-assignable.
-  SelectTable(SelectTable&);
-  SelectTable& operator=(const SelectTable&);
+  SelectTable(const SelectTable&) = delete;
+  SelectTable& operator=(const SelectTable&) = delete;
 };
 
 };  // namespace jtorch

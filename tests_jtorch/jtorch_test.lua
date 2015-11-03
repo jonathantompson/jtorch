@@ -1,314 +1,257 @@
-require 'cunn'
+local cutorch = require 'cutorch'
+local cunn = require 'cunn'
 require 'image'
 require 'torch'
 require 'optim'
-require 'sys'
+local sys = require 'sys'
+require 'strict'
 torch.setdefaulttensortype('torch.FloatTensor')
 
 torch.setnumthreads(3)
 torch.manualSeed(1)
+cutorch.manualSeed(1)
 math.randomseed(1)
 
-jtorch = dofile("../jtorch.lua")
+local jtorch = dofile("../jtorch.lua")
 jtorch.init("../")
 
-num_feats_in = 5
-num_feats_out = 10
-width = 10
-height = 10
-math.mod = math.fmod
+local num_feats_in = 5
+local num_feats_out = 10
+local width = 10
+local height = 10
+local fan_in = 3
+local filt_width = 5
+local filt_height = 5
 
-data_in = torch.FloatTensor(num_feats_in, height, width)
+local data_in = torch.FloatTensor(num_feats_in, height, width)
 
-for f=1,num_feats_in do
-  val = f - (width * height) / 16
-  for v=1,height do
-    for u=1,width do
-      data_in[{f,v,u}] = val
-      val = val + 1/8
+for f = 1, num_feats_in do
+  local val = f - (width * height) / 16
+  for v = 1, height do
+    for u = 1, width do
+      data_in[{f, v, u}] = val
+      val = val + 1 / 8
     end
   end
 end
 
 jtorch.saveTensor(data_in, "test_data/data_in.bin")
-print('Data In: saved to test_data/data_in.bin')
-
-model = nn.Sequential()
 
 -- Test tanh
-model:add(nn.Tanh())
-res = model:forward(data_in)
-jtorch.saveTensor(res, "test_data/tanh_result.bin")
-print('Tanh result saved to test_data/tanh_result.bin')
+local tanh_model = nn.Tanh()
+local tanh_res = tanh_model:forward(data_in)
+jtorch.saveTensor(tanh_res, "test_data/tanh_res.bin")
 
 -- Test Threshold
-threshold = 0.5
-val = 0.1
-model:add(nn.Threshold(threshold, val))
-res = model:forward(data_in)
-jtorch.saveTensor(res, "test_data/threshold.bin")
-print('Threshold result saved to test_data/threshold.bin')
+local threshold = 0.5
+local val = 0.1
+local threshold_model = nn.Threshold(threshold, val)
+local threshold_res = threshold_model:forward(data_in)
+jtorch.saveTensor(threshold_res, "test_data/threshold_res.bin")
+
+-- Test a Sequential stage with both Tanh and Threshold
+local seq_model = nn.Sequential()
+seq_model:add(tanh_model)
+seq_model:add(threshold_model)
+local seq_res = seq_model:forward(data_in)
+jtorch.saveTensor(seq_res, "test_data/sequential_res.bin")
+jtorch.saveModel(seq_model, "test_data/sequential_model.bin")
 
 -- Test SpatialConvolutionMap
-n_states_in = num_feats_in
-n_states_out = num_feats_out
-fan_in = 3
-filt_width = 5
-filt_height = 5
-conn_table = nn.tables.random(n_states_in, n_states_out, fan_in)
-for f_out=1,num_feats_out do
-  for f_in=1,fan_in do
-    conn_table[{(f_out-1) * fan_in + f_in, 2}] = f_out
-    cur_f_in = math.mod((f_out-1) + (f_in-1), n_states_in) + 1
-    conn_table[{(f_out-1) * fan_in + f_in, 1}] = cur_f_in
+local conn_table = nn.tables.random(num_feats_in, num_feats_out, fan_in)
+for f_out = 1, num_feats_out do
+  for f_in = 1, fan_in do
+    conn_table[{(f_out - 1) * fan_in + f_in, 2}] = f_out
+    local cur_f_in = math.fmod((f_out - 1) + (f_in - 1), num_feats_in) + 1
+    conn_table[{(f_out - 1) * fan_in + f_in, 1}] = cur_f_in
   end
 end
--- print('Spatial Convolution Map Connection Table')
--- print(conn_table)
-spat_conv_map = nn.SpatialConvolutionMap(conn_table, filt_width, filt_height)
--- print('Spatial Convolution Map Connection Table Rev')
--- print(spat_conv_map.connTableRev)
-for f_out=1,num_feats_out do
-  spat_conv_map.bias[{f_out}] = f_out / num_feats_out - 0.5
+local conv_map = nn.SpatialConvolutionMap(conn_table, filt_width, filt_height)
+for f_out = 1, num_feats_out do
+  conv_map.bias[{f_out}] = f_out / num_feats_out - 0.5
 end
--- print('Spatial Convolution Map Biases')
--- print(spat_conv_map.bias)
-num_filt = fan_in * num_feats_out
-sigma_x_sq = 1
-sigma_y_sq = 1
-for filt=1,num_filt do
-  for v=1,filt_height do
-    for u=1,filt_width do
-      x = u - 1 - (filt_width-1) / 2
-      y = v - 1 - (filt_height-1) / 2
-      spat_conv_map.weight[{filt, v, u}] = (filt / num_filt) * math.exp(-((x*x) / (2*sigma_x_sq) + 
-        (y*y) / (2*sigma_y_sq)))
+local num_filt = fan_in * num_feats_out
+local sigma_x_sq = 1
+local sigma_y_sq = 1
+for filt = 1, num_filt do
+  for v = 1, filt_height do
+    for u = 1, filt_width do
+      local x = u - 1 - (filt_width - 1) / 2
+      local y = v - 1 - (filt_height - 1) / 2
+      conv_map.weight[{filt, v, u}] =
+          (filt / num_filt) * math.exp(-((x * x) / (2 * sigma_x_sq) +
+          (y * y) / (2 * sigma_y_sq)))
     end
   end
 end
--- print('Spatial Convolution Map Weights')
--- print(spat_conv_map.weight)
-model:add(spat_conv_map)
-res = model:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_convolution_map.bin")
-print('Spatial Convolution Map result saved to test_data/spatial_convolution_map.bin')
+local conv_map_res = conv_map:forward(data_in)
+jtorch.saveTensor(conv_map_res, "test_data/spatial_convolution_map_res.bin")
 
 -- Test SpatialConvolution
-n_states_in = num_feats_in
-n_states_out = num_feats_out
-fan_in = n_states_in
-filt_width = 5
-filt_height = 5
-spat_conv = nn.SpatialConvolution(n_states_in, n_states_out, filt_width, filt_height)
-for f_out=1,num_feats_out do
-  spat_conv.bias[{f_out}] = f_out / num_feats_out - 0.5
-end
--- print('Spatial Convolution Biases')
--- print(spat_conv.bias)
-num_filt = num_feats_out * num_feats_in
-sigma_x_sq = 1
-sigma_y_sq = 1
-for fout=1,num_feats_out do
-  for fin=1,num_feats_in do
-    for v=1,filt_height do
-      for u=1,filt_width do
-        filt = (fout-1) * num_feats_out + (fin - 1) + 1
-        x = u - 1 - (filt_width-1) / 2
-        y = v - 1 - (filt_height-1) / 2
-        spat_conv.weight[{fout, fin, v, u}] = (filt / num_filt) * math.exp(-((x*x) / (2*sigma_x_sq) + 
-          (y*y) / (2*sigma_y_sq)))
-      end
-    end
-  end
-end
--- print('Spatial Convolution Weights')
--- print(spat_conv.weight)
-res = spat_conv:forward(model:get(2).output)
-jtorch.saveTensor(res, "test_data/spatial_convolution.bin")
-print('Spatial Convolution result saved to test_data/spatial_convolution.bin')
+local conv = nn.SpatialConvolution(num_feats_in, num_feats_out, filt_width,
+                                   filt_height)
+local conv_res = conv:forward(data_in)
+jtorch.saveTensor(conv_res, "test_data/spatial_convolution_res.bin")
+jtorch.saveModel(conv, "test_data/spatial_convolution_model.bin")
 
 -- Test SpatialConvolutionMM with padding
-padw = 6
-padh = 3
-spat_conv_mm = nn.SpatialConvolutionMM(n_states_in, n_states_out, filt_width, filt_height, 1, 1, padw, padh)
-spat_conv_mm.bias:copy(spat_conv.bias)
-spat_conv_mm.weight:copy(spat_conv.weight)
--- print('Spatial Convolution Weights')
--- print(spat_conv.weight)
-res = spat_conv_mm:forward(model:get(2).output)
-jtorch.saveTensor(res, "test_data/spatial_convolution_mm_padding.bin")
-print('Spatial Convolution result saved to test_data/spatial_convolution_mm_padding.bin')
+local padw = 6
+local padh = 3
+local conv_mm = nn.SpatialConvolutionMM(num_feats_in, num_feats_out, filt_width,
+                                        filt_height, 1, 1, padw, padh)
+local conv_mm_res = conv_mm:forward(data_in)
+jtorch.saveTensor(conv_mm_res, "test_data/spatial_convolution_mm_res.bin")
+jtorch.saveModel(conv_mm, "test_data/spatial_convolution_mm_model.bin")
 
 -- Test SpatialLPPooling
-pnorm = 2.0
-nstates = num_feats_out
-poolsize_u = 2
-poolsize_v = 2
-pooldw = 1
-pooldh = 1
-poolpadw = 1
-poolpadh = 1
-pool_stage = nn.SpatialLPPooling(nstates, poolsize_u, poolsize_v, poolsize_u, poolsize_v)
-model:add(pool_stage)
-res = model:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_lp_pooling.bin")
-print('Spatial LP Pooling result saved to test_data/spatial_lp_pooling.bin')
+local pnorm = 2.0
+local poolsize_u = 2
+local poolsize_v = 2
+local pooldw = 1
+local pooldh = 1
+local poolpadw = 1
+local poolpadh = 1
+local lp_pool = nn.SpatialLPPooling(num_feats_in, poolsize_u, poolsize_v,
+                                    poolsize_u, poolsize_v)
+local lp_pool_res = lp_pool:forward(data_in)
+jtorch.saveTensor(lp_pool_res, "test_data/spatial_lp_pooling_res.bin")
 
 -- Test SpatialMaxPooling
-model3 = nn.Sequential()
-max_pool_stage = nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsize_v)
-model3:add(max_pool_stage)
-res = model3:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_max_pooling.bin")
-print('Spatial Max Pooling result saved to test_data/spatial_max_pooling.bin')
+local max_pool = nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u,
+                                      poolsize_v)
+local max_pool_res = max_pool:forward(data_in)
+jtorch.saveTensor(max_pool_res, "test_data/spatial_max_pooling_res.bin")
 
 -- Test SpatialMaxPooling with padding and stride
-model3_1 = nn.Sequential()
-do
-  local kw = 4
-  local kh = 5;
-  local dw = 1;
-  local dh = 3;
-  local padw = 2;
-  local padh = 0;
-  max_pool_stage_1 = nn.SpatialMaxPooling(kw, kh, dw, dh, padw, padh)
-  model3_1:add(max_pool_stage_1)
-end
-res = model3_1:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_max_pooling_pad_stride.bin")
-print('Spatial Max Pooling result saved to test_data/spatial_max_pooling_pad_stride.bin')
+local kw = 4
+local kh = 5;
+local dw = 1;
+local dh = 3;
+local padw = 2;
+local padh = 0;
+local max_pool_stride = nn.SpatialMaxPooling(kw, kh, dw, dh, padw, padh)
+local max_pool_stride_res = max_pool_stride:forward(data_in)
+jtorch.saveTensor(max_pool_stride_res,
+                  "test_data/spatial_max_pooling_stride_res.bin")
 
--- Test SpatialSubtractiveNormalization
-model4 = nn.Sequential()
-normkernel = image.gaussian1D(7)
-print('Normalization Kernel1D')
-print(normkernel)
-norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
-model4:add(norm)
-res = model4:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_subtractive_normalization.bin")
-print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization.bin')
+-- Test SpatialSubtractiveNormalization 1D kernel
+local normkernel = image.gaussian1D(7)
+local sub_norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+local sub_norm_res = sub_norm:forward(data_in)
+jtorch.saveTensor(sub_norm_res,
+                  "test_data/spatial_subtractive_normalization_1d_res.bin")
 
-model4 = nn.Sequential()
-normkernel = image.gaussian(7)
-print('Normalization Kernel2D')
-print(normkernel)
-norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
-model4:add(norm)
-res = model4:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_subtractive_normalization_2d.bin")
-print('SpatialSubtractiveNormalization result saved to test_data/spatial_subtractive_normalization_2d.bin')
+-- Test SpatialSubtractiveNormalization 2D kernel
+local normkernel = image.gaussian(7)
+local sub_norm = nn.SpatialSubtractiveNormalization(num_feats_in, normkernel)
+local sub_norm_res = sub_norm:forward(data_in)
+jtorch.saveTensor(sub_norm_res,
+                  "test_data/spatial_subtractive_normalization_2d_res.bin")
 
--- Test SpatialDivisiveNormalization
-model5 = nn.Sequential()
-normkernel = image.gaussian1D(7)
-print('Normalization Kernel1D')
-print(normkernel)
-spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
-model5:add(spatial_div_norm)
-res = model5:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_divisive_normalization.bin")
-print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization.bin')
+-- Test SpatialDivisiveNormalization 1D kernel
+local normkernel = image.gaussian1D(7)
+local div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+local div_norm_res = div_norm:forward(data_in)
+jtorch.saveTensor(div_norm_res,
+                  "test_data/spatial_divisive_normalization_1d_res.bin")
 
-model5 = nn.Sequential()
-normkernel = image.gaussian(7)
-print('Normalization Kernel2D')
-print(normkernel)
-spatial_div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
-model5:add(spatial_div_norm)
-res = model5:forward(data_in)
-jtorch.saveTensor(res, "test_data/spatial_divisive_normalization_2d.bin")
-print('SpatialDivisiveNormalization result saved to test_data/spatial_divisive_normalization_2d.bin')
+-- Test SpatialDivisiveNormalization 2D kernel
+local normkernel = image.gaussian(7)
+local div_norm = nn.SpatialDivisiveNormalization(num_feats_in, normkernel)
+local div_norm_res = div_norm:forward(data_in)
+jtorch.saveTensor(div_norm_res,
+                  "test_data/spatial_divisive_normalization_2d_res.bin")
 
--- return spatial_div_norm.localstds
-
--- Test SpatialContrastiveNormalization  --> Doesn't work on blackbox (works on my PC)
-model6 = nn.Sequential()
-lena = image.scale(image.lena():float(), 32, 32)
+-- Test SpatialContrastiveNormalization
+local lena = image.scale(image.lena():float(), 32, 32)
 jtorch.saveTensor(lena, 'test_data/lena_image.bin')
-print('Saved lena to test_data/lena_image.bin')
-
-normkernel = torch.Tensor(7):fill(1)
-spatial_contrast_norm = nn.SpatialContrastiveNormalization(3, normkernel)
-model6:add(spatial_contrast_norm)
-res = model6:forward(lena)
-jtorch.saveTensor(res, 'test_data/spatial_contrastive_normalization.bin')
-print('Saved SpatialContrastiveNormalization result to test_data/spatial_contrastive_normalization.bin')
+local normkernel = torch.Tensor(7):fill(1)
+local cont_norm = nn.SpatialContrastiveNormalization(3, normkernel)
+local cont_norm_res = cont_norm:forward(lena)
+jtorch.saveTensor(cont_norm_res,
+                  'test_data/spatial_contrastive_normalization_res.bin')
 
 -- Test Linear
-model2 = nn.Sequential()
-lin_size = num_feats_in * width * height
-lin_size_out = 20
-model2:add(nn.Reshape(lin_size))
-lin_stage = nn.Linear(lin_size, lin_size_out)
-for n=1,lin_size do
-  for m=1,lin_size_out do
-    k = (m-1) * lin_size + (n-1) + 1
-    lin_stage.weight[{m,n}] = k / (lin_size * lin_size_out)
-  end
+local lin_size = num_feats_in * width * height
+local lin_size_out = 20
+local linear = nn.Sequential()
+linear:add(nn.Reshape(lin_size))
+linear:add(nn.Linear(lin_size, lin_size_out))
+local linear_res = linear:forward(data_in)
+jtorch.saveTensor(linear_res, "test_data/linear_res.bin")
+jtorch.saveModel(linear, "test_data/linear_model.bin")
+
+-- Test Concat
+local concat_dim = 1  -- For now only dim 1 is supported
+local concat = nn.Concat(concat_dim)
+local num_tensors = 4
+for i = 1, num_tensors do
+  concat:add(nn.MulConstant(torch.rand(1):squeeze()))
 end
-for i=1,lin_size_out do
-  lin_stage.bias[{i}] = i / lin_size_out
+local concat_res = concat:forward(data_in)
+jtorch.saveTensor(concat_res, "test_data/concat_res.bin")
+jtorch.saveModel(concat, "test_data/concat_model.bin")
+
+-- Test Narrow
+local narrow_model = nn.Concat(concat_dim)
+assert(num_feats_in == 5)  -- otherwise this logic will break.
+local narrow_indices = {1, 2, 3, 4, 5, 1, 2, 3, 4}
+local narrow_lengths = {5, 4, 3, 2, 1, 4, 3, 2, 1}
+local narrow_dim = 1
+for i = 1, #narrow_indices do
+  narrow_model:add(nn.Narrow(narrow_dim, narrow_indices[i], narrow_lengths[i]))
 end
-model2:add(lin_stage)
-res = model2:forward(data_in)
-jtorch.saveTensor(res, "test_data/linear.bin")
-print('Linear result saved to test_data/linear.bin')
+local narrow_res = narrow_model:forward(data_in)
+jtorch.saveTensor(narrow_res, "test_data/narrow_res.bin")
+jtorch.saveModel(narrow_model, "test_data/narrow_model.bin")
 
 -- Test SpatialBatchNormalization
-nfeats_bn = 32
-eps = 1e-5
-momentum = 0.1
-affine = true
-batchNorm = nn.SpatialBatchNormalization(nfeats_bn, eps, momentum, affine)
+local nfeats_bn = 32
+local eps = 1e-5
+local momentum = 0.1
+local affine = true
+local batchNorm = nn.SpatialBatchNormalization(nfeats_bn, eps, momentum, affine)
 batchNorm.train = false
 batchNorm.bias:copy(torch.rand(nfeats_bn))
 batchNorm.weight:copy(torch.rand(nfeats_bn))
 batchNorm.running_mean:copy(torch.rand(nfeats_bn))
 batchNorm.running_std:copy(torch.rand(nfeats_bn))
-batchNormIn = torch.rand(1, nfeats_bn, 16, 8)
-batchNormOutAffine = batchNorm:forward(batchNormIn)
-jtorch.saveModel(batchNorm, 'test_data/batch_norm_affine.bin')
+local batchNormIn = torch.rand(1, nfeats_bn, 16, 8)
+local batchNormOutAffine = batchNorm:forward(batchNormIn)
+jtorch.saveModel(batchNorm, 'test_data/batch_norm_affine_model.bin')
 jtorch.saveTensor(batchNormIn[1], 'test_data/batch_norm_in.bin')
 jtorch.saveTensor(batchNormOutAffine[1], 'test_data/batch_norm_affine_out.bin')
 batchNorm.affine = false
-batchNormOut = batchNorm:forward(batchNormIn)
-jtorch.saveModel(batchNorm, 'test_data/batch_norm.bin')
+local batchNormOut = batchNorm:forward(batchNormIn)
+jtorch.saveModel(batchNorm, 'test_data/batch_norm_model.bin')
 jtorch.saveTensor(batchNormOut[1], 'test_data/batch_norm_out.bin')
-print('SpatialBatchNormalization results save to test_data (model and tensors)')
 
--- Test model
-test_model = nn.Sequential()
-n_states_in = num_feats_in
-n_states_out = num_feats_out
-fan_in = n_states_in
-filt_width = 5  -- Must be odd size!
-filt_height = 5
-test_model:add(nn.SpatialConvolution(n_states_in, n_states_out, filt_width, filt_height))
-test_model:add(nn.Tanh())
-test_model:add(nn.Threshold())
-test_model:add(nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u, poolsize_v))
-test_model:add(nn.SpatialConvolutionMM(n_states_out, n_states_out, filt_width, filt_height, 1, 1, math.floor(filt_width / 2), math.floor(filt_width / 2)))
-width_out = (width - filt_width + 1) / 2
-height_out = (height - filt_height + 1) / 2
-lin_size_in = n_states_out * height_out * width_out
-test_model:add(nn.Reshape(lin_size_in))
-test_model:add(nn.Linear(lin_size_in, 6))
-
-res = test_model:forward(data_in)
-jtorch.saveTensor(res, "test_data/test_model_result.bin")
-print('Test model result saved to test_data/test_model_result.bin')
-
--- Save the Test model
-jtorch.saveModel(test_model, "test_data/testmodel.bin")
 
 -- test SpatialUpSamplingNearest
-do
-  local model = nn.SpatialUpSamplingNearest(4)
-  local res = model:forward(data_in)
-  jtorch.saveTensor(res, "test_data/spatial_up_sampling_nearest.bin")
-  print('SpatialUpSamplingNearest result saved to test_data/spatial_up_sampling_nearest.bin')
-end
+local up = nn.SpatialUpSamplingNearest(4)
+local up_res = up:forward(data_in)
+jtorch.saveTensor(up_res, "test_data/spatial_up_sampling_nearest_res.bin")
+
+-- Test model
+local test_model = nn.Sequential()
+test_model:add(nn.SpatialConvolution(num_feats_in, num_feats_out, filt_width,
+                                     filt_height))
+test_model:add(nn.Tanh())
+test_model:add(nn.Threshold())
+test_model:add(nn.SpatialMaxPooling(poolsize_u, poolsize_v, poolsize_u,
+                                    poolsize_v))
+test_model:add(nn.SpatialConvolutionMM(num_feats_out, num_feats_out, filt_width,
+                                       filt_height, 1, 1,
+                                       math.floor(filt_width / 2),
+                                       math.floor(filt_width / 2)))
+local width_out = (width - filt_width + 1) / 2
+local height_out = (height - filt_height + 1) / 2
+local lin_size_in = num_feats_out * height_out * width_out
+test_model:add(nn.Reshape(lin_size_in))
+test_model:add(nn.Linear(lin_size_in, 6))
+local test_model_res = test_model:forward(data_in)
+jtorch.saveTensor(test_model_res, "test_data/test_model_res.bin")
+jtorch.saveModel(test_model, "test_data/test_model.bin")
 
 -- Profile convolutions
 do
@@ -319,11 +262,11 @@ do
   local pad = 5
   local imw = 90
   local imh = 60
-  local t_test = 5  
+  local t_test = 5
 
   local model = nn.SpatialConvolutionMM(fin, fout, kw, kh, 1, 1, pad):cuda()
-  local input = torch.ones(1,fin,imh,imw):cuda()
-  
+  local input = torch.ones(1, fin, imh, imw):cuda()
+
   print('Profiling convolution for ' .. t_test .. ' seconds')
 
   sys.tic()
@@ -336,6 +279,8 @@ do
     niters = niters + 1
     t_end = sys.toc()
   end
-  print('Execution time: ' .. 1/(niters / (t_end - t_start)) .. 
-    ' seconds per FPROP')
+  print('Execution time: ' .. 1 / (niters / (t_end - t_start)) ..
+        ' seconds per FPROP')
 end
+
+print('All data saved to disk.')

@@ -14,20 +14,24 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
+#include <random>
 #include <sstream>
+
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
-#include "jcl/jcl.h"  // For jcl::JCLBuffer
-#include "jtorch/torch_data.h"
+#include "jcl/opencl_buffer_data.h"
+#include "jcl/opencl_context.h"
 #include "jtorch/jtorch.h"
+#include "jtorch/torch_data.h"
 
 #define JTORCH_TENSOR_PRECISON 4
 
 namespace jcl {
 namespace threading {
 class ThreadPool;
-}
-}
+}  // namespace threading
+}  // namespace jcl
 
 #define TO_TENSOR_PTR(x)                                                 \
   ((x != nullptr && ((x)->type() == jtorch::TorchDataType::TENSOR_DATA)) \
@@ -42,15 +46,6 @@ static const char* kFillKernel =
 "      const float value) {     /* 1 */\n"
 "      const int x_out = get_global_id(0);\n"
 "      output[x_out] = value;\n"
-"    }";
-
-static const char* kDivKernel =
-"    /* output = output / div_val */\n"
-"    __kernel void Div(\n"
-"      const  float div_val,  /* 0 */\n"
-"      __global  float* output) {      /* 1 */\n"
-"      const int x_out = get_global_id(0);\n"
-"      output[x_out] /= div_val;\n"
 "    }";
 
 static const char* kAccumulateKernel =
@@ -107,9 +102,29 @@ static const char* kMulKernel =
 "      output[x_out] *= mul_val;\n"
 "    }";
 
+static const char* kAddScalarKernel =
+"    /* output = add_val + output */\n"
+"    __kernel void AddScalarKernel(\n"
+"      const  float add_val,  /* 0 */\n"
+"      __global  float* output) {      /* 1 */\n"
+"      const int x_out = get_global_id(0);\n"
+"      output[x_out] += add_val;\n"
+"    }";
+
+// Note: This Tensor class DOESN'T support non-contiguous tensors.  Updating
+// it to do so wouldn't be a huge amount of work, but I have not needed to
+// do any select or narrow operations on the inner dimensions, so I have
+// not implemented it.
+// TODO(tompson): Implement non-contiguous support!
 template <typename T>
 class Tensor : public TorchData {
  public:
+  // Default constructor that allocates a zero dimension tensor.
+  Tensor();
+  // Constructor to allocate a tensor of dimension dim. size is an array of
+  // sizes for each dimension. size[0] is the lowest (contiguous) dimension.
+  // Note that this is opposite to torch, where size(1) is the highest (outer)
+  // dimension.
   Tensor(const uint32_t dim, const uint32_t* size);
   ~Tensor() override;
 
@@ -119,13 +134,18 @@ class Tensor : public TorchData {
   void setData(const T* data);
   void getData(T* data) const;
 
-  // View returns a new view on the same object.  The caller owns the new
-  // memory (ie, it is transferred).
-  std::shared_ptr<Tensor<T>> view(const uint32_t dim, const uint32_t* size);
-
   const uint32_t dim() const { return dim_; }
   const uint32_t* size() const { return size_.get(); }
   const bool isSameSizeAs(const Tensor<T>& src) const;
+
+  // As per torch convention, resize does not allocate a new buffer if the
+  // requested size is smaller than (or equal to) the current size. Otherwise it
+  // will allocate a new buffer and copy over the elements. True is returned
+  // when the underlining storage changes (i.e. memory was allocated).
+  bool resize(const uint32_t dim, const uint32_t* size);
+
+  // Courtesy function for the above.
+  bool resizeAs(const Tensor<T>& src);
 
   // Print --> EXPENSIVE
   void print() override;  // print to std::cout
@@ -143,6 +163,8 @@ class Tensor : public TorchData {
   static void mul(Tensor<T>& x, float mul_value);
   // div: x = x / div_value
   static void div(Tensor<T>& x, float div_value);
+  // add: dst = x + add_value
+  static void add(Tensor<T>& x, float add_value);
   // accumulate: dst += src
   static void accumulate(Tensor<T>& dst, const Tensor<T>& src);
   // zero: x = vec(0)
@@ -161,30 +183,50 @@ class Tensor : public TorchData {
   // slowMean - This does a CPU copy because I haven't written a reduction
   // operator yet
   static float slowMean(const Tensor<T>& x);
+  // slowRand - This generates random numbers on the CPU then uploads them.
+  static std::shared_ptr<Tensor<T>> slowRand(const uint32_t dim,
+                                             const uint32_t* size);
 
   // Some tensor math operations that return new tensors
-  static Tensor<T>* clone(const Tensor<T>& x);
-  static Tensor<T>* gaussian1D(const int32_t kernel_size);  // sigma = size / 2
-  static Tensor<T>* gaussian(const int32_t kernel_size);
-  static Tensor<T>* loadFromFile(const std::string& file);
-  static void saveToFile(const Tensor<T>* tensor, const std::string& file);
+  static std::shared_ptr<Tensor<T>> clone(const Tensor<T>& x);
+  // for gaussian1D: sigma = size / 2
+  static std::shared_ptr<Tensor<T>> gaussian1D(const int32_t kernel_size);
+  static std::shared_ptr<Tensor<T>> gaussian(const int32_t kernel_size);
+  static std::shared_ptr<Tensor<T>> loadFromFile(const std::string& file);
+  static void saveToFile(const Tensor<T>& tensor, const std::string& file);
 
-  inline const jcl::JCLBuffer& storage() const { return storage_; }
+  // In selectOuterDim we do not fully support slicing tensors along any
+  // arbitrary dimension, but it is easy enough to select contiguous chunks.
+  // As per torch standard, select reduces dimension by 1.
+  static std::shared_ptr<Tensor<T>> selectOuterDim(const Tensor<T>& src,
+                                                   const uint32_t i);
+
+  // In narrowOuterDim we do not fully support slicing tensors along any
+  // arbitrary dimension, but it is easy enough to select contiguous chunks.
+  // As per torch standard, narrow does not reduce dimension by 1.
+  static std::shared_ptr<Tensor<T>> narrowOuterDim(const Tensor<T>& src,
+                                                   const uint32_t i,
+                                                   const uint32_t length);
+
+  // View returns a new view on the same object.  The caller owns the new
+  // memory (ie, it is transferred).
+  static std::shared_ptr<Tensor<T>> view(const Tensor<T>& src,
+                                         const uint32_t dim,
+                                         const uint32_t* size);
+
+  const std::shared_ptr<jcl::OpenCLBufferData> storage() const;
   inline uint32_t nelems() const;
-
-  uint32_t* calcStride() const;  // memory returned is owned by caller
+  std::unique_ptr<uint32_t[]> calcStride() const;
 
  protected:
-  jcl::JCLBuffer storage_;  // Internal data
+  std::shared_ptr<jcl::OpenCLBufferData> storage_;  // Internal data
   uint32_t dim_;
-  std::unique_ptr<uint32_t[]> size_;  // size_[0] is lowest contiguous dimension,
-                                      // size_[2] is highest dimension
-
-  Tensor();  // Default constructor used internally (in view function)
+  std::unique_ptr<uint32_t[]> size_;  // size_[0] is lowest contiguous dim,
+                                      // size_[2] is highest dim
 
   // Non-copyable, non-assignable.
-  Tensor(Tensor&);
-  Tensor& operator=(const Tensor&);
+  Tensor(const Tensor&) = delete;
+  Tensor& operator=(const Tensor&) = delete;
 };
 
 template <typename T>
@@ -194,7 +236,7 @@ Tensor<T>::Tensor(const uint32_t dim, const uint32_t* size) {
   memcpy(this->size_.get(), size, sizeof(this->size_[0]) * dim);
   storage_ = jtorch::cl_context->allocateBuffer(
       jcl::CLBufferTypeReadWrite,
-      nelems());  // Adds a reference to the reference count
+      nelems());
   zero(*this);
 }
 
@@ -204,7 +246,7 @@ Tensor<T>::Tensor() {
   // private).
   dim_ = 0;
   size_.reset(nullptr);
-  storage_ = (jcl::JCLBuffer)-1;
+  storage_ = nullptr;
 }
 
 template <typename T>
@@ -213,21 +255,74 @@ Tensor<T>::~Tensor() {
   // that you are not cleaning up your allocated tensors
   // before shutting down jtorch.
   RASSERT(jtorch::cl_context != nullptr);
-  jtorch::cl_context->releaseReference(storage_);
+  storage_ = nullptr;  // decrement ref count
 }
 
 template <typename T>
-uint32_t* Tensor<T>::calcStride() const {
-  uint32_t* stride = new uint32_t[dim_];
+const std::shared_ptr<jcl::OpenCLBufferData> Tensor<T>::storage() const {
+  return storage_;
+}
+
+template <typename T>
+bool Tensor<T>::resize(const uint32_t dim, const uint32_t* size) {
+  RASSERT(dim > 0);
+  uint32_t new_nelems = size[0];
+  for (uint32_t i = 1; i < dim; i++) {
+    new_nelems *= size[i];
+  }
+  bool new_alloc = false;
+  if (storage_ == nullptr || storage_->nelems() < new_nelems) {
+    // The user requested a larger tensor. We need to allocate a larger tensor
+    // and copy over what we have.
+    std::shared_ptr<jcl::OpenCLBufferData> new_storage =
+        jtorch::cl_context->allocateBuffer(jcl::CLBufferTypeReadWrite,
+                                           new_nelems);
+    if (storage_ != nullptr) {
+      cl_context->useKernelCStr(kCopyKernel, "Copy");
+      cl_context->setArg(0, storage_);     // input
+      cl_context->setArg(1, new_storage);  // ouptut
+      uint32_t dim = 1;
+      // The current view might be smaller than the old storage, so avoid
+      // copying too much data.
+      uint32_t nelem = nelems();
+      cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
+    }
+    storage_ = new_storage;
+    new_alloc = true;
+  } else {
+    // Otherwise, the size is smaller than the current storage, so just shrink
+    // the view.
+  }
+  if (dim_ != dim) {
+    size_.reset(new uint32_t[dim]);
+  }
+  dim_ = dim;
+  for (uint32_t i = 0; i < dim_; i++) {
+    size_[i] = size[i];
+  }
+  return new_alloc;
+}
+
+template <typename T>
+bool Tensor<T>::resizeAs(const Tensor<T>& src) {
+  return resize(src.dim_, src.size_.get());
+}
+
+template <typename T>
+std::unique_ptr<uint32_t[]> Tensor<T>::calcStride() const {
+  std::unique_ptr<uint32_t[]> stride(new uint32_t[dim_]);
   stride[0] = 1;
   for (uint32_t i = 1; i < dim_; i++) {
     stride[i] = stride[i - 1] * size_[i - 1];
   }
-  return stride;
+  return std::move(stride);
 }
 
 template <typename T>
 uint32_t Tensor<T>::nelems() const {
+  if (dim_ == 0) {
+    return 0;
+  }
   uint32_t nelem = 1;
   for (uint32_t i = 0; i < dim_; i++) {
     nelem *= size_[i];
@@ -238,10 +333,14 @@ uint32_t Tensor<T>::nelems() const {
 template <typename T>
 const bool Tensor<T>::isSameSizeAs(const Tensor<T>& src) const {
   if (dim_ != src.dim_) {
+    std::cout << "here" << std::endl;
     return false;
   }
   for (uint32_t i = 0; i < dim_; i++) {
     if (size_[i] != src.size_[i]) {
+      std::cout << "here" << std::endl;
+      std::cout << size_[i] << std::endl;
+      std::cout << src.size_[i] << std::endl;
       return false;
     }
   }
@@ -249,7 +348,8 @@ const bool Tensor<T>::isSameSizeAs(const Tensor<T>& src) const {
 }
 
 template <typename T>
-std::shared_ptr<Tensor<T>> Tensor<T>::view(const uint32_t dim,
+std::shared_ptr<Tensor<T>> Tensor<T>::view(const Tensor<T>& src,
+                                           const uint32_t dim,
                                            const uint32_t* size) {
   RASSERT(dim != 0);
   int32_t view_nelem = 1;
@@ -257,25 +357,29 @@ std::shared_ptr<Tensor<T>> Tensor<T>::view(const uint32_t dim,
     view_nelem *= size[i];
   }
 
-  RASSERT(view_nelem == nelems());  // Otherwise size mismatch
+  RASSERT(view_nelem == src.nelems());  // Otherwise size mismatch
 
   std::shared_ptr<Tensor<T>> return_header(new Tensor<T>());
   return_header->dim_ = dim;
   return_header->size_.reset(new uint32_t[dim]);
-  memcpy(return_header->size_.get(), size, sizeof(return_header->size_[0]) * dim);
-  return_header->storage_ = storage_;
-  jtorch::cl_context->addReference(storage_);
+  memcpy(return_header->size_.get(), size,
+         sizeof(return_header->size_[0]) * dim);
+  return_header->storage_ = src.storage_;  // Incruments ref count.
   return return_header;
 }
 
 template <typename T>
 void Tensor<T>::setData(const T* data) {
-  jtorch::cl_context->writeToBuffer(data, jtorch::deviceid, storage_, true);
+  RASSERT(dim_ != 0);
+  jtorch::cl_context->writeToBuffer(data, nelems(), jtorch::deviceid, storage_,
+                                    true);
 }
 
 template <typename T>
 void Tensor<T>::getData(T* data) const {
-  jtorch::cl_context->readFromBuffer(data, jtorch::deviceid, storage_, true);
+  RASSERT(dim_ != 0);
+  jtorch::cl_context->readFromBuffer(data, nelems(), jtorch::deviceid, storage_,
+                                     true);
 }
 
 template <typename T>
@@ -296,7 +400,9 @@ void Tensor<T>::print() {
   std::cout.setf(std::ios::showpos);
 #endif
 
-  if (dim_ == 1) {
+  if (dim_ == 0) {
+    std::cout << "  tensor[]" << std::endl;
+  } else if (dim_ == 1) {
     // Print a 1D tensor
     std::cout << "  tensor[*] =" << std::endl;
     if (fabsf((float)scale - 1.0f) > kEpsilon) {
@@ -338,21 +444,31 @@ void Tensor<T>::print() {
       }
     }
   } else {
+    RASSERT(dim_ > 2);
     // Print a nD tensor
-    int32_t odim = 1;
+    int32_t odim = 1;  // Number of outer dimensions greater than 2.
     for (uint32_t i = 2; i < dim_; i++) {
       odim *= size_[i];
     }
 
-    uint32_t* stride = calcStride();
+    const uint32_t upper_dim = dim_ - 2;
+    std::unique_ptr<uint32_t[]> upper_stride(new uint32_t[upper_dim]);
+    std::unique_ptr<uint32_t[]> upper_size(new uint32_t[upper_dim]);
+    upper_stride[0] = 1;
+    upper_size[0] = size_[2];
+    for (uint32_t i = 1; i < upper_dim; i++) {
+      upper_size[i] = size_[i + 2];
+      upper_stride[i] = upper_stride[i - 1] * upper_size[i - 1];
+    }
 
     for (int32_t i = 0; i < odim; i++) {
       std::cout << "  tensor[";
-      for (uint32_t cur_dim = dim_ - 1; cur_dim >= 2; cur_dim--) {
-        if (size_[cur_dim] == 1) {
+      for (int32_t cur_dim = upper_dim - 1; cur_dim >= 0; cur_dim--) {
+        if (upper_size[cur_dim] == 1) {
           std::cout << "1,";
         } else {
-          std::cout << (i % stride[cur_dim]) << ",";
+          std::cout << ((i / upper_stride[cur_dim]) % upper_size[cur_dim])
+                    << ",";
         }
       }
 
@@ -381,15 +497,14 @@ void Tensor<T>::print() {
         }
       }
     }
-
-    delete[] stride;
   }
   std::cout.precision(prec);
   std::cout << std::resetiosflags(std::ios_base::showpos);
   delete[] d;
 
   std::cout << "[jtorch.";
-  std::cout << jcl::JCL::CLDeviceToString(jtorch::cl_context->device());
+  std::cout << jcl::OpenCLContext::CLDeviceToString(
+      jtorch::cl_context->getDeviceType(jtorch::deviceid));
   std::cout << " of dimension ";
   for (int32_t i = (int32_t)dim_ - 1; i >= 0; i--) {
     std::cout << size_[i];
@@ -401,9 +516,9 @@ void Tensor<T>::print() {
 };
 
 template <typename T>
-Tensor<T>* Tensor<T>::gaussian1D(const int32_t kernel_size) {
+std::shared_ptr<Tensor<T>> Tensor<T>::gaussian1D(const int32_t kernel_size) {
   const uint32_t size = kernel_size;
-  Tensor<T>* ret = new Tensor<T>(1, &size);
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>(1, &size));
   const float sigma = 0.25f;
   const float amplitude = 1.0f;
   const float center = (float)kernel_size / 2.0f + 0.5f;
@@ -417,13 +532,13 @@ Tensor<T>* Tensor<T>::gaussian1D(const int32_t kernel_size) {
   }
   ret->setData(data);
   delete[] data;
-  return ret;
+  return std::shared_ptr<Tensor<T>>(ret);
 }
 
 template <typename T>
-Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
-  const uint32_t size[2] = {kernel_size, kernel_size};
-  Tensor<T>* ret = new Tensor<T>(2, size);
+std::shared_ptr<Tensor<T>> Tensor<T>::gaussian(const int32_t kernel_size) {
+  const uint32_t size[2] = {(uint32_t)kernel_size, (uint32_t)kernel_size};
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>(2, size));
   const float sigma = 0.25f;
   const float amplitude = 1.0f;
   const float center = (float)kernel_size / 2.0f + 0.5f;
@@ -442,11 +557,12 @@ Tensor<T>* Tensor<T>::gaussian(const int32_t kernel_size) {
 }
 
 template <typename T>
-Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
-  Tensor<T>* ret = new Tensor<T>(x.dim_, x.size_.get());
+  std::shared_ptr<Tensor<T>> Tensor<T>::clone(const Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>(x.dim_, x.size_.get()));
   cl_context->useKernelCStr(kCopyKernel, "Copy");
-  cl_context->setArg(0, x.storage());
-  cl_context->setArg(1, ret->storage());
+  cl_context->setArg(0, x.storage());  // input
+  cl_context->setArg(1, ret->storage());  // output
   uint32_t dim = 1;
   uint32_t nelem = x.nelems();
   cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
@@ -454,10 +570,79 @@ Tensor<T>* Tensor<T>::clone(const Tensor<T>& x) {
 }
 
 template <typename T>
+std::shared_ptr<Tensor<T>> Tensor<T>::selectOuterDim(const Tensor<T>& src,
+                                                     const uint32_t i) {
+  RASSERT(src.dim_ != 0);  // Can't select on empty tensors.
+  // For now, we don't support selecting scalars from vectors.
+  RASSERT(src.dim_ > 1);
+  RASSERT(i < src.size_[src.dim_ - 1]);
+
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>());  // Empty tensor.
+
+  // Calculate the return size.
+  ret->dim_ = src.dim_ - 1;
+  ret->size_.reset(new uint32_t[ret->dim_]);
+
+  // Copy size from dims 0 to (dim - 1).
+  for (uint32_t i = 0; i < ret->dim_; i++) {
+    ret->size_[i] = src.size_[i];
+  }
+
+  // Calculate the offset in memory.
+  std::unique_ptr<uint32_t[]> src_stride = src.calcStride();
+  uint32_t offset = src_stride[src.dim_ - 1] * i;
+
+  // Calculate the new size size.
+  const uint32_t new_nelems = ret->nelems();
+
+  ret->storage_ = src.storage_->createSubBuffer(new_nelems, offset);
+
+  return ret;
+}
+
+template <typename T>
+std::shared_ptr<Tensor<T>> Tensor<T>::narrowOuterDim(const Tensor<T>& src,
+                                                     const uint32_t i,
+                                                     const uint32_t length) {
+  RASSERT(length > 0); // Otherwise the output would be empty.
+  RASSERT(src.dim_ != 0);  // Can't narrow on empty tensors.
+  // For now, we don't support narrowing scalars from vectors.
+  RASSERT(src.dim_ > 1 || length > 1);
+  RASSERT(i < src.size_[src.dim_ - 1]);  // Make sure the start index fits.
+  // Make sure the whole chunk fits.
+  RASSERT(i + length - 1 < src.size_[src.dim_ - 1]);
+
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>());  // Empty tensor.
+
+  // Calculate the return size.
+  ret->dim_ = src.dim_;
+  ret->size_.reset(new uint32_t[ret->dim_]);
+
+  // Copy size, and set the outputer dimension to length.
+  for (uint32_t i = 0; i < ret->dim_; i++) {
+    ret->size_[i] = src.size_[i];
+  }
+  ret->size_[ret->dim_ - 1] = length;
+
+  // Calculate the offset in memory.
+  std::unique_ptr<uint32_t[]> src_stride = src.calcStride();
+  uint32_t offset = src_stride[src.dim_ - 1] * i;
+
+  // Calculate the new size size.
+  const uint32_t new_nelems = ret->nelems();
+
+  ret->storage_ = src.storage_->createSubBuffer(new_nelems, offset);
+
+  return ret;
+}
+
+template <typename T>
 void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
+  RASSERT(src.dim_ != 0);
+  RASSERT(dst.dim_ != 0);
   cl_context->useKernelCStr(kCopyKernel, "Copy");
-  cl_context->setArg(0, src.storage());
-  cl_context->setArg(1, dst.storage());
+  cl_context->setArg(0, src.storage());  // input
+  cl_context->setArg(1, dst.storage());  // output
   uint32_t dim = 1;
   uint32_t nelem = dst.nelems();
   cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
@@ -465,6 +650,9 @@ void Tensor<T>::copy(Tensor<T>& dst, const Tensor<T>& src) {
 
 template <typename T>
 void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
+  RASSERT(dst.dim_ != 0);
+  RASSERT(x.dim_ != 0);
+  RASSERT(y.dim_ != 0);
   cl_context->useKernelCStr(kAddKernel, "Add");
   cl_context->setArg(0, x.storage());
   cl_context->setArg(1, y.storage());
@@ -476,6 +664,9 @@ void Tensor<T>::add(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
 
 template <typename T>
 void Tensor<T>::sub(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
+  RASSERT(dst.dim_ != 0);
+  RASSERT(x.dim_ != 0);
+  RASSERT(y.dim_ != 0);
   cl_context->useKernelCStr(kSubKernel, "Sub");
   cl_context->setArg(0, x.storage());
   cl_context->setArg(1, y.storage());
@@ -487,6 +678,7 @@ void Tensor<T>::sub(Tensor<T>& dst, const Tensor<T>& x, const Tensor<T>& y) {
 
 template <typename T>
 void Tensor<T>::abs(Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
   cl_context->useKernelCStr(kAbsKernel, "Abs");
   cl_context->setArg(0, x.storage());
   uint32_t dim = 1;
@@ -496,6 +688,7 @@ void Tensor<T>::abs(Tensor<T>& x) {
 
 template <typename T>
 void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
+  RASSERT(x.dim_ != 0);
   cl_context->useKernelCStr(kMulKernel, "Mul");
   cl_context->setArg(0, mul_val);
   cl_context->setArg(1, x.storage());
@@ -506,8 +699,20 @@ void Tensor<T>::mul(Tensor<T>& x, float mul_val) {
 
 template <typename T>
 void Tensor<T>::div(Tensor<T>& x, float div_val) {
-  cl_context->useKernelCStr(kDivKernel, "Div");
-  cl_context->setArg(0, div_val);
+  RASSERT(x.dim_ != 0);
+  cl_context->useKernelCStr(kMulKernel, "Mul");
+  cl_context->setArg(0, 1.0f / div_val);
+  cl_context->setArg(1, x.storage());
+  uint32_t dim = 1;
+  uint32_t nelem = x.nelems();
+  cl_context->runKernel(jtorch::deviceid, dim, &nelem, false);
+}
+
+template <typename T>
+void Tensor<T>::add(Tensor<T>& x, float add_val) {
+  RASSERT(x.dim_ != 0);
+  cl_context->useKernelCStr(kAddScalarKernel, "AddScalarKernel");
+  cl_context->setArg(0, add_val);
   cl_context->setArg(1, x.storage());
   uint32_t dim = 1;
   uint32_t nelem = x.nelems();
@@ -516,6 +721,8 @@ void Tensor<T>::div(Tensor<T>& x, float div_val) {
 
 template <typename T>
 void Tensor<T>::accumulate(Tensor<T>& dst, const Tensor<T>& src) {
+  RASSERT(src.dim_ != 0);
+  RASSERT(dst.dim_ != 0);
   cl_context->useKernelCStr(kAccumulateKernel, "Accumulate");
   cl_context->setArg(0, src.storage());
   cl_context->setArg(1, dst.storage());
@@ -531,6 +738,7 @@ void Tensor<T>::zero(Tensor<T>& dst) {
 
 template <typename T>
 void Tensor<T>::fill(Tensor<T>& dst, float value) {
+  RASSERT(dst.dim_ != 0);
   cl_context->useKernelCStr(kFillKernel, "Fill");
   cl_context->setArg(0, dst.storage());
   cl_context->setArg(1, value);
@@ -541,6 +749,7 @@ void Tensor<T>::fill(Tensor<T>& dst, float value) {
 
 template <typename T>
 float Tensor<T>::slowSum(const Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
   std::unique_ptr<float[]> temp(new float[x.nelems()]);
   x.getData(temp.get());
   float sum = 0.0f;
@@ -552,6 +761,7 @@ float Tensor<T>::slowSum(const Tensor<T>& x) {
 
 template <typename T>
 float Tensor<T>::slowMax(const Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
   std::unique_ptr<float[]> temp(new float[x.nelems()]);
   x.getData(temp.get());
   float max = -std::numeric_limits<float>::infinity();
@@ -565,6 +775,7 @@ float Tensor<T>::slowMax(const Tensor<T>& x) {
 
 template <typename T>
 float Tensor<T>::slowMin(const Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
   std::unique_ptr<float[]> temp(new float[x.nelems()]);
   x.getData(temp.get());
   float min = std::numeric_limits<float>::infinity();
@@ -578,6 +789,7 @@ float Tensor<T>::slowMin(const Tensor<T>& x) {
 
 template <typename T>
 float Tensor<T>::slowMean(const Tensor<T>& x) {
+  RASSERT(x.dim_ != 0);
   std::unique_ptr<float[]> temp(new float[x.nelems()]);
   x.getData(temp.get());
   float mean = 0;
@@ -588,8 +800,8 @@ float Tensor<T>::slowMean(const Tensor<T>& x) {
 }
 
 template <typename T>
-Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
-  Tensor<T>* new_tensor = nullptr;
+std::shared_ptr<Tensor<T>> Tensor<T>::loadFromFile(const std::string& file) {
+  std::shared_ptr<Tensor<T>> new_tensor = nullptr;
   std::ifstream ifile(file.c_str(), std::ios::in | std::ios::binary);
   if (ifile.is_open()) {
     ifile.seekg(0, std::ios::beg);
@@ -602,7 +814,7 @@ Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
       ifile.read((char*)(&cur_size), sizeof(cur_size));
       size[dim - i - 1] = (uint32_t)cur_size;
     }
-    new_tensor = new Tensor<T>(dim, size);
+    new_tensor = std::shared_ptr<Tensor<T>>(new Tensor<T>(dim, size));
 
     T* data = new T[new_tensor->nelems()];
     ifile.read((char*)(data), sizeof(data[0]) * new_tensor->nelems());
@@ -620,19 +832,19 @@ Tensor<T>* Tensor<T>::loadFromFile(const std::string& file) {
 }
 
 template <typename T>
-void Tensor<T>::saveToFile(const Tensor<T>* tensor, const std::string& file) {
+void Tensor<T>::saveToFile(const Tensor<T>& tensor, const std::string& file) {
   std::ofstream ofile(file.c_str(), std::ios::out | std::ios::binary);
   if (ofile.is_open()) {
     // Now save the Tensor
-    int32_t dim = tensor->dim_;
+    int32_t dim = tensor.dim_;
     ofile.write((char*)(&dim), sizeof(dim));
     for (int32_t i = dim - 1; i >= 0; i--) {
-      int32_t cur_size = tensor->size_[i];
+      int32_t cur_size = tensor.size_[i];
       ofile.write((char*)(&cur_size), sizeof(cur_size));
     }
-    T* data = new T[tensor->nelems()];
-    tensor->getData(data);
-    ofile.write((char*)(data), sizeof(data[0]) * tensor->nelems());
+    T* data = new T[tensor.nelems()];
+    tensor.getData(data);
+    ofile.write((char*)(data), sizeof(data[0]) * tensor.nelems());
     delete[] data;
     ofile.close();
   } else {
@@ -640,6 +852,26 @@ void Tensor<T>::saveToFile(const Tensor<T>* tensor, const std::string& file) {
     std::cout << file << std::endl;
     RASSERT(false);
   }
+}
+
+template <typename T>
+std::shared_ptr<Tensor<T>> Tensor<T>::slowRand(const uint32_t dim,
+                                               const uint32_t* size) {
+  RASSERT(dim > 0);
+
+  std::shared_ptr<Tensor<T>> ret(new Tensor<T>(dim, size));
+  const uint32_t nelems = ret->nelems();
+
+  // Allocate the tensor on the CPU first.
+  std::default_random_engine generator;
+  std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+  std::unique_ptr<float[]> ret_cpu(new float[nelems]);
+  for (uint32_t i = 0; i < nelems; i++) {
+    ret_cpu[i] = distribution(generator);
+  }
+
+  ret->setData(ret_cpu.get());
+  return ret;
 }
 
 };  // namespace jtorch

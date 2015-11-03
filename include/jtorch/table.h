@@ -10,10 +10,11 @@
 #pragma once
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <memory>
 #include <vector>
+
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_data.h"
 
@@ -42,8 +43,8 @@ class Table : public TorchData {
   std::vector<std::shared_ptr<TorchData>> data_;  // Internal data
 
   // Non-copyable, non-assignable.
-  Table(Table&);
-  Table& operator=(const Table&);
+  Table(const Table&) = delete;
+  Table& operator=(const Table&) = delete;
 };
 
 };  // namespace jtorch

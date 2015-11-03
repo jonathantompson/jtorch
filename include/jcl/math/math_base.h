@@ -6,13 +6,13 @@
 //  This is where all the miscellaneous math functions go.  It's a little messy.
 //
 
-#include "jcl/math/int_types.h"
-
 #pragma once
 
 #include <algorithm>
 #include <stdexcept>
 #include <string>
+
+#include "jcl/math/int_types.h"
 
 namespace jcl {
 namespace math {
