@@ -13,6 +13,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <vector>
+
 #include "jcl/math/int_types.h"
 #include "jcl/threading/callback.h"
 #include "jtorch/torch_stage.h"
@@ -62,8 +63,8 @@ class SpatialLPPooling : public TorchStage {
   void cleanup();
 
   // Non-copyable, non-assignable.
-  SpatialLPPooling(SpatialLPPooling&);
-  SpatialLPPooling& operator=(const SpatialLPPooling&);
+  SpatialLPPooling(const SpatialLPPooling&) = delete;
+  SpatialLPPooling& operator=(const SpatialLPPooling&) = delete;
 };
 
 };  // namespace jtorch

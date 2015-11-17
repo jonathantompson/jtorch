@@ -12,10 +12,8 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
-#include "jtorch/torch_stage.h"
 #include "jcl/math/math_types.h"
+#include "jtorch/torch_stage.h"
 
 namespace jtorch {
 
@@ -40,8 +38,8 @@ class Reshape : public TorchStage {
   uint32_t outNElem() const;
 
   // Non-copyable, non-assignable.
-  Reshape(Reshape&);
-  Reshape& operator=(const Reshape&);
+  Reshape(const Reshape&) = delete;
+  Reshape& operator=(const Reshape&) = delete;
 };
 
 };  // namespace jtorch

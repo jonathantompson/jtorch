@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <vector>
+
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
@@ -40,8 +41,8 @@ class ParallelTable : public TorchStage {
   void initOutput();
 
   // Non-copyable, non-assignable.
-  ParallelTable(ParallelTable&);
-  ParallelTable& operator=(const ParallelTable&);
+  ParallelTable(const ParallelTable&) = delete;
+  ParallelTable& operator=(const ParallelTable&) = delete;
 };
 
 };  // namespace jtorch

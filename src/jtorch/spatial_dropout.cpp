@@ -1,9 +1,9 @@
 #include "jtorch/spatial_dropout.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
 #include "jtorch/jtorch.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -28,7 +28,7 @@ void SpatialDropout::init(std::shared_ptr<TorchData> input) {
     }
   }
   if (output == nullptr) {
-    output.reset(Tensor<float>::clone(*in));
+    output = Tensor<float>::clone(*in);
   }
 }
 

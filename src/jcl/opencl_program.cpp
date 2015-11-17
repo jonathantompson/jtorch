@@ -1,6 +1,7 @@
-#include <iostream>
 #include "jcl/opencl_program.h"
-#include "jcl/jcl.h"
+
+#include <iostream>
+
 #include "jcl/opencl_context.h"
 
 namespace jcl {
@@ -44,8 +45,8 @@ namespace jcl {
     buf = (char*)malloc(length+2);  // Allocate a buffer for the entire length 
                                     // of the file and a null terminator
     fseek(fptr, 0, SEEK_SET);  // Go back to the beginning of the file
-    fread(buf, length, 1, fptr);  // Read the contents of the file in to the
-                                  // buffer
+    size_t sz = fread(buf, length, 1, fptr);  // Read the contents of the file
+    static_cast<void>(sz);
     fclose(fptr);  // Close the file
     buf[length] = '\n'; 
     buf[length+1] = 0; // Null terminator
@@ -59,7 +60,7 @@ namespace jcl {
         1, std::make_pair(code_.get(), strlen(code_.get())));
     cl_int err;
     program_ = cl::Program(context, source, &err);
-    cl::CheckError(err);
+    CHECK_ERROR(err);
 
 #if defined(DEBUG) || defined(_DEBUG)
     std::cout << "\tBuilding program: " << filename_ << std::endl;
@@ -98,7 +99,7 @@ namespace jcl {
       std::cout << "ERROR: program_.build() failed." 
                 << cl::GetCLErrorEnumString(err) << std::endl;
       std::cout << "    Program Info: " << str << std::endl;
-      cl::CheckError(err);
+      CHECK_ERROR(err);
     }
   }
 

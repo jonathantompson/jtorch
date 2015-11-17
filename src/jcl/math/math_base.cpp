@@ -1,8 +1,9 @@
+#include "jcl/math/math_base.h"
+
 #include <assert.h>
-#include <stdlib.h>
 #include <cmath>
 #include <cstddef>
-#include "jcl/math/math_base.h"
+#include <stdlib.h>
 
 #define rand_r rand
 

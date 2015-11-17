@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
@@ -30,8 +28,8 @@ class Tanh : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  Tanh(Tanh&);
-  Tanh& operator=(const Tanh&);
+  Tanh(const Tanh&) = delete;
+  Tanh& operator=(const Tanh&) = delete;
 };
 
 };  // namespace jtorch

@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <stdint.h>
+
 #include "jtorch/torch_stage.h"
 
 namespace jtorch {
@@ -37,8 +38,8 @@ class JoinTable : public TorchStage {
   uint32_t dimension_;
 
   // Non-copyable, non-assignable.
-  JoinTable(JoinTable&);
-  JoinTable& operator=(const JoinTable&);
+  JoinTable(const JoinTable&) = delete;
+  JoinTable& operator=(const JoinTable&) = delete;
 };
 
 };  // namespace jtorch

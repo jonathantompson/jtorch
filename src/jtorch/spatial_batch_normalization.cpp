@@ -1,9 +1,9 @@
 #include "jtorch/spatial_batch_normalization.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
 #include "jtorch/jtorch.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl;
@@ -137,7 +137,7 @@ std::unique_ptr<TorchStage> SpatialBatchNormalization::loadFromFile(
     ret->setWeights(data.get());
 
     file.read((char*)(data.get()), sizeof(data[0]) * nfeats);
-    ret->setBiases(data.get()); 
+    ret->setBiases(data.get());
   }
 
   return std::unique_ptr<TorchStage>(std::move(ret));

@@ -7,10 +7,11 @@
 #pragma once
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <memory>
 #include <vector>
+
 #include "jcl/math/int_types.h"
 #include "jtorch/torch_stage.h"
 
@@ -36,8 +37,8 @@ class Sequential : public TorchStage {
   std::vector<std::unique_ptr<TorchStage>> network_;
 
   // Non-copyable, non-assignable.
-  Sequential(Sequential&);
-  Sequential& operator=(const Sequential&);
+  Sequential(const Sequential&) = delete;
+  Sequential& operator=(const Sequential&) = delete;
 };
 
 };  // namespace jtorch

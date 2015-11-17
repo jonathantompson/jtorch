@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <iomanip>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+
 #include "jcl/math/int_types.h"
 
 namespace jtorch {
@@ -32,8 +33,8 @@ class TorchData {
 
  protected:
   // Non-copyable, non-assignable.
-  TorchData(TorchData&);
-  TorchData& operator=(const TorchData&);
+  TorchData(const TorchData&) = delete;
+  TorchData& operator=(const TorchData&) = delete;
 };
 
 };  // namespace jtorch

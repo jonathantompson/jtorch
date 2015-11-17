@@ -1,8 +1,8 @@
 #include "jtorch/spatial_subtractive_normalization.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -158,15 +158,15 @@ SpatialSubtractiveNormalization::SpatialSubtractiveNormalization(
          !(kernel->dim() == 2 && kernel->size()[1] % 2 == 0));
 
   // Clone and normalize the input kernel
-  kernel_.reset(Tensor<float>::clone(*kernel.get()));
+  kernel_ = Tensor<float>::clone(*kernel.get());
   float sum = Tensor<float>::slowSum(*kernel_);
   Tensor<float>::div(*kernel_, sum);
 
   output = nullptr;
-  mean_coef_.reset(nullptr);
-  mean_pass1_.reset(nullptr);
-  mean_pass2_.reset(nullptr);
-  mean_.reset(nullptr);
+  mean_coef_ = nullptr;
+  mean_pass1_ = nullptr;
+  mean_pass2_ = nullptr;
+  mean_ = nullptr;
 }
 
 SpatialSubtractiveNormalization::~SpatialSubtractiveNormalization() {
@@ -175,10 +175,10 @@ SpatialSubtractiveNormalization::~SpatialSubtractiveNormalization() {
 
 void SpatialSubtractiveNormalization::cleanup() {
   output = nullptr;
-  mean_coef_.reset(nullptr);
-  mean_pass1_.reset(nullptr);
-  mean_pass2_.reset(nullptr);
-  mean_.reset(nullptr);
+  mean_coef_ = nullptr;
+  mean_pass1_ = nullptr;
+  mean_pass2_ = nullptr;
+  mean_ = nullptr;
 }
 
 void SpatialSubtractiveNormalization::init(std::shared_ptr<TorchData> input) {

@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <iostream>  // For std::cout
 #include <string>
+
 #include "jcl/threading/callback_queue_item.h"
 
 namespace jcl {

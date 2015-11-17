@@ -1,8 +1,8 @@
 #include "jtorch/reshape.h"
+
+#include <cstring>
+
 #include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -36,7 +36,7 @@ void Reshape::init(std::shared_ptr<TorchData> input) {
   int32_t nelems = outNElem();
   static_cast<void>(nelems);
   // Check the input size.
-  RASSERT(in->nelems() == nelems);
+  RASSERT(in->nelems() == static_cast<uint32_t>(nelems));
 
   if (output != nullptr) {
     Tensor<float>* out = TO_TENSOR_PTR(output.get());
@@ -47,8 +47,7 @@ void Reshape::init(std::shared_ptr<TorchData> input) {
   }
 
   if (output == nullptr) {
-    output =
-        in->view(odim_, osize_.get());  // rets header that uses same storage
+    output = Tensor<float>::view(*in, odim_, osize_.get());
   }
 }
 

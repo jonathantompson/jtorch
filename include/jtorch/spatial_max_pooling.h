@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
@@ -44,8 +42,8 @@ class SpatialMaxPooling : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialMaxPooling(SpatialMaxPooling&);
-  SpatialMaxPooling& operator=(const SpatialMaxPooling&);
+  SpatialMaxPooling(const SpatialMaxPooling&) = delete;
+  SpatialMaxPooling& operator=(const SpatialMaxPooling&) = delete;
 };
 
 };  // namespace jtorch

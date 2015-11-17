@@ -1,6 +1,7 @@
+#include "jcl/data_str/hash_funcs.h"  // for uint
+
 #include <cstring>  // For strlen
 #include <string>
-#include "jcl/data_str/hash_funcs.h"  // for uint
 
 namespace jcl {
 namespace data_str {

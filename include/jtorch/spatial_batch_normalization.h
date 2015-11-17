@@ -6,12 +6,9 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
-#include "jcl/jcl.h"  // For jcl::JCLBuffer
 
 namespace jtorch {
 
@@ -38,7 +35,7 @@ class SpatialBatchNormalization : public TorchStage {
   void setRunningMean(const float* running_mean);
   void setRunningStd(const float* running_std);
   Tensor<float>* running_mean() { return running_mean_.get(); }
-  Tensor<float>* running_std() { return running_std_.get(); } 
+  Tensor<float>* running_std() { return running_std_.get(); }
 
   static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
@@ -54,8 +51,9 @@ class SpatialBatchNormalization : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialBatchNormalization(SpatialBatchNormalization&);
-  SpatialBatchNormalization& operator=(const SpatialBatchNormalization&);
+  SpatialBatchNormalization(const SpatialBatchNormalization&) = delete;
+  SpatialBatchNormalization& operator=(const SpatialBatchNormalization&) =
+      delete;
 };
 
 };  // namespace jtorch

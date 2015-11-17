@@ -1,4 +1,5 @@
 #include "jcl/threading/thread_pool.h"
+
 #include "jcl/threading/thread.h"
 
 #if defined(WIN32) || defined(_WIN32)

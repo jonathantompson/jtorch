@@ -1,11 +1,11 @@
 #include "jtorch/spatial_contrastive_normalization.h"
-#include "jtorch/spatial_subtractive_normalization.h"
-#include "jtorch/spatial_divisive_normalization.h"
+
+#include <cstring>
+
 #include "jtorch/sequential.h"
+#include "jtorch/spatial_divisive_normalization.h"
+#include "jtorch/spatial_subtractive_normalization.h"
 #include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;

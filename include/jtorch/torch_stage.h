@@ -13,8 +13,8 @@
 #pragma once
 
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <memory>
 
 #include "jtorch/torch_data.h"
@@ -45,6 +45,9 @@ typedef enum {
   SPATIAL_CONVOLUTION_MM_STAGE = 20,
   SPATIAL_DROPOUT_STAGE = 21,
   SPATIAL_BATCH_NORMALIZATION_STAGE = 22,
+  CONCAT_STAGE = 23,
+  NARROW_STAGE = 24,
+  MUL_CONSTANT_STAGE = 25,
 } TorchStageType;
 
 class TorchStage {
@@ -68,8 +71,8 @@ class TorchStage {
   static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
 
   // Non-copyable, non-assignable.
-  TorchStage(TorchStage&);
-  TorchStage& operator=(const TorchStage&);
+  TorchStage(const TorchStage&) = delete;
+  TorchStage& operator=(const TorchStage&) = delete;
 };
 
 };  // namespace jtorch

@@ -1,7 +1,9 @@
+#include "jcl/threading/thread.h"
+
+#include <sstream>
 #include <stdio.h>  // perror
 #include <stdlib.h>  // exit
 #include <thread>
-#include <sstream>
 #if defined(WIN32) || defined(_WIN32)
   #include <windows.h>
 #elif defined(__APPLE__)
@@ -9,7 +11,6 @@
 #else
   #include <sys/prctl.h>
 #endif
-#include "jcl/threading/thread.h"
 
 using std::thread;
 

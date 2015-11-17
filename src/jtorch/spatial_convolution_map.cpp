@@ -1,8 +1,11 @@
 #include "jtorch/spatial_convolution_map.h"
-#include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
+
+#include <cstring>
+
 #include "jcl/threading/callback.h"
+#include "jcl/threading/thread.h"
 #include "jcl/threading/thread_pool.h"
+#include "jtorch/tensor.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -26,18 +29,15 @@ SpatialConvolutionMap::SpatialConvolutionMap(const uint32_t feats_in,
   input_cpu_.reset(nullptr);
 
   for (uint32_t i = 0; i < feats_out_ * fan_in_; i++) {
-    weights.push_back(
+    weights_.push_back(
         std::unique_ptr<float[]>(new float[filt_width_ * filt_height_]));
   }
   for (uint32_t i = 0; i < feats_out_; i++) {
-    conn_table.push_back(std::unique_ptr<int16_t[]>(new int16_t[fan_in_ * 2]));
+    conn_table_.push_back(std::unique_ptr<int16_t[]>(new int16_t[fan_in_ * 2]));
   }
-  biases.reset(new float[feats_out_]);
+  biases_.reset(new float[feats_out_]);
 
   tp_.reset(new ThreadPool(JTIL_SPATIAL_CONVOLUTION_MAP_NTHREADS));
-
-  std::cout << "WARNING: SPATIALCONVOLUTIONMAP IS SLOW." << std::endl;
-  std::cout << "--> ALL COMPUTATION IS DONE ON THE CPU!" << std::endl;
 }
 
 SpatialConvolutionMap::~SpatialConvolutionMap() { tp_->stop(); }
@@ -105,7 +105,7 @@ void SpatialConvolutionMap::forwardProp(std::shared_ptr<TorchData> input) {
 
     // Wait for all threads to finish
     std::unique_lock<std::mutex> ul(thread_update_lock_);  // Get lock
-    while (threads_finished_ != feats_out_) {
+    while (threads_finished_ != static_cast<int32_t>(feats_out_)) {
       not_finished_.wait(ul);
     }
     ul.unlock();  // Release lock
@@ -124,14 +124,14 @@ void SpatialConvolutionMap::forwardPropThread(const uint32_t outf) {
   // http://www.torch.ch/manual/nn/index#spatialconvolution
   // Set the output layer to the current bias
   for (uint32_t uv = outf * out_dim; uv < ((outf + 1) * out_dim); uv++) {
-    cur_output_[uv] = biases[outf];
+    cur_output_[uv] = biases_[outf];
   }
 
   // Now iterate through the connection table:
   for (uint32_t inf = 0; inf < fan_in_; inf++) {
-    uint32_t inf_index = (int32_t)conn_table[outf][inf * 2];
-    uint32_t weight_index = (int32_t)conn_table[outf][inf * 2 + 1];
-    float* cur_filt = weights[weight_index].get();
+    uint32_t inf_index = (int32_t)conn_table_[outf][inf * 2];
+    uint32_t weight_index = (int32_t)conn_table_[outf][inf * 2 + 1];
+    float* cur_filt = weights_[weight_index].get();
 
     // for each output pixel, perform the convolution over the input
     for (uint32_t outv = 0; outv < out_h; outv++) {
@@ -172,17 +172,17 @@ std::unique_ptr<TorchStage> SpatialConvolutionMap::loadFromFile(
 
   int32_t filt_dim = filt_width * filt_height;
   for (int32_t i = 0; i < n_output_features * filt_fan_in; i++) {
-    file.read((char*)(ret->weights[i].get()),
-              sizeof(ret->weights[i][0]) * filt_dim);
+    file.read((char*)(ret->weights_[i].get()),
+              sizeof(ret->weights_[i][0]) * filt_dim);
   }
 
   for (int32_t i = 0; i < n_output_features; i++) {
-    file.read((char*)(ret->conn_table[i].get()),
-              sizeof(ret->conn_table[i][0]) * filt_fan_in * 2);
+    file.read((char*)(ret->conn_table_[i].get()),
+              sizeof(ret->conn_table_[i][0]) * filt_fan_in * 2);
   }
 
-  file.read((char*)(ret->biases.get()),
-            sizeof(ret->biases[0]) * n_output_features);
+  file.read((char*)(ret->biases_.get()),
+            sizeof(ret->biases_[0]) * n_output_features);
   return std::unique_ptr<TorchStage>(std::move(ret));
 }
 

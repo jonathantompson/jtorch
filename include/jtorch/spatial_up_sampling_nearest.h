@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
+#include "jtorch/torch_data.h"
 #include "jtorch/torch_stage.h"
-#include "jcl/jcl.h"  // For jcl::JCLBuffer
 
 namespace jtorch {
 
@@ -40,8 +38,8 @@ class SpatialUpSamplingNearest : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialUpSamplingNearest(SpatialUpSamplingNearest&);
-  SpatialUpSamplingNearest& operator=(const SpatialUpSamplingNearest&);
+  SpatialUpSamplingNearest(const SpatialUpSamplingNearest&) = delete;
+  SpatialUpSamplingNearest& operator=(const SpatialUpSamplingNearest&) = delete;
 };
 
 };  // namespace jtorch

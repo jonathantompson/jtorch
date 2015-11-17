@@ -1,11 +1,12 @@
-#include <clBLAS.h>
-#include "jcl/cl_include.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/thread_pool.h"
-#include "jtorch/jtorch.h"
 #include "jtorch/spatial_convolution_mm.h"
+
+#include "jcl/cl_include.h"  // Must come before clBLAS.h
+#include <clBLAS.h>
+#include <cstring>
+#include <string>
+
 #include "jtorch/tensor.h"
+#include "jtorch/jtorch.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -208,7 +209,7 @@ void SpatialConvolutionMM::forwardProp(std::shared_ptr<TorchData> input) {
 
 std::unique_ptr<TorchStage> SpatialConvolutionMM::loadFromFile(
     std::ifstream& file) {
-  int32_t filt_width, filt_height, n_input_features, n_output_features, 
+  int32_t filt_width, filt_height, n_input_features, n_output_features,
     padw, padh;
   file.read((char*)(&filt_width), sizeof(filt_width));
   file.read((char*)(&filt_height), sizeof(filt_height));
@@ -323,7 +324,7 @@ std::string getErrorString(cl_int err) {
       return "clblasInsufficientMemVecY: The memory object for Vector Y is too "
              "small";
     default:
-      return jcl::JCL::getErrorString(err);
+      return jcl::OpenCLContext::getErrorString(err);
   }
 }
 
@@ -337,18 +338,16 @@ void THCudaBlas_gemm(void* state, char transa, char transb, size_t m, size_t n,
   clblasTranspose opb = convertTransToCublasOperation(transb);
 
   clblasOrder order = clblasColumnMajor;  // Not sure what this is
-  cl_command_queue queue =
-      (cl_command_queue)cl_context->queue(jtorch::deviceid);
+  cl::CommandQueue* cpp_queue = cl_context->getQueue(jtorch::deviceid);
+  cl_command_queue queue = (*cpp_queue)();
   cl_event event = nullptr;
-  cl_int err =
-      clblasSgemm(order, opa, opb, m, n, k, alpha,
-                  (cl_mem)cl_context->getCLMem(a->storage()),
-                  0,  // (offA)
-                  lda, (cl_mem)cl_context->getCLMem(b->storage()),
-                  0,  // (offB)
-                  ldb, beta, (cl_mem)cl_context->getCLMem(c->storage()),
-                  0,  // (offC)
-                  ldc, 1, &queue, 0, nullptr, &event);
+  cl_int err = clblasSgemm(order, opa, opb, m, n, k, alpha, a->storage()->mem(),
+                           0,  // (offA)
+                           lda, b->storage()->mem(),
+                           0,  // (offB)
+                           ldb, beta, c->storage()->mem(),
+                           0,  // (offC)
+                           ldc, 1, &queue, 0, nullptr, &event);
 
   // Non-blocking: Don't wait for events
   // err = clWaitForEvents( 1, &event );

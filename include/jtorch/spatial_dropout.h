@@ -9,12 +9,9 @@
 
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
 #include "jcl/math/int_types.h"
 #include "jcl/math/math_types.h"
 #include "jtorch/torch_stage.h"
-#include "jcl/jcl.h"  // For jcl::JCLBuffer
 
 namespace jtorch {
 
@@ -39,8 +36,8 @@ class SpatialDropout : public TorchStage {
   void init(std::shared_ptr<TorchData> input);
 
   // Non-copyable, non-assignable.
-  SpatialDropout(SpatialDropout&);
-  SpatialDropout& operator=(const SpatialDropout&);
+  SpatialDropout(const SpatialDropout&) = delete;
+  SpatialDropout& operator=(const SpatialDropout&) = delete;
 };
 
 };  // namespace jtorch

@@ -1,10 +1,9 @@
 #include "jtorch/c_add_table.h"
-#include "jtorch/tensor.h"
+
+#include <cstring>
+
 #include "jtorch/table.h"
-#include "jcl/threading/thread.h"
-#include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
-#include "jcl/jcl.h"
+#include "jtorch/tensor.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -46,7 +45,7 @@ void CAddTable::forwardProp(std::shared_ptr<TorchData> input) {
                                    TO_TENSOR_PTR((*in)(0).get())->size()));
   }
 
-  // TODO: We can probabily parallelize these calls accross multiple tensors
+  // TODO: We can probably parallelize these calls across multiple tensors
   Tensor<float>::copy(*TO_TENSOR_PTR(output.get()),
                       *TO_TENSOR_PTR((*in)(0).get()));
   for (uint32_t i = 1; i < in->tableSize(); i++) {

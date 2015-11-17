@@ -18,7 +18,7 @@ TEST(Simple, EnqueueAndDequeue) {
   
   for (int i = kTestBufferSize-1; i >= 0; i--) {
     q.enqueue(i);
-    EXPECT_EQ(q.size(), kTestBufferSize - i);
+    EXPECT_EQ((uint32_t)q.size(), (uint32_t)(kTestBufferSize - i));
     EXPECT_EQ(q.peak(), 10);  // enqueuing on end, while peak gets head
   }
   
@@ -53,7 +53,7 @@ TEST(Simple, ClearAndEnqueue) {
   // Make sure the data structure isn't corrupt by re-insertion of new values
   for (int i = kTestBufferSize-1; i >= 0; i--) {
     q.enqueue(i);
-    EXPECT_EQ(q.size(), kTestBufferSize - i);
+    EXPECT_EQ((uint32_t)q.size(), (uint32_t)kTestBufferSize - i);
   }
   
   for (int i = kTestBufferSize-1; i >= 0; i--) {

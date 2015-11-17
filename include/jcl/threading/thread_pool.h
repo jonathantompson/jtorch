@@ -14,11 +14,10 @@
 
 #pragma once
 
-#include <thread>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <thread>
 #include "jcl/threading/callback.h"
-#include "jcl/threading/thread_pool.h"
 #include "jcl/threading/callback_queue.h"
 
 namespace jcl {
@@ -79,8 +78,8 @@ class ThreadPool {
   void workerMain(const int thread_index);
 
   // Non-copyable, non-assignable.
-  ThreadPool(const ThreadPool&);
-  ThreadPool& operator=(const ThreadPool&);
+  ThreadPool(const ThreadPool&) = delete;
+  ThreadPool& operator=(const ThreadPool&) = delete;
 };
 
 };  // namespace threading

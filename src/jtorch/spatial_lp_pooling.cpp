@@ -1,8 +1,11 @@
 #include "jtorch/spatial_lp_pooling.h"
-#include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
+
+#include <cstring>
+
 #include "jcl/threading/callback.h"
+#include "jcl/threading/thread.h"
 #include "jcl/threading/thread_pool.h"
+#include "jtorch/tensor.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -21,9 +24,6 @@ SpatialLPPooling::SpatialLPPooling(const float p_norm,
   input_cpu_.reset(nullptr);
 
   tp_.reset(new ThreadPool(JTIL_SPATIAL_LP_POOLING_NTHREADS));
-
-  std::cout << "WARNING: SPATIALLPPOOLING IS SLOW." << std::endl;
-  std::cout << "--> ALL COMPUTATION IS DONE ON THE CPU!" << std::endl;
 }
 
 void SpatialLPPooling::cleanup() {

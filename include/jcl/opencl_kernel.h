@@ -11,16 +11,17 @@
 
 #pragma once
 
-
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
+
 #include "jcl/cl_include.h"
 #include "jcl/math/int_types.h"
 
 namespace jcl {
 
-struct OpenCLProgram;
+class OpenCLProgram;
 
 struct OpenCLKernel {
  public:
@@ -43,13 +44,13 @@ struct OpenCLKernel {
   void compileKernel();
 
   // Non-copyable, non-assignable.
-  OpenCLKernel(OpenCLKernel&);
-  OpenCLKernel& operator=(const OpenCLKernel&);
+  OpenCLKernel(const OpenCLKernel&) = delete;
+  OpenCLKernel& operator=(const OpenCLKernel&) = delete;
 };
 
 template <typename T>
 void OpenCLKernel::setArg(const uint32_t index, const T& val) {
-  cl::CheckError(kernel_.setArg<T>(index, val));
+  CHECK_ERROR(kernel_.setArg<T>(index, val));
 }
 
 };  // namespace jcl

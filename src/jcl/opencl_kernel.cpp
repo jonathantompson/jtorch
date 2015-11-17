@@ -1,8 +1,9 @@
-#include <iostream>
 #include "jcl/opencl_kernel.h"
-#include "jcl/opencl_program.h"
-#include "jcl/jcl.h"
+
+#include <iostream>
+
 #include "jcl/opencl_context.h"
+#include "jcl/opencl_program.h"
 
 namespace jcl {
 
@@ -20,12 +21,12 @@ namespace jcl {
   void OpenCLKernel::compileKernel() {
     cl_int err;
     kernel_ = cl::Kernel(program_->program(), kernel_name_.c_str(), &err);
-    cl::CheckError(err);
+    CHECK_ERROR(err);
   }
 
   void OpenCLKernel::setArg(const uint32_t index, const uint32_t size, 
     void* data) {
-    cl::CheckError(kernel_.setArg(index, size, data));
+    CHECK_ERROR(kernel_.setArg(index, size, data));
   }
 
 }  // namespace jcl

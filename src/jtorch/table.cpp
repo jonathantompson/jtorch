@@ -1,8 +1,6 @@
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <fstream>
 #include "jtorch/table.h"
+
+#include <iostream>
 
 namespace jtorch {
 

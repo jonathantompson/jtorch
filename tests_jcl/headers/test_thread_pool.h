@@ -66,9 +66,9 @@ TEST(ThreadPool, CreateAddManyAndStop) {
                                        &c, kCountStride);
     jcl::threading::Callback<void>* threadBody = 
       jcl::threading::MakeCallableMany(&tests::CounterThreadSafe::inc, &c);
-    for ( int i = 0; i < kNumTaskRequests; i ++)
+    for ( uint32_t i = 0; i < kNumTaskRequests; i ++)
       tp->addTask(threadBodyInc);
-    for ( int i = 0; i < kNumTaskRequests; i ++)
+    for ( uint32_t i = 0; i < kNumTaskRequests; i ++)
       tp->addTask(threadBody);
 
     // Request a stop by placing a stop request on the queue (to check that

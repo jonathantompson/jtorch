@@ -1,8 +1,11 @@
 #include "jtorch/spatial_divisive_normalization.h"
-#include "jtorch/tensor.h"
-#include "jcl/threading/thread.h"
+
+#include <cstring>
+
 #include "jcl/threading/callback.h"
+#include "jcl/threading/thread.h"
 #include "jcl/threading/thread_pool.h"
+#include "jtorch/tensor.h"
 
 using namespace jcl::threading;
 using namespace jcl::math;
@@ -159,14 +162,14 @@ SpatialDivisiveNormalization::SpatialDivisiveNormalization(
   RASSERT(kernel->size()[0] % 2 != 0 &&
          !(kernel->dim() == 2 && kernel->size()[1] % 2 == 0));
 
-  kernel_.reset(Tensor<float>::clone(*kernel));
+  kernel_ = Tensor<float>::clone(*kernel);
   kernel_norm_ = nullptr;  // Normalization is input size dependant
 
   output = nullptr;
-  std_coef_.reset(nullptr);
-  std_pass1_.reset(nullptr);
-  std_pass2_.reset(nullptr);
-  std_.reset(nullptr);
+  std_coef_ = nullptr;
+  std_pass1_ = nullptr;
+  std_pass2_ = nullptr;
+  std_ = nullptr;
 
   threshold_ = threshold;
 }
@@ -175,10 +178,10 @@ SpatialDivisiveNormalization::~SpatialDivisiveNormalization() { cleanup(); }
 
 void SpatialDivisiveNormalization::cleanup() {
   output = nullptr;
-  std_coef_.reset(nullptr);
-  std_pass1_.reset(nullptr);
-  std_pass2_.reset(nullptr);
-  std_.reset(nullptr);
+  std_coef_ = nullptr;
+  std_pass1_ = nullptr;
+  std_pass2_ = nullptr;
+  std_ = nullptr;
 }
 
 void SpatialDivisiveNormalization::init(std::shared_ptr<TorchData> input) {
@@ -204,7 +207,7 @@ void SpatialDivisiveNormalization::init(std::shared_ptr<TorchData> input) {
     const float n_feats = (float)in->size()[2];
 
     // Clone and normalize the input kernel
-    kernel_norm_.reset(Tensor<float>::clone(*kernel_));
+    kernel_norm_ = Tensor<float>::clone(*kernel_);
     float sum = Tensor<float>::slowSum(*kernel_norm_);
     float div_val = onedim_kernel ? (sum * sqrtf(n_feats)) : (sum * n_feats);
     Tensor<float>::div(*kernel_norm_, div_val);

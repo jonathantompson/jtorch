@@ -79,13 +79,13 @@ TEST(Creation, MakeAndExecuteMany) {
     jcl::threading::MakeCallableMany(&tests::CounterThreadSafe::inc, &c);
 
   // Run the callback on many threads
-  for (int i = 0; i < kNumExecuteThreads; i ++) {
+  for (uint32_t i = 0; i < kNumExecuteThreads; i ++) {
     tid[i] = MakeThread(threadBody);
     EXPECT_NEQ(jcl::threading::GetThreadID(&tid[i]), 0);
   }
 
   // Wait for them to execute
-  for (int i = 0; i < kNumExecuteThreads; i ++) {
+  for (uint32_t i = 0; i < kNumExecuteThreads; i ++) {
     tid[i].join();
   }
 
