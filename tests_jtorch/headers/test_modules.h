@@ -246,33 +246,42 @@ TEST(Modules, Linear) {
   EXPECT_TRUE(tester.testJTorchValue(model->output, "linear_res.bin"));
 }
 
- TEST(Modules, Concat) {
+TEST(Modules, Concat) {
   Tester tester(test_path);
 
   std::unique_ptr<jtorch::TorchStage> model =
       jtorch::TorchStage::loadFromFile(test_path + "concat_model.bin");
   model->forwardProp(tester.data_in);
   EXPECT_TRUE(tester.testJTorchValue(model->output, "concat_res.bin"));
- }
+}
 
- TEST(Modules, Narrow) {
+TEST(Modules, ConcatTable) {
+  Tester tester(test_path);
+
+  std::unique_ptr<jtorch::TorchStage> model =
+      jtorch::TorchStage::loadFromFile(test_path + "concat_table_model.bin");
+  model->forwardProp(tester.data_in);
+  EXPECT_TRUE(tester.testJTorchValue(model->output, "concat_table_res.bin"));
+} 
+
+TEST(Modules, Narrow) {
   Tester tester(test_path);
 
   std::unique_ptr<jtorch::TorchStage> model =
       jtorch::TorchStage::loadFromFile(test_path + "narrow_model.bin");
   model->forwardProp(tester.data_in);
   EXPECT_TRUE(tester.testJTorchValue(model->output, "narrow_res.bin"));
- }
+}
 
- TEST(Modules, Identity) {
-   Tester tester(test_path);
+TEST(Modules, Identity) {
+  Tester tester(test_path);
 
-   jtorch::Identity model;
-   const int32_t rand_size = 5;
-   std::shared_ptr<jtorch::Tensor<float>> rand(
-       jtorch::Tensor<float>::gaussian(rand_size));
-   model.forwardProp(rand);
-   EXPECT_EQ(model.output, rand);
+  jtorch::Identity model;
+  const int32_t rand_size = 5;
+  std::shared_ptr<jtorch::Tensor<float>> rand(
+      jtorch::Tensor<float>::gaussian(rand_size));
+  model.forwardProp(rand);
+  EXPECT_EQ(model.output, rand);
 }
 
 TEST(Modules, SpatialBatchNormalization) {

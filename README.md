@@ -23,6 +23,7 @@ jtorch.saveModel(model, "my_model.bin")
 The library also contains a CPP framework for loading it and doing the forward prop. See jtorch_test for more details of usage. It uses OpenCL for all GPU computing. The following stages have full implementations (without batch support):
 
 - CAddTable
+- ConcatTable
 - Identity
 - Linear
 - MulConstant
