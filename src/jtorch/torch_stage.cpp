@@ -8,6 +8,7 @@
 #include "jcl/opencl_context.h"
 #include "jtorch/c_add_table.h"
 #include "jtorch/concat.h"
+#include "jtorch/concat_table.h"
 #include "jtorch/identity.h"
 #include "jtorch/join_table.h"
 #include "jtorch/linear.h"
@@ -137,6 +138,9 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
       break;
     case MUL_CONSTANT_STAGE:
       node = MulConstant::loadFromFile(ifile);
+      break;
+    case CONCAT_TABLE_STAGE:
+      node = ConcatTable::loadFromFile(ifile);
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "

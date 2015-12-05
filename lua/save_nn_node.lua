@@ -42,6 +42,7 @@ dofile(jtorch.jtorchRoot .. '/lua/save_spatial_batch_normalization_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_concat_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_narrow_node.lua')
 dofile(jtorch.jtorchRoot .. '/lua/save_mul_constant_node.lua')
+dofile(jtorch.jtorchRoot .. '/lua/save_concat_table_node.lua')
 
 function jtorch._saveNNNode(node, ofile)
   -- Just send the node off to the correct routine depending on it's type
@@ -147,6 +148,9 @@ function jtorch._saveNNNode(node, ofile)
   elseif (class_str == 'nn.MulConstant') then
     ofile:writeInt(25)
     jtorch._saveMulConstantNode(node, ofile)
+  elseif (class_str == 'nn.ConcatTable') then
+    ofile:writeInt(26)
+    jtorch._saveConcatTableNode(node, ofile)
   else
      error('Node type ' .. class_str .. ' is not recognized.')
      return

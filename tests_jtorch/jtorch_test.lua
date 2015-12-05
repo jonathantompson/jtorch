@@ -232,6 +232,27 @@ local up = nn.SpatialUpSamplingNearest(4)
 local up_res = up:forward(data_in)
 jtorch.saveTensor(up_res, "test_data/spatial_up_sampling_nearest_res.bin")
 
+-- test ConcatTable
+-- Note: we'll use concat to concatenate the output tensors because the test
+-- framework requires a single tensor output.
+local concatTableModel = nn.Sequential()
+do
+  local concatTable = nn.ConcatTable()
+  local num_tensors = 4
+  for i = 1, num_tensors do
+    concatTable:add(nn.MulConstant(torch.rand(1):squeeze()))
+  end
+  concatTableModel:add(concatTable)
+  local concat = nn.Concat(1)
+  for i = 1, num_tensors do
+    concat:add(nn.SelectTable(i))
+  end
+  concatTableModel:add(concat)
+end
+local concatTableModel_res = concatTableModel:forward(data_in)
+jtorch.saveTensor(concatTableModel_res, "test_data/concat_table_res.bin")
+jtorch.saveModel(concatTableModel, "test_data/concat_table_model.bin")
+
 -- Test model
 local test_model = nn.Sequential()
 test_model:add(nn.SpatialConvolution(num_feats_in, num_feats_out, filt_width,

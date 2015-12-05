@@ -48,6 +48,7 @@ typedef enum {
   CONCAT_STAGE = 23,
   NARROW_STAGE = 24,
   MUL_CONSTANT_STAGE = 25,
+  CONCAT_TABLE_STAGE = 26,
 } TorchStageType;
 
 class TorchStage {
