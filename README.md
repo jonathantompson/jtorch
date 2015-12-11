@@ -77,12 +77,12 @@ So jtorch and clBLAS must exist at the same directory level.
         - Name = `OPENCL_LIB_DIR`, Value = C:\Program Files (x86)\AMD APP\lib\x86_64
 	- Also define the environment variable AMDAPPSDKROOT.
 - **FOR NVIDIA CARDS:**
-    - Download the CUDA Toolkit 7 - https://developer.nvidia.com/cuda-downloads and install it. Note, this has also been tested with V5.5 and I'm sure there won't be too many issues (if any) with versions newer than 7 since I don't use any late version OpenCL features.
+    - Download the CUDA Toolkit 7 - https://developer.nvidia.com/cuda-downloads and install it. Note, this has also been tested with V5.5 and V7.5.
     - Create windows environment variables (right click My Computer -> Properties -> Advanced System Settings -> Environment Variables -> System Variables -> New): 
         - Name = `OPENCL_INC_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include
         - Name = `OPENCL_LIB_DIR`, Value = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\lib\x64
 	- Also define the environment variables 'CUDA_INC_PATH' and 'CUDA_LIB_PATH' using the same values above.
-    - Now download the hpp header from http://www.khronos.org/registry/cl/api/1.2/cl.hpp and put it in C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\CL
+      ~~- Now download the hpp header from http://www.khronos.org/registry/cl/api/1.2/cl.hpp and put it in C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include\CL~~ Update, it looks like Toolkit 7.5 includes it.
 	- You may need to follow the instructions here: https://github.com/clMathLibraries/clBLAS/issues/117 (you need all the headers)
 - **Compiling the library:**
     - Open the cmake gui.
@@ -96,11 +96,13 @@ So jtorch and clBLAS must exist at the same directory level.
 
 ### MAC OS X / LINUX:
  - Just run cmake and then build (all frameworks should be included):
->> git clone git@github.com:jonathantompson/jtorch.git
->> cd jtorch; mkdir build; cd build
->> cmake ..
+```
+git clone git@github.com:jonathantompson/jtorch.git
+cd jtorch; mkdir build; cd build
+cmake ..
+make -j 8
+```
  - cl.hpp doesn't exist by default but there is a copy of it in the local directory opencl_cpp_header.
->> make -j 8
 
 ** Build and run jtorch **
 ---------------
