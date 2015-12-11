@@ -3,6 +3,7 @@ Instructions for compiling clBLAS on Windows 8.1 (Visual Studio 2012):
 
  0. Follow the OpenCL instructions in README.md
  1. git clone git@github.com:clMathLibraries/clBLAS.git
+ 1.1 Note: As of Dec 10th 2015 the master branch of the above repo is broken. Check out the develop branch.
  2. Open cmake gui (You need 2.8 or greater)
  3. "Browse Source" --> C:/path/to/clBLAS/src
  4. "Browse Build" --> C:/path/to/clBLAS/build
