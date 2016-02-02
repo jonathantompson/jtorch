@@ -1,7 +1,9 @@
 //
-//  reshape.h
+//  view.h
 //
-//  Created by Jonathan Tompson on 4/1/13.
+//  Created by Jonathan Tompson on 1/1/2016.
+//
+//  Partial support. We only support contiguous views where numel is same.
 //
 
 #pragma once
@@ -11,15 +13,14 @@
 
 namespace jtorch {
 
-class Reshape : public TorchStage {
+class View : public TorchStage {
  public:
   // Constructor / Destructor
-  // For 1D tensor: set sz1 = -1, for 2D tensor: set sz2 = -1
-  Reshape(const uint32_t dim, const uint32_t* size);
-  ~Reshape() override;
+  View(const uint32_t dim, const uint32_t* size);
+  ~View() override;
 
-  TorchStageType type() const override { return RESHAPE_STAGE; }
-  std::string name() const override { return "Reshape"; }
+  TorchStageType type() const override { return VIEW_STAGE; }
+  std::string name() const override { return "View"; }
   void forwardProp(std::shared_ptr<TorchData> input) override;
 
   static std::unique_ptr<TorchStage> loadFromFile(std::ifstream& file);
@@ -32,8 +33,8 @@ class Reshape : public TorchStage {
   uint32_t outNElem() const;
 
   // Non-copyable, non-assignable.
-  Reshape(const Reshape&) = delete;
-  Reshape& operator=(const Reshape&) = delete;
+  View(const View&) = delete;
+  View& operator=(const View&) = delete;
 };
 
 };  // namespace jtorch

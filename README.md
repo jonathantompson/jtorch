@@ -45,6 +45,7 @@ The library also contains a CPP framework for loading it and doing the forward p
 - SpatialUpSamplingNearest
 - Tanh
 - Threshold
+- View
 
 The following stages have partial implementations:
 - JoinTable --> Only joins along the top most dimension are allowed for now

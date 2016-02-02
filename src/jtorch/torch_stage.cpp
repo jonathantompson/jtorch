@@ -32,6 +32,7 @@
 #include "jtorch/tanh.h"
 #include "jtorch/threshold.h"
 #include "jtorch/transpose.h"
+#include "jtorch/view.h"
 
 namespace jtorch {
 
@@ -141,6 +142,9 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
       break;
     case CONCAT_TABLE_STAGE:
       node = ConcatTable::loadFromFile(ifile);
+      break;
+    case VIEW_STAGE:
+      node = View::loadFromFile(ifile);
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "
