@@ -48,10 +48,11 @@ The library also contains a CPP framework for loading it and doing the forward p
 - View
 
 The following stages have partial implementations:
-- JoinTable --> Only joins along the top most dimension are allowed for now
-- Transpose --> Just a pass through stage. Again, it just points to the previous stage's output.
 - Concat --> We can only concatenate along the outer dimension for now.
+- JoinTable --> Only joins along the top most dimension are allowed for now
 - Narrow --> We can only narrow along the outer dimension for now.
+- Select --> We can only select along the outer dimension for now.
+- Transpose --> Just a pass through stage. Again, it just points to the previous stage's output.
 
 **Compilation Overview**
 ------------------------

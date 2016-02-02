@@ -16,6 +16,7 @@
 #include "jtorch/narrow.h"
 #include "jtorch/parallel_table.h"
 #include "jtorch/reshape.h"
+#include "jtorch/select.h"
 #include "jtorch/select_table.h"
 #include "jtorch/sequential.h"
 #include "jtorch/spatial_batch_normalization.h"
@@ -145,6 +146,9 @@ std::unique_ptr<TorchStage> TorchStage::loadFromFile(std::ifstream& ifile) {
       break;
     case VIEW_STAGE:
       node = View::loadFromFile(ifile);
+      break;
+    case SELECT_STAGE:
+      node = Select::loadFromFile(ifile);
       break;
     default:
       std::cout << "TorchStage::loadFromFile() - ERROR: "

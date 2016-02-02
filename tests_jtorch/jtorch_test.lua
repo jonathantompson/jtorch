@@ -205,6 +205,18 @@ local narrow_res = narrow_model:forward(data_in)
 jtorch.saveTensor(narrow_res, "test_data/narrow_res.bin")
 jtorch.saveModel(narrow_model, "test_data/narrow_model.bin")
 
+-- Test Select
+local select_model = nn.Concat(concat_dim)
+assert(num_feats_in == 5)  -- otherwise this logic will break.
+local select_indices = {1, 2, 3, 4, 5, 1, 2, 3, 4}
+local select_dim = 1
+for i = 1, #select_indices do
+  select_model:add(nn.Select(narrow_dim, narrow_indices[i]))
+end
+local select_res = select_model:forward(data_in)
+jtorch.saveTensor(select_res, "test_data/select_res.bin")
+jtorch.saveModel(select_model, "test_data/select_model.bin")
+
 -- Test SpatialBatchNormalization
 local nfeats_bn = 32
 local eps = 1e-5

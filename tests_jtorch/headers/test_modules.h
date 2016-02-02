@@ -273,6 +273,15 @@ TEST(Modules, Narrow) {
   EXPECT_TRUE(tester.testJTorchValue(model->output, "narrow_res.bin"));
 }
 
+TEST(Modules, Select) {
+  Tester tester(test_path);
+
+  std::unique_ptr<jtorch::TorchStage> model =
+      jtorch::TorchStage::loadFromFile(test_path + "select_model.bin");
+  model->forwardProp(tester.data_in);
+  EXPECT_TRUE(tester.testJTorchValue(model->output, "select_res.bin"));
+}
+
 TEST(Modules, Identity) {
   Tester tester(test_path);
 
