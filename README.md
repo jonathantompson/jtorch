@@ -1,4 +1,4 @@
-**jtorch - Jonathan's Torch7 Utility Library (C++, OpenCL)**
+**jtorch - An OpenCL Torch Utility Library**
 ---------
 ---------
 
